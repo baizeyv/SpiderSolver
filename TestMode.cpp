@@ -88,7 +88,6 @@ void TestMode::setup()
                     std::cout << *vita_test_solver->current_state << std::endl;
                     return;
                 }
-                // TODO:
             }
             else
             {

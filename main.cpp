@@ -4,8 +4,6 @@
 #include "Const.h"
 #include "cxxopts.h"
 #include "Poker.h"
-#include "Solver.h"
-#include "State.h"
 #include "TestMode.h"
 
 void handle_signal(int signal)
