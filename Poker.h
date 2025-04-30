@@ -1,0 +1,60 @@
+﻿//
+// Created by baizeyv on 4/29/2025.
+//
+
+#ifndef POKER_H
+#define POKER_H
+#include <random>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "Card.h"
+
+
+class Poker {
+public:
+    /**
+     * * 牌局标识符 (play valve -> seed || vita -> level string)
+     */
+    std::string mark;
+
+    /**
+     * * 花色数量
+     */
+    int suitCount;
+
+    Poker(int seed, int suit_count);
+
+    Poker(std::string asVitaLevel);
+
+    std::string get_string() const;
+
+    friend std::ostream& operator<<(std::ostream& out, const Poker& poker);
+
+private:
+
+    std::unordered_map<char, int> vita_char_map;
+
+    static std::vector<Card> generate_deck(int seed, int suitCount);
+
+    // static std::vector<Card> vita_level_convert_to_poker(const std::string &vitaLevel, const Poker* poker);
+    //
+    // static int vita_char_to_card_value(char c, Poker* &poker);
+
+    static char card_value_to_char(int x);
+
+    static Card build_card(int suit, int value);
+
+
+public:
+    /**
+     * * 牌堆
+     */
+    std::vector<Card> cards;
+
+};
+
+
+
+#endif //POKER_H

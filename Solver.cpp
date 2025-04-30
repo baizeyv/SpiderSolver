@@ -1,0 +1,280 @@
+﻿//
+// Created by baizeyv on 4/29/2025.
+//
+
+#include "Solver.h"
+
+#include <algorithm>
+#include <iostream>
+#include <ranges>
+
+std::vector<State *> Solver::take_a_step(State *state, Solver *solver) {
+    std::unordered_set<State *, StatePtrHash, StatePtrEqual> results;
+    for (size_t i = 0; i < state->visibleCards.size(); i ++) {
+        // # find all the movable cards
+        Card* first = nullptr;
+        auto movableCards = find_movable_card_in_column(state->visibleCards[i], first);
+        if (!movableCards.empty()) {
+            // # 尝试移动
+            auto newStates = move_movable_cards(movableCards, i, state, solver);
+            for (auto & item: newStates) {
+                if (!state_exists(results, item))
+                    results.insert(item);
+                else
+                    delete item;
+            }
+        }
+    }
+    // # 添加发牌的可能
+    constexpr std::vector<Card*> tmp;
+    auto newState = create_new_state(state, tmp, -1, -1);
+    bool playDeckFlag = newState->play_deck();
+    if (!playDeckFlag)
+        return sort(results);
+    if (!state_exists(results, newState))
+        results.insert(newState);
+    else
+        delete newState;
+    return sort(results);
+}
+
+std::vector<Card* > Solver::find_movable_card_in_column(
+    std::vector<Card* > &column,
+    Card* &firstCard) {
+    std::vector<Card* > result;
+    if (column.empty())
+        return result;
+    if (firstCard == nullptr) {
+        // # 第一张牌指针为空指针
+        if (column.size() == 1) {
+            // # 此时只有一张可见的牌,则可移动的也就这一张
+            result.push_back(column[0]);
+            return result;
+        }
+        // # 可见牌数>1
+        result.push_back(column[0]);
+        std::vector<Card* > tail;
+        for (size_t i = 1; i < column.size(); i++) {
+            tail.push_back(column[i]);
+        }
+        for (const auto list = find_movable_card_in_column(tail, column[0]); auto &card: list) {
+            result.push_back(card);
+        }
+        return result;
+    }
+    // # 迭代调用
+    // # 花色相同且值差为1,此时可以多移动一张
+    if (column[0]->suit == firstCard->suit && column[0]->value == firstCard->value + 1) {
+        result.push_back(column[0]);
+        std::vector<Card* > tail;
+        for (size_t i = 1; i < column.size(); i++) {
+            tail.push_back(column[i]);
+        }
+        for (const auto list = find_movable_card_in_column(tail, column[0]); auto &card: list) {
+            result.push_back(card);
+        }
+        return result;
+    }
+    return result;
+}
+
+std::vector<State*> Solver::move_movable_cards(const std::vector<Card*> &movableCards,
+    const int &fromIndex, State* &state, Solver* &solver) {
+    // # 最终结果Set
+    std::unordered_set<State*, StatePtrHash, StatePtrEqual> result;
+    for (int column = 0; column < state->visibleCards.size(); column++) { // # 遍历每一列
+        if (column == fromIndex) // # 从自身移动到自身,剪枝
+            continue;
+        if (state->is_blank(column)) { // # 当前状态的column目标列为空
+            if (!solver->special_filter) {
+                // # 没有启动特殊过滤器时
+                for (size_t i = movableCards.size(); i >= 1; i --) {
+                    // # 判断是否是空列全部到另一个空列
+                    if (i == movableCards.size()) {
+                        // # 全移动的情况
+                        if (state->visibleCards[fromIndex].size() + state->hiddenCards[fromIndex].size() == i && state->is_blank(column)) {
+                            continue;
+                        }
+                    }
+                    std::vector cards(movableCards.begin(), movableCards.begin() + i);
+                    if (!state->visibleCards[column].empty() && !cards.empty() && state->visibleCards[column][0]->value == cards.back()->value + 1) {
+                        // # 可以放到目标列 (符合差值为1的条件)
+                        auto newState = create_new_state(state, cards, fromIndex, column);
+                        if (!state_exists(result, newState))
+                            result.insert(newState);
+                        else
+                            delete newState;
+                    }
+                }
+            } else {
+                // # 启动了过滤器了
+                if (movableCards.size() == state->visibleCards[fromIndex].size() && state->hiddenCards[fromIndex].size() == 0) {
+                    // # 当前列没有hidden的牌了，并且要全部移动到另一个空列的情况,不添加
+                } else {
+                    auto newState = create_new_state(state, movableCards, fromIndex, column);
+                    if (!state_exists(result, newState))
+                        result.insert(newState);
+                    else
+                        delete newState;
+                }
+            }
+        } else {
+            // # 目标列不为空
+            for (size_t i = movableCards.size(); i >= 1; i --) {
+                std::vector<Card*> cards(movableCards.begin(), movableCards.begin() + i);
+                if (state->visibleCards[column][0]->value == cards.back()->value + 1) {
+                    // # 可以放到目标列 (符合差值为1的条件)
+                    auto newState = create_new_state(state, cards, fromIndex, column);
+                    if (!state_exists(result, newState))
+                        result.insert(newState);
+                    else
+                        delete newState;
+                }
+            }
+        }
+    }
+    std::vector<State*> vec(result.begin(), result.end());
+    return vec;
+}
+
+Solver::Solver(const int seed, const int suitCount): calc(0), depth(0), sync_end_flag(false), solved(false) {
+    poker = new Poker(seed, suitCount);
+    root_state = new State(poker);
+    // TODO: DELETE
+}
+
+Solver::Solver(const std::string &vitaLevel): calc(0), depth(0), sync_end_flag(false), solved(false) {
+    poker = new Poker(vitaLevel);
+    root_state = new State(poker);
+    // TODO: DELETE
+}
+
+Solver::~Solver() {
+    for (auto & state : all_states) {
+        delete state;
+    }
+    // ! root_state 也在 all_states 中,所以不需要重复释放
+    // if (root_state != nullptr) {
+    //     delete root_state;
+    // }
+    delete poker;
+}
+
+void Solver::test_dfs() {
+    depth_first_search_sync(root_state, [](){}, "", 0, false, 1000000);
+}
+
+void Solver::depth_first_search_sync(State *&root, const std::function<void()> &onCompleted, const std::string &file,
+                                     const int id,
+                                     const bool exportNull, const int stepLimit) {
+
+    std::cout << "------------------------------------" << calc << std::endl;
+    // std::cout << *root << std::endl;
+
+    depth ++;
+    calc ++;
+    all_states.insert(root);
+    root->calc = calc;
+    // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
+    std::vector<State*> states;
+    auto no_filter_states = take_a_step(root, this);
+    for (auto& item: no_filter_states) {
+        if (!state_exists(all_states, item) && item->secondary_valuation(this)) {
+            states.push_back(item);
+        } else {
+            delete item;
+        }
+    }
+    // std::cout << std::to_string(states.size()) << " !!! " << std::endl;
+    if (calc >= stepLimit && stepLimit > 0) {
+        // # 超出步骤限制了
+        if (!file.empty() && exportNull) {
+            // TODO: Export null
+        }
+        sync_end_flag = true;
+        return;
+    }
+    // # 遍历所有没有试过的状态
+    for (auto & state: states) {
+        if (state->is_completed()) {
+            // # 完成游戏
+            std::cout << "Game Completed !!!" << std::endl;
+            solved = true;
+            onCompleted();
+            if (!file.empty()) {
+                // TODO: Export
+            }
+            sync_end_flag = true;
+            return;
+        }
+        for (auto & item: states) {
+            all_states.insert(item);
+        }
+        depth_first_search_sync(state, onCompleted, file, id, exportNull, stepLimit);
+        depth--;
+        if (sync_end_flag)
+            return;
+    }
+}
+
+State* Solver::create_new_state(const State* state, const std::vector<Card*> &cards,
+                                const int fromIndex, const int toIndex) {
+    const auto resultState = new State(state);
+    if (fromIndex < 0 || toIndex < 0)
+        return resultState;
+    resultState->move_card(fromIndex, cards.size(), toIndex);
+    return resultState;
+}
+
+bool Solver::state_exists(std::unordered_set<State *, StatePtrHash, StatePtrEqual> &results, State *&newState) {
+    return results.contains(newState);
+}
+
+std::vector<State *> Solver::sort(std::unordered_set<State *, StatePtrHash, StatePtrEqual> states) {
+    std::vector<State *> list(states.begin(), states.end());
+    // # 第一层,按Valuation降序排序
+    std::ranges::stable_sort(list, [](State* a, State* b) {
+        const int av = a->get_valuation();
+        const int bv = b->get_valuation();
+        // return av > bv;
+        if (av > bv)
+            return true;
+        if (av < bv)
+            return false;
+        if (av == bv) {
+            const auto [af, ac, at, aa] = a->history[0];
+            const auto [bf, bc, bt, bb] = b->history[0];
+            if (af < 0 || ac < 0 || at < 0) {
+                // # a是发牌
+                return false;
+            }
+            if (bf < 0 || bc < 0 || bt < 0) {
+                // # b是发牌
+                return true;
+            }
+            if (af == bf) {
+                return at < bt;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    });
+    // # 第二层,再根据指定规则排序
+    std::ranges::stable_sort(list, [](State* a, State* b) {
+        auto getPriority = [](State* p) -> int {
+            if (!p->previous || p->get_suit_count() <= 1)
+                return std::numeric_limits<int>::min();
+            auto [from, count, to, collection] = p->history[0];
+            if (from < 0 || to < 0 || from < to)
+                return std::numeric_limits<int>::min();
+            const auto& prev = p->previous;
+            if (!prev->visibleCards[to].empty() && prev->visibleCards[from][0]->suit == prev->visibleCards[to][0]->suit) {
+                return std::numeric_limits<int>::max();
+            }
+            return std::numeric_limits<int>::min();
+        };
+        return getPriority(a) > getPriority(b);
+    });
+    return list;
+}
