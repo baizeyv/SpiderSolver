@@ -15,4 +15,8 @@ add_executable(spider main.cpp
         Helper.cpp
         Helper.h
         cxxopts.h
+        IMode.h
+        TestMode.cpp
+        TestMode.h
+        Const.h
 )

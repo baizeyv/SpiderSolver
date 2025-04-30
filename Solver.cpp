@@ -8,6 +8,8 @@
 #include <iostream>
 #include <ranges>
 
+#include "Const.h"
+
 std::vector<State *> Solver::take_a_step(State *state, Solver *solver) {
     std::unordered_set<State *, StatePtrHash, StatePtrEqual> results;
     for (size_t i = 0; i < state->visibleCards.size(); i ++) {
@@ -167,13 +169,13 @@ void Solver::test_dfs() {
 void Solver::depth_first_search_sync(State *&root, const std::function<void()> &onCompleted, const std::string &file,
                                      const int id,
                                      const bool exportNull, const int stepLimit) {
-
-    std::cout << "------------------------------------" << calc << std::endl;
+    // std::cout << "------------------------------------" << calc << std::endl;
     // std::cout << *root << std::endl;
 
     depth ++;
     calc ++;
     all_states.insert(root);
+    current_state = root;
     root->calc = calc;
     // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
     std::vector<State*> states;
@@ -198,7 +200,7 @@ void Solver::depth_first_search_sync(State *&root, const std::function<void()> &
     for (auto & state: states) {
         if (state->is_completed()) {
             // # 完成游戏
-            std::cout << "Game Completed !!!" << std::endl;
+            // std::cout << "Game Completed !!!" << std::endl;
             solved = true;
             onCompleted();
             if (!file.empty()) {
@@ -215,6 +217,11 @@ void Solver::depth_first_search_sync(State *&root, const std::function<void()> &
         if (sync_end_flag)
             return;
     }
+}
+
+void Solver::stop()
+{
+    sync_end_flag = true;
 }
 
 State* Solver::create_new_state(const State* state, const std::vector<Card*> &cards,

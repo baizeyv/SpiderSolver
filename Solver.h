@@ -4,8 +4,8 @@
 
 #ifndef SOLVER_H
 #define SOLVER_H
+#include <atomic>
 #include <functional>
-#include <set>
 #include <unordered_set>
 
 #include "State.h"
@@ -24,16 +24,11 @@ private:
     std::unordered_set<State*, StatePtrHash, StatePtrEqual> all_states;
 
     /**
-     * * 尝试求解总次数
-     */
-    int calc;
-
-    /**
      * * 求解深度
      */
     int depth;
 
-    bool sync_end_flag;
+    std::atomic<bool> sync_end_flag;
 
     static std::vector<State *> take_a_step(State* state, Solver* solver);
 
@@ -54,6 +49,13 @@ public:
      */
     bool special_filter = true;
 
+    State* current_state;
+
+    /**
+     * * 尝试求解总次数
+     */
+    int calc;
+
     bool solved;
 
     explicit Solver(int seed, int suitCount);
@@ -65,6 +67,8 @@ public:
     void test_dfs();
 
     void depth_first_search_sync(State* &root, const std::function<void()> &onCompleted, const std::string &file = "", int id = 0, bool exportNull = true, int stepLimit = -1);
+
+    void stop();
 
     /**
      * * 创建新的Poker状态

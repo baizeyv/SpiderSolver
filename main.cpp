@@ -1,20 +1,24 @@
 #include <csignal>
 #include <iostream>
 
+#include "Const.h"
 #include "cxxopts.h"
 #include "Poker.h"
 #include "Solver.h"
 #include "State.h"
+#include "TestMode.h"
 
-void handle_signal(int signal) {
-    if (signal == SIGINT) {
+void handle_signal(int signal)
+{
+    if (signal == SIGINT)
+    {
         std::cout << "\n 程序已被中断 (CTRL+C). Exiting..." << std::endl;
         exit(0);
     }
 }
 
-int main(int argc, char* argv[]) {
-
+int main(int argc, char* argv[])
+{
     // # 处理 CTRL+C 退出
     std::signal(SIGINT, handle_signal);
 
@@ -23,27 +27,31 @@ int main(int argc, char* argv[]) {
     // solver->test_dfs();
     // delete solver;
 
-    // system("cls");
+    system("cls");
+    spd::output_icon();
+
     cxxopts::Options options("spider", "Test Desc");
-    options.add_options()("h,help", "print help");
-    try {
+    options.add_options()("h,help", spd::HelpOptionsDescription)("t,test", "test mode");
+    try
+    {
         auto result = options.parse(argc, argv);
-        if (result.count("help")) {
+        if (result.count("help"))
+        {
             std::cout << options.help() << std::endl;
             return 0;
         }
-    } catch (const cxxopts::exceptions::exception e) {
+        else if (result.count("test"))
+        {
+            TestMode mode;
+            mode.setup();
+            mode.enter();
+            // TODO:
+        }
+    }
+    catch (const cxxopts::exceptions::exception e)
+    {
         std::cerr << "Error " << e.what() << std::endl;
     }
-
-    while (true) {
-        
-    }
-
-    // std::cout << "Count:" << argc << std::endl;
-    // for (size_t i = 0; i < argc; i ++) {
-    //     std::cout << argv[i] << std::endl;
-    // }
 
 
     return 0;

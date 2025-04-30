@@ -8,11 +8,15 @@
 #include <vector>
 
 
-class Helper {
+class Helper
+{
 public:
     static std::vector<std::string> split(const std::string& str, const std::string& delimiter);
+    static void ltrim(std::string& s);
+    static void rtrim(std::string& s);
+    static void trim(std::string& s);
+    static std::vector<std::string> parse_arguments(const std::string& str);
 };
-
 
 
 #endif //HELPER_H
