@@ -5,6 +5,8 @@
 #include "Poker.h"
 
 #include <algorithm>
+#include <iostream>
+#include <ostream>
 #include <random>
 #include <unordered_set>
 
@@ -18,17 +20,16 @@
 Poker::Poker(const int seed, const int suit_count) : suitCount(suit_count) {
     mark = std::to_string(seed);
     cards = generate_deck(seed, suit_count);
-    // TODO:
 }
 
-Poker::Poker(const std::string asVitaLevel) {
+Poker::Poker(const std::string& asVitaLevel) {
     mark = asVitaLevel;
 
-    auto array = Helper::split(asVitaLevel, ",1;");
+    const auto array = Helper::split(asVitaLevel, ",1;");
     // # 牌堆
     auto deck = array.back().substr(0, array.back().length() - 2);
 
-    std::string value = "";
+    std::string value;
     int idx = 0;
     // # 遍历10列
     for (int x = 0; x < 6; x ++) {
@@ -113,7 +114,6 @@ std::string Poker::get_string() const {
 }
 
 std::vector<Card> Poker::generate_deck(const int seed, const int suitCount) {
-    std::default_random_engine random(seed);
     std::vector<int> cards;
     for (int i = 0; i < 13; i ++) {
         for (int j = 1; j <= 8; j ++) {
@@ -121,7 +121,21 @@ std::vector<Card> Poker::generate_deck(const int seed, const int suitCount) {
             cards.push_back(i + 1 + tmp * 13);
         }
     }
-    std::ranges::shuffle(cards, random);
+
+    auto rds = Helper::get_randoms(seed, 104);
+    std::vector<std::pair<int, int>> key_vec;
+    for (size_t i = 0; i < cards.size(); i ++)
+    {
+        auto random_value = rds[i];
+        key_vec.emplace_back(random_value, cards[i]);
+    }
+    std::ranges::stable_sort(key_vec);
+    for (size_t i = 0; i < cards.size(); i ++)
+    {
+        cards[i] = key_vec[i].second;
+    }
+
+    
     std::vector<Card> deck;
     for (const int card : cards) {
         if (card >= 1 && card <= 13) {

@@ -26,7 +26,7 @@ public:
 
     Poker(int seed, int suit_count);
 
-    Poker(std::string asVitaLevel);
+    Poker(const std::string& asVitaLevel);
 
     std::string get_string() const;
 

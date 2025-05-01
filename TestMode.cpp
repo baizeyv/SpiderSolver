@@ -130,6 +130,60 @@ void TestMode::setup()
         // TODO:
     }));
 
+    arg_commands->insert(std::make_pair("view", [this](const std::string& args)
+    {
+        // # 查看起始牌型
+        const auto params = Helper::parse_arguments(args);
+        if (params.size() > 3 || params.empty())
+        {
+            std::cout << spd::ViewTestArgumentsException << std::endl;
+            return;
+        }
+        if (params[0] == "vita")
+        {
+            if (params.size() != 2)
+            {
+                std::cout << spd::ViewTestArgumentsException << std::endl;
+                return;
+            }
+            if (params[1].length() != 136)
+            {
+                std::cout << spd::ViewVitaLevelLengthException << std::endl;
+                return;
+            }
+            else
+            {
+                const auto poker = new Poker(params[1]);
+                std::cout << *poker << std::endl;
+                delete poker;
+            }
+        }
+        else if (params[0] == "playvalve")
+        {
+            if (params.size() != 3)
+            {
+                std::cout << spd::ViewTestArgumentsException << std::endl;
+                return;
+            }
+            if (int seed, suit; Helper::try_parse_int(params[1], seed) && Helper::try_parse_int(params[2], suit))
+            {
+                const auto poker = new Poker(seed, suit);
+                std::cout << *poker << std::endl;
+                delete poker;
+            }
+            else
+            {
+                std::cout << spd::ViewSpdSeedException << std::endl;
+                return;
+            }
+        }
+        else
+        {
+            std::cout << spd::ViewTestOptionsException << std::endl;
+            return;
+        }
+    }));
+
     // #####################################################
 
     commands->insert(std::make_pair("exit", [this]()
@@ -146,6 +200,10 @@ void TestMode::setup()
     {
         system("cls");
         spd::output_icon();
+    }));
+    commands->insert(std::make_pair("help", [this]()
+    {
+        // TODO:
     }));
     // TODO:
 }
