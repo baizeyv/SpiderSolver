@@ -11,7 +11,9 @@ namespace spd
     static std::string HelpOptionsDescription = "help desc"; // TODO:
     static std::string UnknowCommand = "WARNING(SPD30001): [Unknow Command] -> ";
     static std::string VitaTestArgumentsException = "ERROR(SPD40000): [Vita Test Solve Arguments Error]";
+    static std::string PlayValveTestArgumentsException = "ERROR(SPD40000): [PlayValve Test Solve Arguments Error]";
     static std::string VitaTestLevelLengthException = "ERROR(SPD40001): [Vita Test Solve Arguments Level String Length Error]";
+    static std::string PlayValveTestOptionsException = "ERROR(SPD40001): [PlayValve Test Solve Arguments String Error]";
     static std::string TaskTestArgumentsException = "ERROR(SPD40002): [Task Test Query Arguments Error]";
     static std::string StopTestArgumentsException = "ERROR(SPD40003): [Task Test Query Arguments Error]";
     static std::string TaskTestOptionsException = "ERROR(SPD40004): [Task Test Query Options Error]";
@@ -21,12 +23,19 @@ namespace spd
     static std::string ViewVitaLevelLengthException = "ERROR(SPD40001): [View Vita Arguments Level String Length Error]";
     static std::string ViewSpdSeedException = "ERROR(SPD40001): [View PlayValve Arguments Seed Error]";
     static std::string VitaTestWaitThread = "Wait Vita Test Thread End ...";
+    static std::string PlayValveTestWaitThread = "Wait PlayValve Test Thread End ...";
     static std::string VitaTestThreadEnd = "Vita Test Thread End";
+    static std::string PlayValveTestThreadEnd = "PlayValve Test Thread End";
     static std::string NoVitaTestTask = "No Vita Test Task";
+    static std::string NoPlayValveTestTask = "No PlayValve Test Task";
     static std::string VitaTestSolved = "Vita Test Solved -> ";
+    static std::string PlayValveTestSolved = "PlayValve Test Solved -> ";
     static std::string VitaTestSolving = "Vita Test Solving -> ";
+    static std::string PlayValveTestSolving = "Vita Test Solving -> ";
     static std::string VitaTestStart = "Vita Test Start -> ";
+    static std::string PlayValveTestStart = "PlayValve Test Start -> ";
     static std::string VitaTestRunning = "Vita Test Is Running!Please Stop It First By `stop vita`";
+    static std::string PlayValveTestRunning = "PlayValve Test Is Running!Please Stop It First By `stop vita`";
     static void output_icon()
     {
         std::cout <<

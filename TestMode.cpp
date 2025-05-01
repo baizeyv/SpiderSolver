@@ -12,7 +12,7 @@
 #include "Helper.h"
 #include "Solver.h"
 
-TestMode::TestMode() : is_input(true), vita_test_solver(nullptr)
+TestMode::TestMode() : is_input(true), vita_test_solver(nullptr), playvalve_test_solver(nullptr)
 {
 }
 
@@ -20,15 +20,22 @@ TestMode::~TestMode()
 {
     delete arg_commands;
     delete commands;
+    // # region vita test
     if (vita_test_solver)
-    {
         vita_test_solver->stop();
-    }
     if (vita_test_thread && vita_test_thread->joinable())
         vita_test_thread->join();
     delete vita_test_solver;
     if (vita_test_thread)
         vita_test_thread.reset();
+    // # region playvalve test
+    if (playvalve_test_solver)
+        playvalve_test_solver->stop();
+    if (playvalve_test_thread && playvalve_test_thread->joinable())
+        playvalve_test_thread->join();
+    delete playvalve_test_solver;
+    if (playvalve_test_thread)
+        playvalve_test_thread.reset();
 }
 
 void TestMode::setup()
@@ -64,6 +71,36 @@ void TestMode::setup()
             vita_test_thread_done = true;
         }));
     }));
+    
+    arg_commands->insert(std::make_pair("playvalve", [this](const std::string& args)
+    {
+        if (!playvalve_test_thread_done && playvalve_test_thread && playvalve_test_solver)
+        {
+            std::cout << spd::PlayValveTestRunning << std::endl;
+            return;
+        }
+        join(1); // # 终止上一个线程
+        const auto params = Helper::parse_arguments(args);
+        if (params.size() != 2)
+        {
+            std::cout << spd::PlayValveTestArgumentsException << std::endl;
+            return;
+        }
+        int seed, suit;
+        if (!Helper::try_parse_int(params[0], seed) || !Helper::try_parse_int(params[1], suit))
+        {
+            std::cout << spd::PlayValveTestOptionsException << std::endl;
+            return;
+        }
+        std::cout << spd::PlayValveTestStart << seed << " " << suit << std::endl;
+        playvalve_test_thread_done = false;
+        this->playvalve_test_thread = std::make_unique<std::thread>(std::thread([seed, suit, this]()
+        {
+            playvalve_test_solver = new Solver(seed, suit);
+            playvalve_test_solver->test_dfs();
+            playvalve_test_thread_done = true;
+        }));
+    }));
 
     arg_commands->insert(std::make_pair("query", [this](const std::string& args)
     {
@@ -97,7 +134,25 @@ void TestMode::setup()
         }
         else if (params[0] == "playvalve")
         {
-            // TODO:
+            if (playvalve_test_solver)
+            {
+                if (playvalve_test_solver->solved)
+                {
+                    std::cout << spd::PlayValveTestSolved << playvalve_test_solver->calc << std::endl;
+                    return;
+                }
+                else
+                {
+                    std::cout << spd::PlayValveTestSolving << playvalve_test_solver->calc << std::endl;
+                    std::cout << *playvalve_test_solver->current_state << std::endl;
+                    return;
+                }
+            }
+            else
+            {
+                std::cout << spd::NoPlayValveTestTask << std::endl;
+                return;
+            }
         }
         else
         {
@@ -127,7 +182,6 @@ void TestMode::setup()
             std::cout << spd::StopTestOptionsException << std::endl;
             return;
         }
-        // TODO:
     }));
 
     arg_commands->insert(std::make_pair("view", [this](const std::string& args)
@@ -203,9 +257,16 @@ void TestMode::setup()
     }));
     commands->insert(std::make_pair("help", [this]()
     {
-        // TODO:
+        std::cout << "You are in `TestMode(spider --test)` now." << std::endl
+        << "Commands:" << std::endl
+        << "    vita `level_string` -> Try to solve the Vita level." << std::endl
+        << "    playvalve `seed` `suit_count` -> Try to solve the PlayValve level." << std::endl
+        << "    query `vita | playvalve` -> Query the level currently being attempted to solve." << std::endl
+        << "    stop `vita | playvalve` -> Stop the level currently being attempted to solve." << std::endl
+        << "    view `vita` `vita_level_string` -> View the Vita level cards." << std::endl
+        << "    view `playvalve` `seed` `suit_count` -> View the PlayValve level cards." << std::endl
+        ;
     }));
-    // TODO:
 }
 
 void TestMode::enter()
@@ -283,6 +344,24 @@ void TestMode::join(int type)
             vita_test_thread->join();
             std::cout << spd::VitaTestThreadEnd << std::endl;
             vita_test_thread.reset();
+        }
+    }
+    if (type == 0 || type == 1)
+    {
+        if (playvalve_test_thread_done && playvalve_test_thread && playvalve_test_thread->joinable())
+        {
+            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            playvalve_test_thread->join();
+            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+        }
+        else if (!playvalve_test_thread_done && playvalve_test_thread)
+        {
+            if (playvalve_test_solver)
+                playvalve_test_solver->stop();
+            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            playvalve_test_thread->join();
+            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            playvalve_test_thread.reset();
         }
     }
 }
