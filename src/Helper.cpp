@@ -145,3 +145,12 @@ std::vector<int> Helper::get_randoms(const int seed, const int count)
     auto numbers = run_csharp_random_and_get_numbers(csharp_path, seed, count);
     return numbers;
 }
+
+void Helper::check_file_and_create_dir_when_needed(const std::string& file)
+{
+    std::filesystem::path p(file);
+    if (!std::filesystem::exists(p.parent_path()))
+    {
+        std::filesystem::create_directories(p.parent_path());
+    }
+}

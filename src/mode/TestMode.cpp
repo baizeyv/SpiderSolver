@@ -251,7 +251,7 @@ void TestMode::setup()
         join(0);
         is_input = false;
     }));
-    commands->insert(std::make_pair("clear", [this]()
+    commands->insert(std::make_pair("clear", []()
     {
         system("cls");
         spd::output_icon();

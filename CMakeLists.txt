@@ -23,4 +23,6 @@ add_executable(spider src/main.cpp
         src/exporter/Exporter.h
         src/data/LevelData.cpp
         src/data/LevelData.h
+        src/mode/DebugMode.cpp
+        src/mode/DebugMode.h
 )

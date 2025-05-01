@@ -5,6 +5,7 @@
 #ifndef CONST_H
 #define CONST_H
 #include <string>
+#include <bits/shared_ptr_atomic.h>
 
 namespace spd
 {
@@ -36,6 +37,10 @@ namespace spd
     static std::string PlayValveTestStart = "PlayValve Test Start -> ";
     static std::string VitaTestRunning = "Vita Test Is Running!Please Stop It First By `stop vita`";
     static std::string PlayValveTestRunning = "PlayValve Test Is Running!Please Stop It First By `stop vita`";
+
+    inline bool DebugOutput = false;
+    inline std::string OutputPath;
+    
     static void output_icon()
     {
         std::cout <<

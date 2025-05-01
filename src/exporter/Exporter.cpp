@@ -9,6 +9,7 @@
 #include <fstream>
 #include <utility>
 
+#include "../Helper.h"
 #include "../data/LevelData.h"
 
 Exporter::Exporter(std::string  file_path) : full_file_path(std::move(file_path))
@@ -23,11 +24,7 @@ void Exporter::export_csv(const int id, const State& state, bool is_null) const
     std::ostringstream oss;
     oss << data;
     auto content = oss.str();
-    std::filesystem::path p(full_file_path);
-    if (!std::filesystem::exists(p.parent_path()))
-    {
-        std::filesystem::create_directories(p.parent_path());
-    }
+    Helper::check_file_and_create_dir_when_needed(full_file_path);
     std::ofstream writer(full_file_path, std::ios::app);
     if (!std::filesystem::exists(full_file_path))
     {

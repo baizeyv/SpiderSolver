@@ -20,6 +20,7 @@ public:
     static std::vector<int> run_csharp_random_and_get_numbers(const std::string& exe_path, int seed, int count);
     static std::string get_current_exe_directory();
     static std::vector<int> get_randoms(int seed, int count);
+    static void check_file_and_create_dir_when_needed(const std::string& file);
 };
 
 
