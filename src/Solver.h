@@ -64,7 +64,7 @@ public:
 
     ~Solver();
 
-    void test_dfs();
+    void call_test_dfs();
 
     void depth_first_search_sync(State* &root, const std::function<void()> &onCompleted, const std::string &file = "", int id = 0, bool exportNull = true, int stepLimit = -1);
 

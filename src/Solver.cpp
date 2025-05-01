@@ -139,16 +139,16 @@ std::vector<State*> Solver::move_movable_cards(const std::vector<Card*> &movable
     return vec;
 }
 
-Solver::Solver(const int seed, const int suitCount): calc(0), depth(0), sync_end_flag(false), solved(false) {
+Solver::Solver(const int seed, const int suitCount): depth(0), sync_end_flag(false), current_state(nullptr), calc(0), solved(false)
+{
     poker = new Poker(seed, suitCount);
     root_state = new State(poker);
-    // TODO: DELETE
 }
 
-Solver::Solver(const std::string &vitaLevel): calc(0), depth(0), sync_end_flag(false), solved(false) {
+Solver::Solver(const std::string &vitaLevel): depth(0), sync_end_flag(false), current_state(nullptr), calc(0), solved(false)
+{
     poker = new Poker(vitaLevel);
     root_state = new State(poker);
-    // TODO: DELETE
 }
 
 Solver::~Solver() {
@@ -162,13 +162,14 @@ Solver::~Solver() {
     delete poker;
 }
 
-void Solver::test_dfs() {
+void Solver::call_test_dfs() {
     depth_first_search_sync(root_state, [](){}, "", 0, false, 1000000);
 }
 
-void Solver::depth_first_search_sync(State *&root, const std::function<void()> &onCompleted, const std::string &file,
+void Solver::depth_first_search_sync(State*& root, const std::function<void()>& onCompleted, const std::string& file,
                                      const int id,
-                                     const bool exportNull, const int stepLimit) {
+                                     const bool exportNull, const int stepLimit)
+{
     // std::cout << "------------------------------------" << calc << std::endl;
     // std::cout << *root << std::endl;
 

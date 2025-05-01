@@ -6,19 +6,9 @@
 #include "Poker.h"
 #include "TestMode.h"
 
-void handle_signal(int signal)
-{
-    if (signal == SIGINT)
-    {
-        std::cout << "\n 程序已被中断 (CTRL+C). Exiting..." << std::endl;
-        exit(0);
-    }
-}
-
 int main(int argc, char* argv[])
 {
-    // # 处理 CTRL+C 退出
-    std::signal(SIGINT, handle_signal);
+    // std::signal(SIGINT, handle_signal);
 
     // auto poker = new Poker(36655, 3);
     // const auto solver = new Solver("JCALQZ,1;MZWQYI,1;VTGKLP,1;LOISTE,1;LORVD,1;WNAXU,1;FFISM,1;GUBBI,1;TAXPR,1;YMEYS,1;TJPGCAOFWRKVXCDQHHNGOJZXPUHBVSKNYZKBEWEQUCFJRHDNMD,0");
@@ -40,10 +30,10 @@ int main(int argc, char* argv[])
         }
         else if (result.count("test"))
         {
-            TestMode mode;
-            mode.setup();
-            mode.enter();
-            // TODO:
+            const auto mode = new TestMode();
+            mode->setup();
+            mode->enter();
+            delete mode;
         }
     }
     catch (const cxxopts::exceptions::exception e)

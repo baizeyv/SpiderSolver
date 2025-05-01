@@ -4,6 +4,7 @@
 
 #include "TestMode.h"
 
+#include <csignal>
 #include <iostream>
 #include <sstream>
 #include <thread>
@@ -67,11 +68,11 @@ void TestMode::setup()
         this->vita_test_thread = std::make_unique<std::thread>(std::thread([params, this]()
         {
             vita_test_solver = new Solver(params[0]);
-            vita_test_solver->test_dfs();
+            vita_test_solver->call_test_dfs();
             vita_test_thread_done = true;
         }));
     }));
-    
+
     arg_commands->insert(std::make_pair("playvalve", [this](const std::string& args)
     {
         if (!playvalve_test_thread_done && playvalve_test_thread && playvalve_test_solver)
@@ -97,7 +98,7 @@ void TestMode::setup()
         this->playvalve_test_thread = std::make_unique<std::thread>(std::thread([seed, suit, this]()
         {
             playvalve_test_solver = new Solver(seed, suit);
-            playvalve_test_solver->test_dfs();
+            playvalve_test_solver->call_test_dfs();
             playvalve_test_thread_done = true;
         }));
     }));
@@ -258,14 +259,13 @@ void TestMode::setup()
     commands->insert(std::make_pair("help", [this]()
     {
         std::cout << "You are in `TestMode(spider --test)` now." << std::endl
-        << "Commands:" << std::endl
-        << "    vita `level_string` -> Try to solve the Vita level." << std::endl
-        << "    playvalve `seed` `suit_count` -> Try to solve the PlayValve level." << std::endl
-        << "    query `vita | playvalve` -> Query the level currently being attempted to solve." << std::endl
-        << "    stop `vita | playvalve` -> Stop the level currently being attempted to solve." << std::endl
-        << "    view `vita` `vita_level_string` -> View the Vita level cards." << std::endl
-        << "    view `playvalve` `seed` `suit_count` -> View the PlayValve level cards." << std::endl
-        ;
+            << "Commands:" << std::endl
+            << "    vita `level_string` -> Try to solve the Vita level." << std::endl
+            << "    playvalve `seed` `suit_count` -> Try to solve the PlayValve level." << std::endl
+            << "    query `vita | playvalve` -> Query the level currently being attempted to solve." << std::endl
+            << "    stop `vita | playvalve` -> Stop the level currently being attempted to solve." << std::endl
+            << "    view `vita` `vita_level_string` -> View the Vita level cards." << std::endl
+            << "    view `playvalve` `seed` `suit_count` -> View the PlayValve level cards." << std::endl;
     }));
 }
 
@@ -326,7 +326,7 @@ bool TestMode::input()
     return is_input;
 }
 
-void TestMode::join(int type)
+void TestMode::join(const int type)
 {
     if (type == 0 || type == 2)
     {
