@@ -8,13 +8,6 @@
 
 int main(int argc, char* argv[])
 {
-    // std::signal(SIGINT, handle_signal);
-
-    // auto poker = new Poker(36655, 3);
-    // const auto solver = new Solver("JCALQZ,1;MZWQYI,1;VTGKLP,1;LOISTE,1;LORVD,1;WNAXU,1;FFISM,1;GUBBI,1;TAXPR,1;YMEYS,1;TJPGCAOFWRKVXCDQHHNGOJZXPUHBVSKNYZKBEWEQUCFJRHDNMD,0");
-    // solver->test_dfs();
-    // delete solver;
-
     system("cls");
     spd::output_icon();
 
