@@ -9,9 +9,9 @@
 #include <sstream>
 #include <thread>
 
-#include "Const.h"
-#include "Helper.h"
-#include "Solver.h"
+#include "../Const.h"
+#include "../Helper.h"
+#include "../Solver.h"
 
 TestMode::TestMode() : is_input(true), vita_test_solver(nullptr), playvalve_test_solver(nullptr)
 {
@@ -267,58 +267,6 @@ void TestMode::setup()
             << "    view `vita` `vita_level_string` -> View the Vita level cards." << std::endl
             << "    view `playvalve` `seed` `suit_count` -> View the PlayValve level cards." << std::endl;
     }));
-}
-
-void TestMode::enter()
-{
-    std::string input_content;
-    while (input())
-    {
-        std::cout << "> " << std::flush;
-        std::getline(std::cin, input_content);
-        if (input_content.empty())
-            // # 输入内容为空
-            continue;
-
-        // # 使用stringstream 解析输入的命令和参数
-        std::istringstream stream(input_content);
-        std::string command;
-        stream >> command; // # 提取命令部分
-        Helper::ltrim(command);
-        if (command.empty())
-            continue;
-
-        // std::cout << "command->" << command << std::endl;
-
-        std::string arguments;
-        std::getline(stream, arguments); // # 获取命令之后的所有部分
-        Helper::ltrim(arguments);
-
-        // std::cout << "arguments->" << arguments << std::endl;
-        if (arguments.empty())
-        {
-            // # 没有参数
-            if (commands->contains(command))
-            {
-                commands->at(command)(); // # 调用命令函数
-            }
-            else
-            {
-                std::cout << spd::UnknowCommand << command << std::endl;
-            }
-        }
-        else
-        {
-            if (arg_commands->contains(command))
-            {
-                arg_commands->at(command)(arguments); // # 调用命令函数,传递参数
-            }
-            else
-            {
-                std::cout << spd::UnknowCommand << command << std::endl;
-            }
-        }
-    }
 }
 
 bool TestMode::input()

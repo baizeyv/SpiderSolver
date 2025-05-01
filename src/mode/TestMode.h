@@ -6,8 +6,8 @@
 #define TESTMODE_H
 #include <thread>
 
-#include "IMode.h"
-#include "Solver.h"
+#include "../IMode.h"
+#include "../Solver.h"
 
 
 class TestMode : public IMode
@@ -16,7 +16,6 @@ public:
     TestMode();
     ~TestMode() override;
     void setup() override;
-    void enter() override;
     bool input() override;
     /**
      * 

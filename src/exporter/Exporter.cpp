@@ -1,0 +1,38 @@
+//
+// Created by baizeyv on 2025/5/1.
+//
+
+#include "Exporter.h"
+
+#include <filesystem>
+#include <sstream>
+#include <fstream>
+#include <utility>
+
+#include "../data/LevelData.h"
+
+Exporter::Exporter(std::string  file_path) : full_file_path(std::move(file_path))
+{
+}
+
+Exporter::~Exporter() = default;
+
+void Exporter::export_csv(const int id, const State& state, bool is_null) const
+{
+    const LevelData data(id, state, is_null);
+    std::ostringstream oss;
+    oss << data;
+    auto content = oss.str();
+    std::filesystem::path p(full_file_path);
+    if (!std::filesystem::exists(p.parent_path()))
+    {
+        std::filesystem::create_directories(p.parent_path());
+    }
+    std::ofstream writer(full_file_path, std::ios::app);
+    if (!std::filesystem::exists(full_file_path))
+    {
+        writer << "id,seed,calc,difficulty,step1,step2,step3,step4,step5,step6,step7,step8,suitCount,history\n";
+    }
+    writer << content << "\n";
+}
+

@@ -9,6 +9,7 @@
 #include <ranges>
 
 #include "Const.h"
+#include "exporter/Exporter.h"
 
 std::vector<State *> Solver::take_a_step(State *state, Solver *solver) {
     std::unordered_set<State *, StatePtrHash, StatePtrEqual> results;
@@ -163,7 +164,7 @@ Solver::~Solver() {
 }
 
 void Solver::call_test_dfs() {
-    depth_first_search_sync(root_state, [](){}, "", 0, false, 1000000);
+    depth_first_search_sync(root_state, [](){}, "", 0, false, -1);
 }
 
 void Solver::depth_first_search_sync(State*& root, const std::function<void()>& onCompleted, const std::string& file,
@@ -192,7 +193,10 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
     if (calc >= stepLimit && stepLimit > 0) {
         // # 超出步骤限制了
         if (!file.empty() && exportNull) {
-            // TODO: Export null
+            // # Export null
+            const auto exporter = new Exporter(file);
+            exporter->export_csv(id, root, true);
+            delete exporter;
         }
         sync_end_flag = true;
         return;
@@ -205,7 +209,9 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
             solved = true;
             onCompleted();
             if (!file.empty()) {
-                // TODO: Export
+                const auto exporter = new Exporter(file);
+                exporter->export_csv(id, state);
+                delete exporter;
             }
             sync_end_flag = true;
             return;

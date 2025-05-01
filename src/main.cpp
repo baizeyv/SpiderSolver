@@ -4,7 +4,7 @@
 #include "Const.h"
 #include "cxxopts.h"
 #include "Poker.h"
-#include "TestMode.h"
+#include "mode/TestMode.h"
 
 int main(int argc, char* argv[])
 {

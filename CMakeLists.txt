@@ -16,7 +16,11 @@ add_executable(spider src/main.cpp
         src/Helper.h
         src/cxxopts.h
         src/IMode.h
-        src/TestMode.cpp
-        src/TestMode.h
+        src/mode/TestMode.cpp
+        src/mode/TestMode.h
         src/Const.h
+        src/exporter/Exporter.cpp
+        src/exporter/Exporter.h
+        src/data/LevelData.cpp
+        src/data/LevelData.h
 )
