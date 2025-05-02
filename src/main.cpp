@@ -27,7 +27,8 @@ int main(const int argc, char* argv[])
         ("t,test", "test mode")
         ("d,debug", "debug mode")
         ("b,batch", "batch mode")
-        ("o,output", "debug output path", cxxopts::value<std::string>()->default_value(""));
+        ("o,output", "debug output path", cxxopts::value<std::string>()->default_value(""))
+        ("v,version", "print version");
     try
     {
         if (const auto result = options.parse(argc, argv); result.count("help"))
@@ -63,6 +64,9 @@ int main(const int argc, char* argv[])
             mode->setup();
             mode->enter();
             delete mode;
+        } else if (result.count("version"))
+        {
+            std::cout << "       spider version:" << spd::VERSION << std::endl;
         }
     }
     catch (const cxxopts::exceptions::exception e)

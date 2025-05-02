@@ -205,6 +205,14 @@ void Solver::call_test_dfs()
     depth_first_search_sync(root_state, []()
     {
     }, "", 0, false, -1);
+    if (!solved)
+    {
+        special_filter = false;
+        depth_first_search_sync(root_state, []()
+        {
+        }, "", 0, false, -1);
+        special_filter = true;
+    }
 }
 
 void Solver::call_dfs(const std::string& file, const int id, const bool exportNull, const int stepLimit)
@@ -212,6 +220,14 @@ void Solver::call_dfs(const std::string& file, const int id, const bool exportNu
     depth_first_search_sync(root_state, []()
     {
     }, file, id, exportNull, stepLimit);
+    if (!solved)
+    {
+        special_filter = false;
+        depth_first_search_sync(root_state, []()
+        {
+        }, file, id, exportNull, stepLimit);
+        special_filter = true;
+    }
 }
 
 void Solver::depth_first_search_sync(State*& root, const std::function<void()>& onCompleted, const std::string& file,

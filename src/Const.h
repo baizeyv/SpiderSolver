@@ -10,6 +10,8 @@
 
 namespace spd
 {
+    inline std::string VERSION = "1.0.0";
+    
     static std::string HelpOptionsDescription = "help desc"; // TODO:
     static std::string UnknowCommand = "WARNING(SPD30001): [Unknow Command] -> ";
     static std::string VitaTestArgumentsException = "ERROR(SPD40000): [Vita Test Solve Arguments Error]";
