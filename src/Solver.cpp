@@ -234,6 +234,11 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
                                      const int id,
                                      const bool exportNull, const int stepLimit)
 {
+    depth++;
+    calc++;
+    all_states.insert(root);
+    current_state = root;
+    root->calc = calc;
     if (spd::DebugOutput)
     {
         if (spd::OutputPath.empty())
@@ -262,11 +267,6 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
         writer << *root << "\n";
     }
 
-    depth++;
-    calc++;
-    all_states.insert(root);
-    current_state = root;
-    root->calc = calc;
     // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
     std::vector<State*> states;
     auto no_filter_states = take_a_step(root, this);
