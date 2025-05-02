@@ -238,6 +238,7 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
     all_states.insert(root);
     current_state = root;
     root->calc = calc;
+    // std::cout << root->get_memory_usage() << std::endl;
     if (spd::DebugOutput)
     {
         if (spd::OutputPath.empty())

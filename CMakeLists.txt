@@ -36,4 +36,5 @@ add_executable(spider src/main.cpp
         res/SpiderSolver.rc
         src/HistoryItem.h
         src/HistoryItem.cpp
+        src/IMemUsage.h
 )

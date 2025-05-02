@@ -8,12 +8,14 @@
 
 #include "Card.h"
 #include "HistoryItem.h"
+#include "IMemUsage.h"
 #include "Poker.h"
 // #include "Solver.h"
 class Solver;
 
 
-class State {
+class State final : public IMemUsage {
+
 public:
     const Poker* poker;
     /**
@@ -53,6 +55,8 @@ public:
     explicit State(const State *previous_state);
 
     explicit State(Poker * &poker);
+
+    ~State() override;
 
     /**
      * * 完成了几套牌了
@@ -106,6 +110,8 @@ public:
     std::string to_full_string() const;
 
     friend std::ostream& operator<<(std::ostream& out, const State& state);
+
+    size_t get_memory_usage() const override;
 
 private:
     int valuation = -9999;

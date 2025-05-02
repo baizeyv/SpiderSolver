@@ -41,6 +41,10 @@ State::State(Poker * &poker) {
     std::ranges::reverse(deckCard);
 }
 
+State::~State()
+{
+}
+
 State::State(const State *previous_state) {
     std::vector<std::vector<Card *> > newVisibleCards;
     std::vector<std::vector<Card *> > newHiddenCards;
@@ -591,6 +595,21 @@ std::string State::deck_string() const {
         result += deckCard[i]->to_string();
     }
     return result;
+}
+
+size_t State::get_memory_usage() const
+{
+    size_t total = 0;
+    total += sizeof(*this);
+    total += sizeof(poker);
+    total += get_vector_memory(deckCard);
+    total += get_nested_vector_memory(hiddenCards);
+    total += get_nested_vector_memory(visibleCards);
+    total += get_vector_memory(history);
+    total += get_vector_memory(collection_steps);
+    total += sizeof(previous);
+    total += sizeof(columnValuation);
+    return total;
 }
 
 std::ostream& operator<<(std::ostream &out, const State &state) {

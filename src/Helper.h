@@ -27,5 +27,22 @@ public:
 };
 inline std::string SpiderRandom;
 
+template <typename T>
+size_t get_vector_memory(const std::vector<T>& vec)
+{
+    return sizeof(T) * vec.capacity();
+}
+
+template <typename T>
+size_t get_nested_vector_memory(const std::vector<std::vector<T>>& nestedVec)
+{
+    size_t total = get_vector_memory(nestedVec);
+    for (const auto& inner : nestedVec)
+    {
+        total += get_vector_memory(inner);
+    }
+    return total;
+}
+
 
 #endif //HELPER_H
