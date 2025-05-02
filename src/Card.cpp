@@ -15,7 +15,7 @@ std::ostream& operator<<(std::ostream &out, const Card &card) {
     return out;
 }
 
-Card::Card(int value, const int suit) : suit(suit) {
+Card::Card(int value, const int suit) : suit(suit - 1) {
     original_value = value;
     if (value <= 53 && value >= 40)
         value -= 39;
@@ -28,13 +28,13 @@ Card::Card(int value, const int suit) : suit(suit) {
 
 std::string Card::get_suit() const {
     switch (suit) {
-        case 1:
+        case 0:
             return "S"; // Spades 黑桃
-        case 2:
+        case 1:
             return "H"; // Heart 红桃
-        case 3:
+        case 2:
             return "D"; // Diamonds 方片
-        case 4:
+        case 3:
             return "C"; // Clubs 梅花
         default:
             throw std::string("Error On `GetSuit()` -> Undefined suid.");

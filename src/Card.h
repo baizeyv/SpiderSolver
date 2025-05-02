@@ -4,6 +4,7 @@
 
 #ifndef CARD_H
 #define CARD_H
+#include <cstdint>
 #include <string>
 
 
@@ -12,14 +13,14 @@ public:
     /**
      * * 牌面值
      */
-    int value;
+    uint8_t value : 4;
 
     /**
      * * 牌面花色
      */
-    int suit;
+    uint8_t suit : 2;
 
-    int original_value;
+    uint8_t original_value : 6;
 
     explicit Card(int value, const int suit);
 
