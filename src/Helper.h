@@ -21,6 +21,8 @@ public:
     static std::string get_current_exe_directory();
     static std::vector<int> get_randoms(int seed, int count);
     static void check_file_and_create_dir_when_needed(const std::string& file);
+    static std::string read_file(const std::string& path);
+    static std::string get_current_timestamp_millis();
 };
 
 

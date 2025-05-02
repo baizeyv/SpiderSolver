@@ -8,7 +8,7 @@
 
 #include "Solver.h"
 
-State::State(Poker * &poker): calc(0) {
+State::State(Poker * &poker) {
     this->poker = poker;
     previous = nullptr;
 
@@ -39,7 +39,7 @@ State::State(Poker * &poker): calc(0) {
     std::ranges::reverse(deckCard);
 }
 
-State::State(const State *previous_state): calc(0) {
+State::State(const State *previous_state) {
     std::vector<std::vector<Card *> > newVisibleCards;
     std::vector<std::vector<Card *> > newHiddenCards;
     const std::vector newDeckCards(previous_state->deckCard.begin(), previous_state->deckCard.end());

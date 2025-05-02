@@ -45,7 +45,7 @@ public:
      */
     const State *previous;
 
-    int calc;
+    int calc = 0;
 
     int card_count = 104;
 

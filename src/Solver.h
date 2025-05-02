@@ -66,6 +66,8 @@ public:
 
     void call_test_dfs();
 
+    void call_dfs(const std::string &file = "", int id = 0, bool exportNull = true, int stepLimit = -1);
+
     void depth_first_search_sync(State* &root, const std::function<void()> &onCompleted, const std::string &file = "", int id = 0, bool exportNull = true, int stepLimit = -1);
 
     void stop();

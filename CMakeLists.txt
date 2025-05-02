@@ -25,4 +25,11 @@ add_executable(spider src/main.cpp
         src/data/LevelData.h
         src/mode/DebugMode.cpp
         src/mode/DebugMode.h
+        src/mode/BatchMode.cpp
+        src/mode/BatchMode.h
+        src/json.hpp
+        src/data/VitaBean.cpp
+        src/data/VitaBean.h
+        src/data/LevelBean.cpp
+        src/data/LevelBean.h
 )

@@ -207,6 +207,13 @@ void Solver::call_test_dfs()
     }, "", 0, false, -1);
 }
 
+void Solver::call_dfs(const std::string& file, const int id, const bool exportNull, const int stepLimit)
+{
+    depth_first_search_sync(root_state, []()
+    {
+    }, file, id, exportNull, stepLimit);
+}
+
 void Solver::depth_first_search_sync(State*& root, const std::function<void()>& onCompleted, const std::string& file,
                                      const int id,
                                      const bool exportNull, const int stepLimit)
@@ -222,7 +229,8 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
         {
             // playvalve
             suffix += "playvalve_" + std::to_string(tmp) + ".log";
-        } else
+        }
+        else
         {
             // # vita
             suffix += "vita_" + poker->mark.substr(0, 20) + ".log";
@@ -236,7 +244,7 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
         }
         std::ofstream writer(debug_output_file, std::ios::app);
         writer << "------------------------------------------------\n"
-               << *root << "\n";
+            << *root << "\n";
     }
 
     depth++;
@@ -266,7 +274,7 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
         {
             // # Export null
             const auto exporter = new Exporter(file);
-            exporter->export_csv(id, root, true);
+            exporter->export_csv(id, *root, true);
             delete exporter;
         }
         sync_end_flag = true;
@@ -280,11 +288,12 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
             // # 完成游戏
             // std::cout << "Game Completed !!!" << std::endl;
             solved = true;
+            state->calc = calc;
             onCompleted();
             if (!file.empty())
             {
                 const auto exporter = new Exporter(file);
-                exporter->export_csv(id, state);
+                exporter->export_csv(id, *state);
                 delete exporter;
             }
             sync_end_flag = true;

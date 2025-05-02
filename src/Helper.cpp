@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <windows.h>
 #include <filesystem>
 
@@ -153,4 +154,22 @@ void Helper::check_file_and_create_dir_when_needed(const std::string& file)
     {
         std::filesystem::create_directories(p.parent_path());
     }
+}
+
+std::string Helper::read_file(const std::string& path)
+{
+    std::ifstream file(path);
+    if (!file)
+    {
+        throw std::runtime_error("Failed to open file " + path);
+    }
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
+}
+
+std::string Helper::get_current_timestamp_millis()
+{
+    const int64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    return std::to_string(timestamp);
 }

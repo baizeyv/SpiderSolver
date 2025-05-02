@@ -3,10 +3,19 @@
 
 #include "Const.h"
 #include "cxxopts.h"
+#include "json.hpp"
 #include "Poker.h"
+#include "data/VitaBean.h"
+#include "mode/BatchMode.h"
 #include "mode/DebugMode.h"
 #include "mode/TestMode.h"
 
+/**
+ * * Main Function
+ * @param argc 
+ * @param argv 
+ * @return 
+ */
 int main(const int argc, char* argv[])
 {
     system("cls");
@@ -50,6 +59,10 @@ int main(const int argc, char* argv[])
         else if (result.count("batch"))
         {
             // # batch mode
+            const auto mode = new BatchMode();
+            mode->setup();
+            mode->enter();
+            delete mode;
         }
     }
     catch (const cxxopts::exceptions::exception e)
