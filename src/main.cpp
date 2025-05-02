@@ -21,14 +21,14 @@ int main(const int argc, char* argv[])
     system("cls");
     spd::output_icon();
 
-    cxxopts::Options options("spider", "Test Desc");
+    cxxopts::Options options("spider", "\n[Spider Solitaire Solver]\n@author: baizeyv\n@contact: baizeyv@gmail.com\n@git: https://github.com/baizeyv/SpiderSolver\n");
     options.add_options()
-        ("h,help", spd::HelpOptionsDescription)
-        ("t,test", "test mode")
-        ("d,debug", "debug mode")
-        ("b,batch", "batch mode")
-        ("o,output", "debug output path", cxxopts::value<std::string>()->default_value(""))
-        ("v,version", "print version");
+        ("h,help", "Show help information.")
+        ("t,test", "Enter `test` mode.")
+        ("d,debug", "Enter `debug` mode.")
+        ("b,batch", "Enter `batch` mode.")
+        ("o,output", "Debug mode output path.", cxxopts::value<std::string>()->default_value(""))
+        ("v,version", "Show spider version.");
     try
     {
         if (const auto result = options.parse(argc, argv); result.count("help"))
