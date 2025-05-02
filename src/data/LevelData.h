@@ -26,6 +26,7 @@ public:
     int step7;
     int step8;
     std::string history;
+    std::string level;
 
     LevelData(const int id, const State& state, bool is_null = false);
     ~LevelData();

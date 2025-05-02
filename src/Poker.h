@@ -53,6 +53,8 @@ public:
      */
     std::vector<Card> cards;
 
+    std::string get_level() const;
+
 };
 
 

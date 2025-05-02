@@ -232,6 +232,20 @@ Card Poker::build_card(const int suit, const int value) {
     // return Card(-1, -1);
 }
 
+std::string Poker::get_level() const
+{
+    std::string result;
+    for (size_t i = 0; i < cards.size(); i ++)
+    {
+        result += std::to_string(cards[i].original_value);
+        if (i != cards.size() - 1)
+        {
+            result += ",";
+        }
+    }
+    return result;
+}
+
 std::ostream & operator<<(std::ostream &out, const Poker &poker) {
     out << poker.get_string();
     return out;

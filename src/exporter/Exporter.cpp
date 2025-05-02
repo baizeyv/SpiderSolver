@@ -25,11 +25,15 @@ void Exporter::export_csv(const int id, const State& state, bool is_null) const
     oss << data;
     auto content = oss.str();
     Helper::check_file_and_create_dir_when_needed(full_file_path);
-    std::ofstream writer(full_file_path, std::ios::app);
     if (!std::filesystem::exists(full_file_path))
     {
-        writer << "id,seed,calc,difficulty,step1,step2,step3,step4,step5,step6,step7,step8,suitCount,history\n";
+        std::ofstream writer(full_file_path, std::ios::app);
+        writer << "id,seed,calc,difficulty,step1,step2,step3,step4,step5,step6,step7,step8,suitCount,history,level\n";
+        writer << content << "\n";
+    } else
+    {
+        std::ofstream writer(full_file_path, std::ios::app);
+        writer << content << "\n";
     }
-    writer << content << "\n";
 }
 

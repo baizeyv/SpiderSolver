@@ -6,7 +6,7 @@
 
 #include <ranges>
 
-LevelData::LevelData(const int id, const State& state, bool is_null) : id(id)
+LevelData::LevelData(const int id, const State& state, const bool is_null) : id(id)
 {
     seed = state.poker->mark;
     suit_count = state.poker->suitCount;
@@ -41,6 +41,7 @@ LevelData::LevelData(const int id, const State& state, bool is_null) : id(id)
             history += his;
         }
     }
+    level = state.poker->get_level();
 }
 
 LevelData::~LevelData() = default;
@@ -50,7 +51,8 @@ std::ostream& operator<<(std::ostream& os, const LevelData& data)
     const std::string split(",");
     const std::string quotation("\"");
     os << quotation << std::to_string(data.id) << quotation << split
-        << quotation << data.seed << split << std::to_string(data.calc) << quotation << split
+        << quotation << data.seed << quotation << split
+        << quotation << std::to_string(data.calc) << quotation << split
         << quotation << std::to_string(data.difficulty) << quotation << split
         << quotation << std::to_string(data.step1) << quotation << split
         << quotation << std::to_string(data.step2) << quotation << split
@@ -61,6 +63,7 @@ std::ostream& operator<<(std::ostream& os, const LevelData& data)
         << quotation << std::to_string(data.step7) << quotation << split
         << quotation << std::to_string(data.step8) << quotation << split
         << quotation << std::to_string(data.suit_count) << quotation << split
-        << quotation << data.history << quotation;
+        << quotation << data.history << quotation << split
+        << quotation << data.level << quotation;
     return os;
 }
