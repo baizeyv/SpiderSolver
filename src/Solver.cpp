@@ -360,8 +360,13 @@ std::vector<State*> Solver::sort(std::unordered_set<State*, StatePtrHash, StateP
             return false;
         if (av == bv)
         {
-            const auto [af, ac, at, aa] = a->history[0];
-            const auto [bf, bc, bt, bb] = b->history[0];
+            const auto af = a->history[0].get_from();
+            const auto ac = a->history[0].get_count();
+            const auto at = a->history[0].get_to();
+            
+            const auto bf = b->history[0].get_from();
+            const auto bc = b->history[0].get_count();
+            const auto bt = b->history[0].get_to();
             if (af < 0 || ac < 0 || at < 0)
             {
                 // # a是发牌
@@ -390,7 +395,9 @@ std::vector<State*> Solver::sort(std::unordered_set<State*, StatePtrHash, StateP
         {
             if (!p->previous || p->get_suit_count() <= 1)
                 return std::numeric_limits<int>::min();
-            auto [from, count, to, collection] = p->history[0];
+            
+            const auto from = p->history[0].get_from();
+            const auto to = p->history[0].get_to();
             if (from < 0 || to < 0 || from < to)
                 return std::numeric_limits<int>::min();
             const auto& prev = p->previous;

@@ -34,4 +34,6 @@ add_executable(spider src/main.cpp
         src/data/LevelBean.h
         src/resource.h
         res/SpiderSolver.rc
+        src/HistoryItem.h
+        src/HistoryItem.cpp
 )

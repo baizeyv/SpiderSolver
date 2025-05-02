@@ -35,8 +35,11 @@ LevelData::LevelData(const int id, const State& state, const bool is_null) : id(
         step7 = state.collection_steps[6];
         step8 = state.collection_steps[7];
         difficulty = -100000.0 / calc + 1000.0;
-        for (auto [from, count, to, collection] : std::ranges::reverse_view(state.history))
+        for (auto& item : std::ranges::reverse_view(state.history))
         {
+            const auto from = item.get_from();
+            const auto to = item.get_to();
+            const auto count = item.get_count();
             const std::string his = "[F:" + std::to_string(from) + ",T:" + std::to_string(to) + ",N:" + std::to_string(count) + "]>";
             history += his;
         }

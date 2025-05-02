@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Card.h"
+#include "HistoryItem.h"
 #include "Poker.h"
 // #include "Solver.h"
 class Solver;
@@ -33,7 +34,7 @@ public:
     /**
      * * 历史记录
      */
-    std::vector<std::tuple<int, int, int, bool> > history;
+    std::vector<HistoryItem> history;
 
     /**
      * * 收牌的步骤记录

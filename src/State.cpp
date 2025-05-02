@@ -104,7 +104,11 @@ void State::move_card(const int from, const int count, const int to) {
         hiddenCards[from].erase(hiddenCards[from].begin(), hiddenCards[from].begin() + 1);
     }
     // # 添加历史记录
-    const auto cur = std::make_tuple(from, count, to, collection);
+    auto cur = HistoryItem();
+    cur.set_from(from);
+    cur.set_count(count);
+    cur.set_to(to);
+    cur.set_collection(collection);
     history.insert(history.begin(), cur);
 }
 
@@ -119,7 +123,11 @@ bool State::play_deck() {
         collection |= detect_collection(i);
     }
     // # 添加发牌历史记录
-    const auto cur = std::make_tuple(-1, -1, -1, collection);
+    auto cur = HistoryItem();
+    cur.set_from(-1);
+    cur.set_count(-1);
+    cur.set_to(-1);
+    cur.set_collection(collection);
     history.insert(history.begin(), cur);
     return true;
 }
@@ -185,7 +193,10 @@ int State::get_valuation() {
 bool State::secondary_valuation(const Solver *solver) {
     if (previous == nullptr)
         return true;
-    auto [from, count, to, collection] = history[0];
+    const auto from = history[0].get_from();
+    const auto count = history[0].get_count();
+    const auto to = history[0].get_to();
+    const auto collection = history[0].get_collection();
     if (from < 0 || count < 0 || to < 0)
         // # 发牌
         return true;
@@ -266,7 +277,9 @@ std::string State::to_full_string() const
     if (previous)
     {
         // # 存在上一步
-        auto [from, count, to, collection] = history[0];
+        const auto from = history[0].get_from();
+        const auto count = history[0].get_count();
+        const auto to = history[0].get_to();
         result += "[FROM:" + std::to_string(from) + ",COUNT:" + std::to_string(count) + ",TO:" + std::to_string(to) + "]    Previous >> Current\n";
         int current_max_hidden = 0;
         for (auto& item : hiddenCards) {
@@ -397,7 +410,9 @@ int State::flop_valuation(int limit, bool divide) const {
     if (previous == nullptr)
         // # 没有上一步
         return 0;
-    auto [from, count, to, collection] = history[0];
+    const auto from = history[0].get_from();
+    const auto count = history[0].get_count();
+    const auto to = history[0].get_to();
     if (from < 0 || count < 0 || to < 0)
         // # 忽略发牌
         return 0;
@@ -467,7 +482,9 @@ int State::extra_valuation_more_suit() const {
         return result;
     if (previous == nullptr)
         return result;
-    auto [from, count, to, collection] = history[0];
+    const auto from = history[0].get_from();
+    const auto count = history[0].get_count();
+    const auto to = history[0].get_to();
     if (from < 0 || count < 0 || to < 0)
         return result;
     if (isblank(from))
