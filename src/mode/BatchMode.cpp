@@ -186,6 +186,14 @@ void BatchMode::setup()
         system("cls");
         spd::output_icon();
     }));
+    commands->insert(std::make_pair("help", [this]()
+    {
+        std::cout << "You are in `BatchMode(spider --batch)` now." << std::endl
+            << "Commands:" << std::endl
+            << "    vita `level_json_file_path` `output_path` (`step_limit`) -> Try to solve the Vita level." << std::endl
+            << "    playvalve `level_txt_file_path` `output_path` `suit_count` (`step_limit`) -> Try to solve the PlayValve level." << std::endl
+            << "    stop `vita | playvalve` -> Stop the level currently being attempted to solve." << std::endl;
+    }));
 }
 
 bool BatchMode::input()

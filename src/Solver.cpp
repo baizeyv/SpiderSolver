@@ -243,8 +243,7 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
             std::filesystem::remove(debug_output_file);
         }
         std::ofstream writer(debug_output_file, std::ios::app);
-        writer << "------------------------------------------------\n"
-            << *root << "\n";
+        writer << *root << "\n";
     }
 
     depth++;

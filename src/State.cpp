@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <unordered_set>
 
+#include "Const.h"
+#include "Helper.h"
 #include "Solver.h"
 
 State::State(Poker * &poker) {
@@ -257,6 +259,106 @@ std::string State::to_string() const {
     return res;
 }
 
+std::string State::to_full_string() const
+{
+    std::string result = "[-----------------------------------------------------------------------------------------------------]\n";
+    result += "[CALC: " + std::to_string(calc) + "] [VALUATION: " + std::to_string(valuation) + "] [STEP: " + std::to_string(history.size()) + "] [COLLECTION: " + std::to_string(finished_count()) + "] ";
+    if (previous)
+    {
+        // # 存在上一步
+        auto [from, count, to, collection] = history[0];
+        result += "[FROM:" + std::to_string(from) + ",COUNT:" + std::to_string(count) + ",TO:" + std::to_string(to) + "]    Previous >> Current\n";
+        int current_max_hidden = 0;
+        for (auto& item : hiddenCards) {
+            if (!item.empty() && item.size() > current_max_hidden) {
+                current_max_hidden = item.size();
+            }
+        }
+        int previous_max_hidden = 0;
+        for (auto& item : previous->hiddenCards) {
+            if (!item.empty() && item.size() > previous_max_hidden) {
+                previous_max_hidden = item.size();
+            }
+        }
+        if (current_max_hidden > 0 || previous_max_hidden > 0)
+        {
+            const int max_hidden = std::max(current_max_hidden, previous_max_hidden);
+            result += "\nHIDDEN CARDS:\n";
+            const auto previousArray = Helper::split(previous->hidden_string(0, max_hidden), "\n");
+            const auto currentArray = Helper::split(hidden_string(0, max_hidden), "\n");
+            for (size_t i = 0; i < previousArray.size(); i ++)
+            {
+                result += previousArray[i];
+                result += " -> ";
+                result += currentArray[i];
+                result += "\n";
+            }
+        }
+        
+        int current_max_visible = 0;
+        for (auto& item : visibleCards) {
+            if (!item.empty() && item.size() > current_max_visible) {
+                current_max_visible = item.size();
+            }
+        }
+        int previous_max_visible = 0;
+        for (auto& item : previous->visibleCards) {
+            if (!item.empty() && item.size() > previous_max_visible) {
+                previous_max_visible = item.size();
+            }
+        }
+        if (current_max_visible > 0 || previous_max_visible > 0)
+        {
+            const int max_visible = std::max(current_max_visible, previous_max_visible);
+            result += "\nVISIBLE CARDS:\n";
+            const auto previousArray = Helper::split(previous->visible_string(0, max_visible), "\n");
+            const auto currentArray = Helper::split(visible_string(0, max_visible), "\n");
+            for (size_t i = 0; i < previousArray.size(); i ++)
+            {
+                result += previousArray[i];
+                result += " -> ";
+                result += currentArray[i];
+                result += "\n";
+            }
+        }
+
+        if (deckCard.size() > 0 || previous->deckCard.size() > 0)
+        {
+            result += "\nDECK CARDS:\n";
+            const int max = std::max(deckCard.size(), previous->deckCard.size());
+            std::string previousStr;
+            for (int i = 0; i < max; i++)
+            {
+                if (i % 10 == 0 && i != 0)
+                    previousStr += "\n";
+                previousStr += i < previous->deckCard.size() ? previous->deckCard[i]->to_string() : spd::EmptyCard;
+            }
+            std::string currentStr;
+            for (int i = 0; i < max; i ++)
+            {
+                if (i % 10 == 0 && i != 0)
+                    currentStr += "\n";
+                currentStr += i < deckCard.size() ? deckCard[i]->to_string() : spd::EmptyCard;
+            }
+            auto previousArray = Helper::split(previousStr, "\n");
+            auto currentArray = Helper::split(currentStr, "\n");
+            for (size_t i = 0; i < previousArray.size(); i ++)
+            {
+                result += previousArray[i];
+                result += " -> ";
+                result += currentArray[i];
+                result += "\n";
+            }
+        }
+        
+    } else
+    {
+        result += "\n";
+        result += to_string();
+    }
+    return result;
+}
+
 bool State::detect_collection(const int index) {
     int set = 1;
     if (!visibleCards[index].empty()) {
@@ -437,7 +539,7 @@ std::string State::floor_hidden_string(const int row) const {
         if (column.size() > row) {
             result += column[column.size() - row - 1]->to_string();
         } else {
-            result += "     ";
+            result += spd::EmptyCard;
         }
     }
     return result;
@@ -457,7 +559,7 @@ std::string State::floor_visible_string(const int row) const {
         if (column.size() > row) {
             result += column[column.size() - row - 1]->to_string();
         } else {
-            result += "     ";
+            result += spd::EmptyCard;
         }
     }
     return result;
@@ -475,6 +577,6 @@ std::string State::deck_string() const {
 }
 
 std::ostream& operator<<(std::ostream &out, const State &state) {
-    out << state.to_string();
+    out << state.to_full_string();
     return out;
 }

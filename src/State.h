@@ -102,6 +102,8 @@ public:
 
     std::string to_string() const;
 
+    std::string to_full_string() const;
+
     friend std::ostream& operator<<(std::ostream& out, const State& state);
 
 private:
