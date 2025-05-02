@@ -32,4 +32,6 @@ add_executable(spider src/main.cpp
         src/data/VitaBean.h
         src/data/LevelBean.cpp
         src/data/LevelBean.h
+        src/resource.h
+        res/SpiderSolver.rc
 )

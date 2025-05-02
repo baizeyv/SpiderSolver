@@ -23,7 +23,9 @@ public:
     static void check_file_and_create_dir_when_needed(const std::string& file);
     static std::string read_file(const std::string& path);
     static std::string get_current_timestamp_millis();
+    static void prepare_spider_random_exe();
 };
+inline std::string SpiderRandom;
 
 
 #endif //HELPER_H

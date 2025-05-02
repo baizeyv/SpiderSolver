@@ -1,0 +1,3 @@
+#include "../src/resource.h"
+
+SPIDER_RANDOM_EXE RCDATA "../lib/SpiderRandom.exe"

@@ -1,11 +1,12 @@
+#include <bemapiset.h>
 #include <csignal>
 #include <iostream>
+#include <fstream>
+#include <windows.h>
 
 #include "Const.h"
 #include "cxxopts.h"
 #include "json.hpp"
-#include "Poker.h"
-#include "data/VitaBean.h"
 #include "mode/BatchMode.h"
 #include "mode/DebugMode.h"
 #include "mode/TestMode.h"

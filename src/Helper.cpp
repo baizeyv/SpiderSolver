@@ -141,8 +141,16 @@ std::string Helper::get_current_exe_directory()
 
 std::vector<int> Helper::get_randoms(const int seed, const int count)
 {
-    const auto exe_dir = get_current_exe_directory();
-    const auto csharp_path = exe_dir + R"(\..\SpiderRandom\SpiderRandom\bin\Debug\net9.0\SpiderRandom.exe)";
+    prepare_spider_random_exe();
+    std::string csharp_path;
+    if (SpiderRandom.empty())
+    {
+        const auto exe_dir = get_current_exe_directory();
+        csharp_path = exe_dir + R"(\..\SpiderRandom\SpiderRandom\bin\Debug\net9.0\SpiderRandom.exe)";
+    } else
+    {
+        csharp_path = SpiderRandom;
+    }
     auto numbers = run_csharp_random_and_get_numbers(csharp_path, seed, count);
     return numbers;
 }
@@ -172,4 +180,41 @@ std::string Helper::get_current_timestamp_millis()
 {
     const int64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     return std::to_string(timestamp);
+}
+
+void Helper::prepare_spider_random_exe()
+{
+    if (!SpiderRandom.empty() && std::filesystem::exists(SpiderRandom))
+        return;
+    HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(101), RT_RCDATA);
+    if (hRes)
+    {
+        HGLOBAL hData = LoadResource(NULL, hRes);
+        DWORD size = SizeofResource(NULL, hRes);
+        void* pData = LockResource(hData);
+
+        std::string tempPath = getenv("TEMP");
+        std::string exePath = tempPath + "\\SpiderRandom.exe";
+        std::ofstream out(exePath, std::ios::binary);
+        out.write(reinterpret_cast<char*>(pData), size);
+        out.close();
+        SpiderRandom = exePath;
+        /*
+        auto pipe = _popen(exePath.c_str(), "r");
+        if (!pipe)
+        {
+            std::cerr << "Failed to run c# process." << std::endl;
+        } else
+        {
+            std::string output;
+            std::vector<char> buffer(128);
+            size_t bytes_read = 0;
+            while ((bytes_read = fread(buffer.data(), 1, buffer.size(), pipe)) > 0)
+            {
+                output.append(buffer.data(), bytes_read);
+            }
+            _pclose(pipe);
+        }
+        */
+    }
 }
