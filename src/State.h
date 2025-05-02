@@ -50,9 +50,9 @@ public:
 
     int card_count = 104;
 
-    State(const State *previous_state);
+    explicit State(const State *previous_state);
 
-    State(Poker * &poker);
+    explicit State(Poker * &poker);
 
     /**
      * * 完成了几套牌了
@@ -117,7 +117,7 @@ private:
      * @param index
      * @return
      */
-    bool detect_collection(const int index);
+    bool detect_collection(int index);
 
     /**
      * * 翻牌额外估值
@@ -141,13 +141,13 @@ private:
      */
     int blank_column_count() const;
 
-    std::string hidden_string(const int row, const int max) const;
+    std::string hidden_string(int row, int max) const;
 
-    std::string floor_hidden_string(const int row)const;
+    std::string floor_hidden_string(int row)const;
 
-    std::string visible_string(const int row, const int max) const;
+    std::string visible_string(int row, int max) const;
 
-    std::string floor_visible_string(const int row)const;
+    std::string floor_visible_string(int row)const;
 
     std::string deck_string() const;
 };

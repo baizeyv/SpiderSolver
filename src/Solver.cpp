@@ -39,8 +39,7 @@ std::vector<State*> Solver::take_a_step(State* state, Solver* solver)
     // # 添加发牌的可能
     constexpr std::vector<Card*> tmp;
     auto newState = create_new_state(state, tmp, -1, -1);
-    bool playDeckFlag = newState->play_deck();
-    if (!playDeckFlag)
+    if (!newState->play_deck())
         return sort(results);
     if (!state_exists(results, newState))
         results.insert(newState);
