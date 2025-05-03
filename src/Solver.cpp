@@ -209,6 +209,7 @@ void Solver::call_test_dfs()
     Helper::trim_memory();
     if (!solved)
     {
+        all_serialized_states.clear();
         special_filter = false;
         depth_first_search_sync(root_state, []()
         {
@@ -226,6 +227,7 @@ void Solver::call_dfs(const std::string& file, const int id, const bool exportNu
     Helper::trim_memory();
     if (!solved)
     {
+        all_serialized_states.clear();
         special_filter = false;
         depth_first_search_sync(root_state, []()
         {
