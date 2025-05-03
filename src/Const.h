@@ -6,7 +6,6 @@
 #define CONST_H
 #include <string>
 #include <iostream>
-#include <bits/shared_ptr_atomic.h>
 
 namespace spd
 {
