@@ -189,6 +189,7 @@ Solver::Solver(const std::string& vitaLevel): depth(0), sync_end_flag(false), ca
 
 Solver::~Solver()
 {
+    all_serialized_states.clear();
     // for (auto& state : all_states)
     // {
     //     delete state;

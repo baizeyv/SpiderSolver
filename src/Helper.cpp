@@ -9,6 +9,7 @@
 #include <sstream>
 #include <fstream>
 #include <windows.h>
+#include <psapi.h>
 #include <filesystem>
 
 std::vector<std::string> Helper::split(const std::string& str, const std::string& delimiter)
@@ -216,5 +217,33 @@ void Helper::prepare_spider_random_exe()
             _pclose(pipe);
         }
         */
+    }
+}
+
+size_t Helper::get_memory_usage()
+{
+    // PROCESS_MEMORY_COUNTERS pmc;
+    // const HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, GetCurrentProcessId());
+    //
+    // if (hProcess == NULL) {
+    //     return 0;
+    // }
+    //
+    // if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
+    //     CloseHandle(hProcess);
+    //     return pmc.WorkingSetSize / 1024;  // 返回 KB
+    // }
+    //
+    // CloseHandle(hProcess);
+    // return 0;
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+    HANDLE hProcess = GetCurrentProcess();
+
+    if (GetProcessMemoryInfo(hProcess, (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc))) {
+        // std::cout << "PrivateUsage (真实占用): " << pmc.PrivateUsage / 1024 << " KB\n";
+        return pmc.PrivateUsage / 1024;
+    } else {
+        // std::cerr << "GetProcessMemoryInfo failed.\n";
+        return 0;
     }
 }

@@ -255,6 +255,10 @@ void TestMode::setup()
         join(0);
         is_input = false;
     }));
+    commands->insert(std::make_pair("memory", [this]()
+    {
+        std::cout << Helper::get_memory_usage() << "KB Memory Usage." << std::endl;
+    }));
     commands->insert(std::make_pair("clear", []()
     {
         system("cls");
