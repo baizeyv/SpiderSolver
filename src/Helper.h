@@ -25,6 +25,7 @@ public:
     static std::string get_current_timestamp_millis();
     static void prepare_spider_random_exe();
     static size_t get_memory_usage();
+    static void trim_memory();
 };
 inline std::string SpiderRandom;
 

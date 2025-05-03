@@ -241,6 +241,7 @@ void TestMode::setup()
             std::cout << spd::ViewTestOptionsException << std::endl;
             return;
         }
+        Helper::trim_memory();
     }));
 
     // #####################################################
@@ -264,6 +265,10 @@ void TestMode::setup()
         system("cls");
         spd::output_icon();
     }));
+    commands->insert(std::make_pair("shrink", []()
+    {
+        Helper::trim_memory();
+    }));
     commands->insert(std::make_pair("help", [this]()
     {
         std::cout << "You are in `TestMode(spider --test)` now." << std::endl
@@ -273,7 +278,8 @@ void TestMode::setup()
             << "    query `vita | playvalve` -> Query the level currently being attempted to solve." << std::endl
             << "    stop `vita | playvalve` -> Stop the level currently being attempted to solve." << std::endl
             << "    view `vita` `vita_level_string` -> View the Vita level cards." << std::endl
-            << "    view `playvalve` `seed` `suit_count` -> View the PlayValve level cards." << std::endl;
+            << "    view `playvalve` `seed` `suit_count` -> View the PlayValve level cards." << std::endl
+            << "    shrink -> Trim memory." << std::endl;
     }));
 }
 

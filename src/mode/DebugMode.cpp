@@ -118,6 +118,7 @@ void DebugMode::setup()
             std::cout << spd::StopTestOptionsException << std::endl;
             return;
         }
+        Helper::trim_memory();
     }));
 
     commands->insert(std::make_pair("exit", [this]()
@@ -135,13 +136,18 @@ void DebugMode::setup()
         system("cls");
         spd::output_icon();
     }));
+    commands->insert(std::make_pair("shrink", []()
+    {
+        Helper::trim_memory();
+    }));
     commands->insert(std::make_pair("help", [this]()
     {
         std::cout << "You are in `DebugMode(spider --debug)` now." << std::endl
             << "Commands:" << std::endl
             << "    vita `level_string` -> Try to solve the Vita level." << std::endl
             << "    playvalve `seed` `suit_count` -> Try to solve the PlayValve level." << std::endl
-            << "    stop `vita | playvalve` -> Stop the level currently being attempted to solve." << std::endl;
+            << "    stop `vita | playvalve` -> Stop the level currently being attempted to solve." << std::endl
+            << "    shrink -> Trim memory." << std::endl;
     }));
 }
 

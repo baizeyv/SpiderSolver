@@ -247,3 +247,9 @@ size_t Helper::get_memory_usage()
         return 0;
     }
 }
+
+void Helper::trim_memory()
+{
+    // -1 表示让系统自动决定新的最小/最大工作集，效果是释放尽量多的物理内存
+    SetProcessWorkingSetSize(GetCurrentProcess(), -1, -1);
+}
