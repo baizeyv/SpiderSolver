@@ -13,21 +13,23 @@ DebugMode::~DebugMode()
     delete arg_commands;
     delete commands;
     // # region vita test
-    if (vita_debug_solver)
+    if (vita_debug_solver != nullptr)
         vita_debug_solver->stop();
-    if (vita_debug_thread && vita_debug_thread->joinable())
+    if (vita_debug_thread != nullptr && vita_debug_thread->joinable())
         vita_debug_thread->join();
-    delete vita_debug_solver;
-    if (vita_debug_thread)
+    if (vita_debug_solver != nullptr)
+        delete vita_debug_solver;
+    if (vita_debug_thread != nullptr)
         vita_debug_thread.reset();
     
     // # region playvalve test
-    if (playvalve_debug_solver)
+    if (playvalve_debug_solver != nullptr)
         playvalve_debug_solver->stop();
-    if (playvalve_debug_thread && playvalve_debug_thread->joinable())
+    if (playvalve_debug_thread != nullptr && playvalve_debug_thread->joinable())
         playvalve_debug_thread->join();
-    delete playvalve_debug_solver;
-    if (playvalve_debug_thread)
+    if (playvalve_debug_solver != nullptr)
+        delete playvalve_debug_solver;
+    if (playvalve_debug_thread != nullptr)
         playvalve_debug_thread.reset();
 }
 
@@ -38,7 +40,7 @@ void DebugMode::setup()
 
     arg_commands->insert(std::make_pair("vita", [this](const std::string& args)
     {
-        if (!vita_debug_thread_done && vita_debug_thread && vita_debug_solver)
+        if (!vita_debug_thread_done && vita_debug_thread != nullptr && vita_debug_solver != nullptr)
         {
             std::cout << spd::VitaTestRunning << std::endl;
             return;
@@ -67,7 +69,7 @@ void DebugMode::setup()
     
     arg_commands->insert(std::make_pair("playvalve", [this](const std::string& args)
     {
-        if (!playvalve_debug_thread_done && playvalve_debug_thread && playvalve_debug_solver)
+        if (!playvalve_debug_thread_done && playvalve_debug_thread != nullptr && playvalve_debug_solver != nullptr)
         {
             std::cout << spd::PlayValveTestRunning << std::endl;
             return;
@@ -152,13 +154,13 @@ void DebugMode::join(const int type)
 {
     if (type == 0 || type == 2)
     {
-        if (vita_debug_thread_done && vita_debug_thread && vita_debug_thread->joinable())
+        if (vita_debug_thread_done && vita_debug_thread != nullptr && vita_debug_thread->joinable())
         {
             std::cout << spd::VitaTestWaitThread << std::endl;
             vita_debug_thread->join();
             std::cout << spd::VitaTestThreadEnd << std::endl;
         }
-        else if (!vita_debug_thread_done && vita_debug_thread)
+        else if (!vita_debug_thread_done && vita_debug_thread != nullptr)
         {
             if (vita_debug_solver)
                 vita_debug_solver->stop();
@@ -167,16 +169,21 @@ void DebugMode::join(const int type)
             std::cout << spd::VitaTestThreadEnd << std::endl;
             vita_debug_thread.reset();
         }
+        if (vita_debug_solver != nullptr)
+        {
+            delete vita_debug_solver;
+            vita_debug_solver = nullptr;
+        }
     }
     if (type == 0 || type == 1)
     {
-        if (playvalve_debug_thread_done && playvalve_debug_thread && playvalve_debug_thread->joinable())
+        if (playvalve_debug_thread_done && playvalve_debug_thread != nullptr && playvalve_debug_thread->joinable())
         {
             std::cout << spd::PlayValveTestWaitThread << std::endl;
             playvalve_debug_thread->join();
             std::cout << spd::PlayValveTestThreadEnd << std::endl;
         }
-        else if (!playvalve_debug_thread_done && playvalve_debug_thread)
+        else if (!playvalve_debug_thread_done && playvalve_debug_thread != nullptr)
         {
             if (playvalve_debug_solver)
                 playvalve_debug_solver->stop();
@@ -184,6 +191,11 @@ void DebugMode::join(const int type)
             playvalve_debug_thread->join();
             std::cout << spd::PlayValveTestThreadEnd << std::endl;
             playvalve_debug_thread.reset();
+        }
+        if (playvalve_debug_solver != nullptr)
+        {
+            delete playvalve_debug_solver;
+            playvalve_debug_solver = nullptr;
         }
     }
 }

@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <mutex>
 #include <ranges>
 
 #include "Const.h"
@@ -174,13 +175,13 @@ std::vector<State*> Solver::move_movable_cards(const std::vector<Card*>& movable
     return vec;
 }
 
-Solver::Solver(const int seed, const int suitCount): depth(0), sync_end_flag(false), current_state(nullptr), calc(0), solved(false)
+Solver::Solver(const int seed, const int suitCount): depth(0), sync_end_flag(false), calc(0), solved(false)
 {
     poker = new Poker(seed, suitCount);
     root_state = new State(poker);
 }
 
-Solver::Solver(const std::string& vitaLevel): depth(0), sync_end_flag(false), current_state(nullptr), calc(0), solved(false)
+Solver::Solver(const std::string& vitaLevel): depth(0), sync_end_flag(false), calc(0), solved(false)
 {
     poker = new Poker(vitaLevel);
     root_state = new State(poker);
@@ -188,10 +189,10 @@ Solver::Solver(const std::string& vitaLevel): depth(0), sync_end_flag(false), cu
 
 Solver::~Solver()
 {
-    for (auto& state : all_states)
-    {
-        delete state;
-    }
+    // for (auto& state : all_states)
+    // {
+    //     delete state;
+    // }
     // ! root_state 也在 all_states 中,所以不需要重复释放
     // if (root_state != nullptr) {
     //     delete root_state;
@@ -235,9 +236,14 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
 {
     depth++;
     calc++;
-    all_states.insert(root);
-    current_state = root;
+    all_serialized_states.insert(root->to_serialized());
+    // all_states.insert(root);
     root->calc = calc;
+    if (prepare_query == 1)
+    {
+        std::cout << "\b\b" << *root << "> ";
+        prepare_query = 0;
+    }
     // std::cout << root->get_memory_usage() << std::endl;
     if (spd::DebugOutput)
     {
@@ -272,7 +278,8 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
     auto no_filter_states = take_a_step(root, this);
     for (auto& item : no_filter_states)
     {
-        if (!state_exists(all_states, item) && item->secondary_valuation(this))
+        // if (!state_exists(all_states, item) && item->secondary_valuation(this))
+        if (!state_serialized_exists(all_serialized_states, item) && item->secondary_valuation(this))
         {
             states.push_back(item);
         }
@@ -295,33 +302,52 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
         sync_end_flag = true;
         return;
     }
+    // delete root; // ! 不能在这里删除,因为State内部使用了上一步的State,只有在剪枝的时候才时候delete
+    // # 完成后需要continue去delete state pointer
+    bool completed_continue_flag = false;
     // # 遍历所有没有试过的状态
-    for (auto& state : states)
+    for (size_t i = 0; i < states.size(); i++)
     {
-        if (state->is_completed())
+        if (completed_continue_flag)
+        {
+            delete states[i];
+            continue;
+        }
+        if (states[i]->is_completed())
         {
             // # 完成游戏
             // std::cout << "Game Completed !!!" << std::endl;
             solved = true;
-            state->calc = calc;
+            states[i]->calc = calc;
             onCompleted();
             if (!file.empty())
             {
                 const auto exporter = new Exporter(file);
-                exporter->export_csv(id, *state);
+                exporter->export_csv(id, *states[i]);
                 delete exporter;
             }
             sync_end_flag = true;
-            return;
+            completed_continue_flag = true;
+            delete states[i];
+            continue;
         }
-        for (auto& item : states)
+        for (size_t x = i; x < states.size(); x++)
         {
-            all_states.insert(item);
+            all_serialized_states.insert(states[x]->to_serialized());
+            // all_states.insert(item);
         }
-        depth_first_search_sync(state, onCompleted, file, id, exportNull, stepLimit);
+        // for (const auto& item : states)
+        // {
+        //     all_serialized_states.insert(item->to_serialized());
+        //     // all_states.insert(item);
+        // }
+        depth_first_search_sync(states[i], onCompleted, file, id, exportNull, stepLimit);
         depth--;
         if (sync_end_flag)
-            return;
+        {
+            completed_continue_flag = true;
+        }
+        delete states[i];
     }
 }
 
@@ -345,6 +371,12 @@ bool Solver::state_exists(std::unordered_set<State*, StatePtrHash, StatePtrEqual
     return results.contains(newState);
 }
 
+bool Solver::state_serialized_exists(const std::unordered_set<std::string>& results, State*& newState)
+{
+    const auto str = newState->to_serialized();
+    return results.contains(str);
+}
+
 std::vector<State*> Solver::sort(std::unordered_set<State*, StatePtrHash, StatePtrEqual> states)
 {
     std::vector<State*> list(states.begin(), states.end());
@@ -363,7 +395,7 @@ std::vector<State*> Solver::sort(std::unordered_set<State*, StatePtrHash, StateP
             const auto af = a->history[0].get_from();
             const auto ac = a->history[0].get_count();
             const auto at = a->history[0].get_to();
-            
+
             const auto bf = b->history[0].get_from();
             const auto bc = b->history[0].get_count();
             const auto bt = b->history[0].get_to();
@@ -395,7 +427,7 @@ std::vector<State*> Solver::sort(std::unordered_set<State*, StatePtrHash, StateP
         {
             if (!p->previous || p->get_suit_count() <= 1)
                 return std::numeric_limits<int>::min();
-            
+
             const auto from = p->history[0].get_from();
             const auto to = p->history[0].get_to();
             if (from < 0 || to < 0 || from < to)

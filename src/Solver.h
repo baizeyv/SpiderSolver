@@ -6,6 +6,8 @@
 #define SOLVER_H
 #include <atomic>
 #include <functional>
+#include <memory>
+#include <queue>
 #include <unordered_set>
 
 #include "State.h"
@@ -21,7 +23,12 @@ private:
     /**
      * * 所有尝试过的状态的指针HashSet
      */
-    std::unordered_set<State*, StatePtrHash, StatePtrEqual> all_states;
+    // std::unordered_set<State*, StatePtrHash, StatePtrEqual> all_states;
+
+    /**
+     * * 所有尝试过的状态的序列化
+     */
+    std::unordered_set<std::string> all_serialized_states;
 
     /**
      * * 求解深度
@@ -49,7 +56,7 @@ public:
      */
     bool special_filter = true;
 
-    State* current_state;
+    uint8_t prepare_query : 1 = 0;
 
     /**
      * * 尝试求解总次数
@@ -84,6 +91,8 @@ public:
 
     static bool state_exists(std::unordered_set<State *, StatePtrHash, StatePtrEqual>& results, State* &newState);
 
+    static bool state_serialized_exists(const std::unordered_set<std::string>& results, State* &newState);
+    
     static std::vector<State *> sort(std::unordered_set<State *, StatePtrHash, StatePtrEqual> states);
 };
 

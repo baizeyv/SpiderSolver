@@ -30,6 +30,8 @@ public:
 
     std::string to_string() const;
 
+    char to_char() const;
+
     friend std::ostream& operator<<(std::ostream& out, const Card& card);
 
 };

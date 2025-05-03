@@ -17,7 +17,7 @@ std::ostream& operator<<(std::ostream &out, const Card &card) {
 
 Card::Card(int value, const int suit) : suit(suit - 1) {
     original_value = value;
-    if (value <= 53 && value >= 40)
+    if (value <= 52 && value >= 40)
         value -= 39;
     else if (value  <= 39 &&value >= 27)
         value -= 26;
@@ -55,4 +55,12 @@ std::string Card::get_value() const {
 
 std::string Card::to_string() const {
     return get_suit() + get_value();
+}
+
+char Card::to_char() const
+{
+    if (const auto offest_index = original_value - 1; offest_index < 26)
+        return 'a' + offest_index;
+    else
+        return 'A' + offest_index;
 }

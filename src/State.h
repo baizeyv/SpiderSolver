@@ -4,6 +4,7 @@
 
 #ifndef STATE_H
 #define STATE_H
+#include <memory>
 #include <vector>
 
 #include "Card.h"
@@ -112,6 +113,12 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const State& state);
 
     size_t get_memory_usage() const override;
+
+    /**
+     * * 获取序列化后的字符串,用于保存State,节省内存
+     * @return 
+     */
+    std::string to_serialized() const;
 
 private:
     int valuation = -9999;

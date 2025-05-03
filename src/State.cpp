@@ -43,6 +43,11 @@ State::State(Poker * &poker) {
 
 State::~State()
 {
+    deckCard.clear();
+    hiddenCards.clear();
+    visibleCards.clear();
+    hiddenCards.clear();
+    collection_steps.clear();
 }
 
 State::State(const State *previous_state) {
@@ -93,12 +98,12 @@ bool State::is_blank(const int index) const {
 }
 
 void State::move_card(const int from, const int count, const int to) {
-    std::vector<Card *> *fromList = &visibleCards[from];
-    std::vector<Card *> *toList = &visibleCards[to];
-    const size_t tmpCount = std::min<size_t>(count, fromList->size());
-    toList->insert(toList->begin(), std::make_move_iterator(fromList->begin()),
-                   std::make_move_iterator(fromList->begin() + tmpCount));
-    fromList->erase(fromList->begin(), fromList->begin() + tmpCount);
+    const size_t tmpCount = std::min<size_t>(count, visibleCards[from].size());
+    for (int i = tmpCount - 1; i >= 0; i--)
+    {
+        visibleCards[to].insert(visibleCards[to].begin(), visibleCards[from][i]);
+    }
+    visibleCards[from].erase(visibleCards[from].begin(), visibleCards[from].begin() + tmpCount);
     // # 检测收牌
     bool collection = detect_collection(to);
     // # 来源列再没有可见牌的时候要翻开hidden牌
@@ -471,9 +476,11 @@ int State::check_flop(const State * state, int column, int &depth, const int lim
     // # 计算额外翻牌分
     for (auto & item: setCome) {
         result += item->flop_valuation(limit, true);
+        delete item;
     }
     for (auto & item: setTo) {
         result += item->flop_valuation(limit, false);
+        delete item;
     }
     return result;
 }
@@ -610,6 +617,36 @@ size_t State::get_memory_usage() const
     total += sizeof(previous);
     total += sizeof(columnValuation);
     return total;
+}
+
+std::string State::to_serialized() const
+{
+    std::string result;
+    for (size_t i = 0; i < 10; i ++)
+    {
+        result += std::to_string(visibleCards[i].size());
+        result += ",";
+        for (const auto& card : visibleCards[i])
+        {
+            result += card->to_char();
+        }
+        for (const auto& card : hiddenCards[i])
+        {
+            result += card->to_char();
+        }
+        result += ";";
+    }
+    if (deckCard.empty())
+    {
+        result += "*";
+    } else
+    {
+        for (const auto& card : deckCard)
+        {
+            result += card->to_char();
+        }
+    }
+    return result;
 }
 
 std::ostream& operator<<(std::ostream &out, const State &state) {

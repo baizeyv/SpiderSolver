@@ -22,20 +22,22 @@ TestMode::~TestMode()
     delete arg_commands;
     delete commands;
     // # region vita test
-    if (vita_test_solver)
+    if (vita_test_solver != nullptr)
         vita_test_solver->stop();
-    if (vita_test_thread && vita_test_thread->joinable())
+    if (vita_test_thread != nullptr && vita_test_thread->joinable())
         vita_test_thread->join();
-    delete vita_test_solver;
-    if (vita_test_thread)
+    if (vita_test_solver != nullptr)
+        delete vita_test_solver;
+    if (vita_test_thread != nullptr)
         vita_test_thread.reset();
     // # region playvalve test
-    if (playvalve_test_solver)
+    if (playvalve_test_solver != nullptr)
         playvalve_test_solver->stop();
-    if (playvalve_test_thread && playvalve_test_thread->joinable())
+    if (playvalve_test_thread != nullptr && playvalve_test_thread->joinable())
         playvalve_test_thread->join();
-    delete playvalve_test_solver;
-    if (playvalve_test_thread)
+    if (playvalve_test_solver != nullptr)
+        delete playvalve_test_solver;
+    if (playvalve_test_thread != nullptr)
         playvalve_test_thread.reset();
 }
 
@@ -46,7 +48,7 @@ void TestMode::setup()
 
     arg_commands->insert(std::make_pair("vita", [this](const std::string& args)
     {
-        if (!vita_test_thread_done && vita_test_thread && vita_test_solver)
+        if (!vita_test_thread_done && vita_test_thread != nullptr && vita_test_solver != nullptr)
         {
             std::cout << spd::VitaTestRunning << std::endl;
             return;
@@ -75,7 +77,7 @@ void TestMode::setup()
 
     arg_commands->insert(std::make_pair("playvalve", [this](const std::string& args)
     {
-        if (!playvalve_test_thread_done && playvalve_test_thread && playvalve_test_solver)
+        if (!playvalve_test_thread_done && playvalve_test_thread != nullptr && playvalve_test_solver != nullptr)
         {
             std::cout << spd::PlayValveTestRunning << std::endl;
             return;
@@ -113,7 +115,7 @@ void TestMode::setup()
         }
         if (params[0] == "vita")
         {
-            if (vita_test_solver)
+            if (vita_test_solver != nullptr)
             {
                 if (vita_test_solver->solved)
                 {
@@ -123,7 +125,8 @@ void TestMode::setup()
                 else
                 {
                     std::cout << spd::VitaTestSolving << vita_test_solver->calc << std::endl;
-                    std::cout << *vita_test_solver->current_state << std::endl;
+                    vita_test_solver->prepare_query = 1;
+                    // std::cout << *vita_test_solver->current_state << std::endl;
                     return;
                 }
             }
@@ -135,7 +138,7 @@ void TestMode::setup()
         }
         else if (params[0] == "playvalve")
         {
-            if (playvalve_test_solver)
+            if (playvalve_test_solver != nullptr)
             {
                 if (playvalve_test_solver->solved)
                 {
@@ -145,7 +148,8 @@ void TestMode::setup()
                 else
                 {
                     std::cout << spd::PlayValveTestSolving << playvalve_test_solver->calc << std::endl;
-                    std::cout << *playvalve_test_solver->current_state << std::endl;
+                    playvalve_test_solver->prepare_query = 1;
+                    // std::cout << *playvalve_test_solver->current_state << std::endl;
                     return;
                 }
             }
@@ -278,13 +282,13 @@ void TestMode::join(const int type)
 {
     if (type == 0 || type == 2)
     {
-        if (vita_test_thread_done && vita_test_thread && vita_test_thread->joinable())
+        if (vita_test_thread_done && vita_test_thread != nullptr && vita_test_thread->joinable())
         {
             std::cout << spd::VitaTestWaitThread << std::endl;
             vita_test_thread->join();
             std::cout << spd::VitaTestThreadEnd << std::endl;
         }
-        else if (!vita_test_thread_done && vita_test_thread)
+        else if (!vita_test_thread_done && vita_test_thread != nullptr)
         {
             if (vita_test_solver)
                 vita_test_solver->stop();
@@ -293,16 +297,21 @@ void TestMode::join(const int type)
             std::cout << spd::VitaTestThreadEnd << std::endl;
             vita_test_thread.reset();
         }
+        if (vita_test_solver != nullptr)
+        {
+            delete vita_test_solver;
+            vita_test_solver = nullptr;
+        }
     }
     if (type == 0 || type == 1)
     {
-        if (playvalve_test_thread_done && playvalve_test_thread && playvalve_test_thread->joinable())
+        if (playvalve_test_thread_done && playvalve_test_thread != nullptr && playvalve_test_thread->joinable())
         {
             std::cout << spd::PlayValveTestWaitThread << std::endl;
             playvalve_test_thread->join();
             std::cout << spd::PlayValveTestThreadEnd << std::endl;
         }
-        else if (!playvalve_test_thread_done && playvalve_test_thread)
+        else if (!playvalve_test_thread_done && playvalve_test_thread != nullptr)
         {
             if (playvalve_test_solver)
                 playvalve_test_solver->stop();
@@ -310,6 +319,11 @@ void TestMode::join(const int type)
             playvalve_test_thread->join();
             std::cout << spd::PlayValveTestThreadEnd << std::endl;
             playvalve_test_thread.reset();
+        }
+        if (playvalve_test_solver != nullptr)
+        {
+            delete playvalve_test_solver;
+            playvalve_test_solver = nullptr;
         }
     }
 }

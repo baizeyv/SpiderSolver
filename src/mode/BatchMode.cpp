@@ -16,26 +16,28 @@ BatchMode::~BatchMode()
     delete arg_commands;
     delete commands;
     // # region vita test
-    if (vita_batch_solver)
+    if (vita_batch_solver != nullptr)
     {
         vita_batch_stop_flag = true;
         vita_batch_solver->stop();
     }
-    if (vita_batch_thread && vita_batch_thread->joinable())
+    if (vita_batch_thread != nullptr && vita_batch_thread->joinable())
         vita_batch_thread->join();
-    delete vita_batch_solver;
-    if (vita_batch_thread)
+    if (vita_batch_solver != nullptr)
+        delete vita_batch_solver;
+    if (vita_batch_thread != nullptr)
         vita_batch_thread.reset();
     // # region playvalve test
-    if (playvalve_batch_solver)
+    if (playvalve_batch_solver != nullptr)
     {
         playvalve_batch_stop_flag = true;
         playvalve_batch_solver->stop();
     }
-    if (playvalve_batch_thread && playvalve_batch_thread->joinable())
+    if (playvalve_batch_thread != nullptr && playvalve_batch_thread->joinable())
         playvalve_batch_thread->join();
-    delete playvalve_batch_solver;
-    if (playvalve_batch_thread)
+    if (playvalve_batch_solver != nullptr)
+        delete playvalve_batch_solver;
+    if (playvalve_batch_thread != nullptr)
         playvalve_batch_thread.reset();
 }
 
@@ -47,6 +49,11 @@ void BatchMode::setup()
     // playvalve C:\foo\bar\level.txt C:\foo\bar\output 1000000
     arg_commands->insert(std::make_pair("vita", [this](const std::string& args)
     {
+        if (!vita_batch_thread_done && vita_batch_thread != nullptr && vita_batch_solver != nullptr)
+        {
+            std::cout << spd::VitaTestRunning << std::endl;
+            return;
+        }
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 3 && params.size() != 2)
         {
@@ -97,6 +104,11 @@ void BatchMode::setup()
     }));
     arg_commands->insert(std::make_pair("playvalve", [this](const std::string& args)
     {
+        if (!playvalve_batch_thread_done && playvalve_batch_thread != nullptr && playvalve_batch_solver != nullptr)
+        {
+            std::cout << spd::PlayValveTestRunning << std::endl;
+            return;
+        }
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 4 && params.size() != 3)
         {
@@ -206,40 +218,50 @@ void BatchMode::join(int type)
     if (type == 0 || type == 2)
     {
         vita_batch_stop_flag = true;
-        if (vita_batch_thread_done && vita_batch_thread && vita_batch_thread->joinable())
+        if (vita_batch_thread_done && vita_batch_thread != nullptr && vita_batch_thread->joinable())
         {
             std::cout << spd::VitaTestWaitThread << std::endl;
             vita_batch_thread->join();
             std::cout << spd::VitaTestThreadEnd << std::endl;
         }
-        else if (!vita_batch_thread_done && vita_batch_thread)
+        else if (!vita_batch_thread_done && vita_batch_thread != nullptr)
         {
-            if (vita_batch_solver)
+            if (vita_batch_solver != nullptr)
                 vita_batch_solver->stop();
             std::cout << spd::VitaTestWaitThread << std::endl;
             vita_batch_thread->join();
             std::cout << spd::VitaTestThreadEnd << std::endl;
             vita_batch_thread.reset();
         }
+        if (vita_batch_solver != nullptr)
+        {
+            delete vita_batch_solver;
+            vita_batch_solver = nullptr;
+        }
         vita_batch_stop_flag = false;
     }
     if (type == 0 || type == 1)
     {
         playvalve_batch_stop_flag = true;
-        if (playvalve_batch_thread_done && playvalve_batch_thread && playvalve_batch_thread->joinable())
+        if (playvalve_batch_thread_done && playvalve_batch_thread != nullptr && playvalve_batch_thread->joinable())
         {
             std::cout << spd::PlayValveTestWaitThread << std::endl;
             playvalve_batch_thread->join();
             std::cout << spd::PlayValveTestThreadEnd << std::endl;
         }
-        else if (!playvalve_batch_thread_done && playvalve_batch_thread)
+        else if (!playvalve_batch_thread_done && playvalve_batch_thread != nullptr)
         {
-            if (playvalve_batch_solver)
+            if (playvalve_batch_solver != nullptr)
                 playvalve_batch_solver->stop();
             std::cout << spd::PlayValveTestWaitThread << std::endl;
             playvalve_batch_thread->join();
             std::cout << spd::PlayValveTestThreadEnd << std::endl;
             playvalve_batch_thread.reset();
+        }
+        if (playvalve_batch_solver != nullptr)
+        {
+            delete playvalve_batch_solver;
+            playvalve_batch_solver = nullptr;
         }
         playvalve_batch_stop_flag = false;
     }
