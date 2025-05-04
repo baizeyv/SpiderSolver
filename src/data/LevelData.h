@@ -27,8 +27,9 @@ public:
     int step8;
     std::string history;
     std::string level;
+    std::string serialized;
 
-    LevelData(const int id, const State& state, bool is_null = false);
+    LevelData(int id, const State& state, bool is_null = false);
     ~LevelData();
 };
 

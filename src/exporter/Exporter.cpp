@@ -12,7 +12,7 @@
 #include "../Helper.h"
 #include "../data/LevelData.h"
 
-Exporter::Exporter(std::string  file_path) : full_file_path(std::move(file_path))
+Exporter::Exporter(std::string file_path) : full_file_path(std::move(file_path))
 {
 }
 
@@ -28,12 +28,12 @@ void Exporter::export_csv(const int id, const State& state, bool is_null) const
     if (!std::filesystem::exists(full_file_path))
     {
         std::ofstream writer(full_file_path, std::ios::app);
-        writer << "id,seed,calc,difficulty,step1,step2,step3,step4,step5,step6,step7,step8,suitCount,history,level\n";
+        writer << "id,seed,calc,difficulty,step1,step2,step3,step4,step5,step6,step7,step8,suitCount,history,level,serialized\n";
         writer << content << "\n";
-    } else
+    }
+    else
     {
         std::ofstream writer(full_file_path, std::ios::app);
         writer << content << "\n";
     }
 }
-

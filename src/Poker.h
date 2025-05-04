@@ -55,6 +55,8 @@ public:
 
     std::string get_level() const;
 
+    std::string to_serialized() const;
+
 };
 
 

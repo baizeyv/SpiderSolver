@@ -45,6 +45,7 @@ LevelData::LevelData(const int id, const State& state, const bool is_null) : id(
         }
     }
     level = state.poker->get_level();
+    serialized = state.poker->to_serialized();
 }
 
 LevelData::~LevelData() = default;
@@ -67,6 +68,7 @@ std::ostream& operator<<(std::ostream& os, const LevelData& data)
         << quotation << std::to_string(data.step8) << quotation << split
         << quotation << std::to_string(data.suit_count) << quotation << split
         << quotation << data.history << quotation << split
-        << quotation << data.level << quotation;
+        << quotation << data.level << quotation << split
+        << quotation << data.serialized << quotation;
     return os;
 }
