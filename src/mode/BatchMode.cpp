@@ -280,7 +280,7 @@ bool BatchMode::input()
     return is_input;
 }
 
-void BatchMode::join(int type)
+void BatchMode::join(const int type)
 {
     if (type == 0 || type == 2)
     {
