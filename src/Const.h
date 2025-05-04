@@ -9,7 +9,7 @@
 
 namespace spd
 {
-    inline std::string VERSION = "1.0.2";
+    inline std::string VERSION = "1.0.3";
     
     static std::string UnknowCommand = "WARNING(SPD30001): [Unknow Command] -> ";
     static std::string VitaTestArgumentsException = "ERROR(SPD40000): [Vita Test Solve Arguments Error]";
