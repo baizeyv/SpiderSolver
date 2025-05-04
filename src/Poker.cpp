@@ -251,7 +251,6 @@ std::string Poker::to_serialized() const
     std::vector<std::vector<Card> > hiddenCards;
     std::vector<std::vector<Card> > visibleCards;
     std::vector<Card> deckCard;
-    //std::vector<Card> tmpHidden(cards.begin(), cards.begin() + 44);
 
     // # 44张隐藏的
     for (int i = 0; i < 44; ++i) {

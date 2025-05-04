@@ -13,6 +13,7 @@ namespace spd
     
     static std::string UnknowCommand = "WARNING(SPD30001): [Unknow Command] -> ";
     static std::string VitaTestArgumentsException = "ERROR(SPD40000): [Vita Test Solve Arguments Error]";
+    static std::string GenerationArgumentsException = "ERROR(SPD40000): [Generation Arguments Error]";
     static std::string PlayValveTestArgumentsException = "ERROR(SPD40000): [PlayValve Test Solve Arguments Error]";
     static std::string VitaTestLevelLengthException = "ERROR(SPD40001): [Vita Test Solve Arguments Level String Length Error]";
     static std::string PlayValveTestOptionsException = "ERROR(SPD40001): [PlayValve Test Solve Arguments String Error]";
@@ -37,6 +38,7 @@ namespace spd
     static std::string VitaTestStart = "Vita Test Start -> ";
     static std::string PlayValveTestStart = "PlayValve Test Start -> ";
     static std::string VitaTestRunning = "Vita Test Is Running!Please Stop It First By `stop vita`";
+    static std::string GenerationRunning = "Generation Is Running!Please Stop It First By `stop`";
     static std::string PlayValveTestRunning = "PlayValve Test Is Running!Please Stop It First By `stop vita`";
     
     inline std::string EmptyCard = ":::: ";

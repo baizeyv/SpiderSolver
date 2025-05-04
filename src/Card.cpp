@@ -62,5 +62,5 @@ char Card::to_char() const
     if (const auto offest_index = original_value - 1; offest_index < 26)
         return 'a' + offest_index;
     else
-        return 'A' + offest_index;
+        return 'A' + offest_index - 26;
 }

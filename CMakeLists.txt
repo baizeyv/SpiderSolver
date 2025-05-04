@@ -37,4 +37,6 @@ add_executable(spider src/main.cpp
         src/HistoryItem.h
         src/HistoryItem.cpp
         src/IMemUsage.h
+        src/mode/GenMode.cpp
+        src/mode/GenMode.h
 )
