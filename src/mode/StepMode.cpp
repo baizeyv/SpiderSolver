@@ -130,7 +130,7 @@ void StepMode::setup()
     }));
     commands->insert(std::make_pair("help", [this]()
     {
-        std::cout << "You are in `TestMode(spider --test)` now." << std::endl
+        std::cout << "You are in `StepMode(spider --step)` now." << std::endl
             << "Commands:" << std::endl
             << "    vita `level_string` -> Try to solve the Vita level." << std::endl
             << "    playvalve `seed` `suit_count` -> Try to solve the PlayValve level." << std::endl

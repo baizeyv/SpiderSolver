@@ -20,8 +20,6 @@
  */
 int main(const int argc, char* argv[])
 {
-    system("cls");
-    spd::output_icon();
 
     cxxopts::Options options(
         "spider", "\n[Spider Solitaire Solver]\n@author: baizeyv\n@contact: baizeyv@gmail.com\n@git: https://github.com/baizeyv/SpiderSolver\n");
@@ -38,11 +36,14 @@ int main(const int argc, char* argv[])
     {
         if (const auto result = options.parse(argc, argv); result.count("help"))
         {
+            spd::output_icon();
             std::cout << options.help() << std::endl;
             return 0;
         }
         else if (result.count("test"))
         {
+            system("cls");
+            spd::output_icon();
             // # test mode
             const auto mode = new TestMode();
             mode->setup();
@@ -51,6 +52,8 @@ int main(const int argc, char* argv[])
         }
         else if (result.count("debug"))
         {
+            system("cls");
+            spd::output_icon();
             // # debug mode
             if (result.count("output"))
             {
@@ -64,6 +67,8 @@ int main(const int argc, char* argv[])
         }
         else if (result.count("batch"))
         {
+            system("cls");
+            spd::output_icon();
             // # batch mode
             const auto mode = new BatchMode();
             mode->setup();
@@ -72,6 +77,8 @@ int main(const int argc, char* argv[])
         }
         else if (result.count("step"))
         {
+            system("cls");
+            spd::output_icon();
             // # step mode
             const auto mode = new StepMode();
             mode->setup();
@@ -80,6 +87,8 @@ int main(const int argc, char* argv[])
         }
         else if (result.count("generate"))
         {
+            system("cls");
+            spd::output_icon();
             // # generation mode
             const auto mode = new GenMode();
             mode->setup();
@@ -88,6 +97,7 @@ int main(const int argc, char* argv[])
         }
         else if (result.count("version"))
         {
+            spd::output_icon();
             std::cout << "       spider version:" << spd::VERSION << std::endl;
         }
     }
