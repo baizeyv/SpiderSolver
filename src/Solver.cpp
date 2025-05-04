@@ -201,6 +201,24 @@ Solver::~Solver()
     delete poker;
 }
 
+void Solver::call_step_dfs()
+{
+    depth_first_search_sync(root_state, []()
+    {
+    }, "", 0, false, -1, true);
+    Helper::trim_memory();
+    if (!solved)
+    {
+        all_serialized_states.clear();
+        special_filter = false;
+        depth_first_search_sync(root_state, []()
+        {
+        }, "", 0, false, -1, true);
+        special_filter = true;
+        Helper::trim_memory();
+    }
+}
+
 void Solver::call_test_dfs()
 {
     depth_first_search_sync(root_state, []()
@@ -239,8 +257,20 @@ void Solver::call_dfs(const std::string& file, const int id, const bool exportNu
 
 void Solver::depth_first_search_sync(State*& root, const std::function<void()>& onCompleted, const std::string& file,
                                      const int id,
-                                     const bool exportNull, const int stepLimit)
+                                     const bool exportNull, const int stepLimit, const bool step_mode)
 {
+    if (step_mode)
+    {
+        while (next_step == 0)
+        {
+            if (abort_step == 1)
+            {
+                sync_end_flag = true;
+                break;
+            }
+        }
+        next_step = 0;
+    }
     depth++;
     calc++;
     all_serialized_states.insert(root->to_serialized());
@@ -252,6 +282,10 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
     {
         std::cout << "\b\b" << *root << "> ";
         prepare_query = 0;
+    }
+    if (step_mode && abort_step == 0)
+    {
+        std::cout << "\b\b" << *root << std::endl << "> ";
     }
     // std::cout << root->get_memory_usage() << std::endl;
     if (spd::DebugOutput)
@@ -314,6 +348,8 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
     // delete root; // ! 不能在这里删除,因为State内部使用了上一步的State,只有在剪枝的时候才时候delete
     // # 完成后需要continue去delete state pointer
     bool completed_continue_flag = false;
+    if (step_mode && abort_step == 1)
+        completed_continue_flag = true;
     // # 遍历所有没有试过的状态
     for (size_t i = 0; i < states.size(); i++)
     {
@@ -350,9 +386,9 @@ void Solver::depth_first_search_sync(State*& root, const std::function<void()>& 
         //     all_serialized_states.insert(item->to_serialized());
         //     // all_states.insert(item);
         // }
-        depth_first_search_sync(states[i], onCompleted, file, id, exportNull, stepLimit);
+        depth_first_search_sync(states[i], onCompleted, file, id, exportNull, stepLimit, step_mode);
         depth--;
-        if (sync_end_flag)
+        if (sync_end_flag || abort_step == 1)
         {
             completed_continue_flag = true;
         }

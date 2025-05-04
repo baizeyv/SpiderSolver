@@ -58,6 +58,10 @@ public:
 
     uint8_t prepare_query : 1 = 0;
 
+    uint8_t next_step : 1 = 0;
+    
+    uint8_t abort_step : 1 = 0;
+
     /**
      * * 尝试求解总次数
      */
@@ -71,11 +75,13 @@ public:
 
     ~Solver();
 
+    void call_step_dfs();
+    
     void call_test_dfs();
 
     void call_dfs(const std::string &file = "", int id = 0, bool exportNull = true, int stepLimit = -1);
 
-    void depth_first_search_sync(State* &root, const std::function<void()> &onCompleted, const std::string &file = "", int id = 0, bool exportNull = true, int stepLimit = -1);
+    void depth_first_search_sync(State* &root, const std::function<void()> &onCompleted, const std::string &file = "", int id = 0, bool exportNull = true, int stepLimit = -1, bool step_mode = false);
 
     void stop();
 

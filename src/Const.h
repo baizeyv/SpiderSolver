@@ -38,6 +38,7 @@ namespace spd
     static std::string VitaTestStart = "Vita Test Start -> ";
     static std::string PlayValveTestStart = "PlayValve Test Start -> ";
     static std::string VitaTestRunning = "Vita Test Is Running!Please Stop It First By `stop vita`";
+    static std::string StepTestRunning = "Step Test Is Running!Please Stop It First By `stop`";
     static std::string GenerationRunning = "Generation Is Running!Please Stop It First By `stop`";
     static std::string PlayValveTestRunning = "PlayValve Test Is Running!Please Stop It First By `stop vita`";
     

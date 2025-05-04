@@ -9,6 +9,7 @@
 #include "mode/BatchMode.h"
 #include "mode/DebugMode.h"
 #include "mode/GenMode.h"
+#include "mode/StepMode.h"
 #include "mode/TestMode.h"
 
 /**
@@ -29,7 +30,8 @@ int main(const int argc, char* argv[])
         ("t,test", "Enter `test` mode.")
         ("d,debug", "Enter `debug` mode.")
         ("b,batch", "Enter `batch` mode.")
-        ("g,generate", "Enter `generate` mode")
+        ("g,generate", "Enter `generate` mode.")
+        ("s,step", "Enter `step` mode.")
         ("o,output", "Debug mode output path.", cxxopts::value<std::string>()->default_value(""))
         ("v,version", "Show spider version.");
     try
@@ -64,6 +66,14 @@ int main(const int argc, char* argv[])
         {
             // # batch mode
             const auto mode = new BatchMode();
+            mode->setup();
+            mode->enter();
+            delete mode;
+        }
+        else if (result.count("step"))
+        {
+            // # step mode
+            const auto mode = new StepMode();
             mode->setup();
             mode->enter();
             delete mode;

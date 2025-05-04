@@ -10,7 +10,7 @@
 #include "../Solver.h"
 
 
-class TestMode : public IMode
+class TestMode final : public IMode
 {
 public:
     TestMode();
