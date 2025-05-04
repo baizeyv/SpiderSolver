@@ -74,7 +74,6 @@ void DebugMode::setup()
             std::cout << spd::PlayValveTestRunning << std::endl;
             return;
         }
-        join(1); // # 终止上一个线程
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 2)
         {
@@ -87,6 +86,7 @@ void DebugMode::setup()
             std::cout << spd::PlayValveTestOptionsException << std::endl;
             return;
         }
+        join(1); // # 终止上一个线程
         std::cout << spd::PlayValveTestStart << seed << " " << suit << std::endl;
         playvalve_debug_thread_done = false;
         this->playvalve_debug_thread = std::make_unique<std::thread>(std::thread([seed, suit, this]()

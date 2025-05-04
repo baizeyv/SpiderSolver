@@ -53,7 +53,6 @@ void TestMode::setup()
             std::cout << spd::VitaTestRunning << std::endl;
             return;
         }
-        join(2); // # 终止上一个线程
         const auto params = Helper::parse_arguments(args);
         if (params.size() > 1 || params.empty())
         {
@@ -65,6 +64,7 @@ void TestMode::setup()
             std::cout << spd::VitaTestLevelLengthException << std::endl;
             return;
         }
+        join(2); // # 终止上一个线程
         std::cout << spd::VitaTestStart << params[0] << std::endl;
         vita_test_thread_done = false;
         this->vita_test_thread = std::make_unique<std::thread>(std::thread([params, this]()
@@ -82,7 +82,6 @@ void TestMode::setup()
             std::cout << spd::PlayValveTestRunning << std::endl;
             return;
         }
-        join(1); // # 终止上一个线程
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 2)
         {
@@ -95,6 +94,7 @@ void TestMode::setup()
             std::cout << spd::PlayValveTestOptionsException << std::endl;
             return;
         }
+        join(1); // # 终止上一个线程
         std::cout << spd::PlayValveTestStart << seed << " " << suit << std::endl;
         playvalve_test_thread_done = false;
         this->playvalve_test_thread = std::make_unique<std::thread>(std::thread([seed, suit, this]()
