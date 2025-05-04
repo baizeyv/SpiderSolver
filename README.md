@@ -15,3 +15,6 @@ Debug关卡模式
 
 ### GenMode
 生成关卡模式
+
+### StepMode
+Step-By-Step模式
