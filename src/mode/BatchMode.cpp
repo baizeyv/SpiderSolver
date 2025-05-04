@@ -234,6 +234,35 @@ void BatchMode::setup()
     {
         Helper::trim_memory();
     }));
+    commands->insert(std::make_pair("query", [this]()
+    {
+        if (vita_batch_solver != nullptr)
+        {
+            if (vita_batch_solver->solved)
+            {
+                std::cout << spd::VitaTestSolved << vita_batch_solver->poker->mark << " ->CALC:" << vita_batch_solver->calc << std::endl;
+                return;
+            }
+            else
+            {
+                std::cout << spd::VitaTestSolving << vita_batch_solver->poker->mark << " ->CALC:" << vita_batch_solver->calc << std::endl;
+                return;
+            }
+        }
+        if (playvalve_batch_solver != nullptr)
+        {
+            if (playvalve_batch_solver->solved)
+            {
+                std::cout << spd::PlayValveTestSolved << playvalve_batch_solver->poker->mark << " ->CALC:" << playvalve_batch_solver->calc << std::endl;
+                return;
+            }
+            else
+            {
+                std::cout << spd::PlayValveTestSolving << playvalve_batch_solver->poker->mark << " ->CALC:" << playvalve_batch_solver->calc << std::endl;
+                return;
+            }
+        }
+    }));
     commands->insert(std::make_pair("help", [this]()
     {
         std::cout << "You are in `BatchMode(spider --batch)` now." << std::endl
@@ -241,6 +270,7 @@ void BatchMode::setup()
             << "    vita `level_json_file_path` `output_path` (`step_limit`) -> Try to solve the Vita level." << std::endl
             << "    playvalve `level_txt_file_path` `output_path` `suit_count` (`step_limit`) -> Try to solve the PlayValve level." << std::endl
             << "    stop `vita | playvalve` -> Stop the level currently being attempted to solve." << std::endl
+            << "    query -> Query Vita and PlayValve Exporter." << std::endl
             << "    shrink -> Trim memory." << std::endl;
     }));
 }

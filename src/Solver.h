@@ -16,8 +16,6 @@
 class Solver {
 private:
 
-    Poker* poker;
-
     State* root_state;
 
     /**
@@ -50,6 +48,8 @@ private:
     static std::vector<State*> move_movable_cards(const std::vector<Card*>& movableCards, const int& fromIndex, State*& state, Solver*& solver);
 
 public:
+
+    Poker* poker;
     /**
      * * 特殊算法过滤器,当使用过滤器无解时再关闭过滤器重新执行一次
      * true->代表开启过滤器
