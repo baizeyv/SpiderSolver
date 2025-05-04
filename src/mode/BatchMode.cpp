@@ -6,6 +6,7 @@
 
 #include "../json.hpp"
 #include "../data/VitaBean.h"
+#include "../data/VitaBean2.h"
 
 BatchMode::BatchMode() : is_input(true), vita_batch_solver(nullptr), playvalve_batch_solver(nullptr)
 {
@@ -64,7 +65,6 @@ void BatchMode::setup()
         auto output_path = params[1];
         auto json_content = Helper::read_file(json_path);
         const nlohmann::json j = nlohmann::json::parse(json_content);
-        auto vita_bean = j.get<VitaBean>();
         int step_limit = -1;
         if (params.size() == 3)
         {
@@ -76,31 +76,62 @@ void BatchMode::setup()
         }
         join(2); // # 终止上一个线程
         vita_batch_thread_done = false;
-        this->vita_batch_thread = std::make_unique<std::thread>(std::thread([params, vita_bean, step_limit, this]()
+        try
         {
-            const auto output = params[1] + "\\vita\\vita_" + Helper::get_current_timestamp_millis() + ".csv";
-            for (auto& item : vita_bean.data)
+            auto vita_bean = j.get<VitaBean>();
+            this->vita_batch_thread = std::make_unique<std::thread>(std::thread([params, vita_bean, step_limit, this]()
             {
-                for (auto& level : item.second)
+                const auto output = params[1] + "\\vita\\vita_" + Helper::get_current_timestamp_millis() + ".csv";
+                for (auto& item : vita_bean.data)
                 {
-                    vita_batch_solver = new Solver(level.question);
-                    if (int id; Helper::try_parse_int(level.id, id))
+                    for (auto& level : item.second)
                     {
-                        vita_batch_solver->call_dfs(output, id, true, step_limit);
+                        vita_batch_solver = new Solver(level.question);
+                        if (int id; Helper::try_parse_int(level.id, id))
+                        {
+                            vita_batch_solver->call_dfs(output, id, true, step_limit);
+                        }
+                        if (vita_batch_stop_flag)
+                        {
+                            break;
+                        }
                     }
                     if (vita_batch_stop_flag)
                     {
                         break;
                     }
                 }
-                if (vita_batch_stop_flag)
+                vita_batch_stop_flag = false;
+                vita_batch_thread_done = true;
+            }));
+        }
+        catch (...)
+        {
+            auto vita_bean = j.get<VitaBean2>();
+            this->vita_batch_thread = std::make_unique<std::thread>(std::thread([params, vita_bean, step_limit, this]()
+            {
+                const auto output = params[1] + "\\vita\\vita_" + Helper::get_current_timestamp_millis() + ".csv";
+                for (auto& item : vita_bean.data)
                 {
-                    break;
+                    for (auto& level : item.second)
+                    {
+                        vita_batch_solver = new Solver(level.question);
+                        const int id = level.id;
+                        vita_batch_solver->call_dfs(output, id, true, step_limit);
+                        if (vita_batch_stop_flag)
+                        {
+                            break;
+                        }
+                    }
+                    if (vita_batch_stop_flag)
+                    {
+                        break;
+                    }
                 }
-            }
-            vita_batch_stop_flag = false;
-            vita_batch_thread_done = true;
-        }));
+                vita_batch_stop_flag = false;
+                vita_batch_thread_done = true;
+            }));
+        }
     }));
     arg_commands->insert(std::make_pair("playvalve", [this](const std::string& args)
     {

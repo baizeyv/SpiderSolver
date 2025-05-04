@@ -39,4 +39,8 @@ add_executable(spider src/main.cpp
         src/IMemUsage.h
         src/mode/GenMode.cpp
         src/mode/GenMode.h
+        src/data/LevelBean2.cpp
+        src/data/LevelBean2.h
+        src/data/VitaBean2.cpp
+        src/data/VitaBean2.h
 )
