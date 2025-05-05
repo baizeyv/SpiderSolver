@@ -22,25 +22,25 @@
 #### Commands
 
 > `vita [level_string]` -> Try to solve the vita level.
-
+>
 > `playvalve [seed] [suit_count]` -> Try to solve the PlayValve level.
-
+>
 > `query [vita|playvalve]` -> Query the level currently being attempted to solve.
-
+>
 > `stop [vita|playvalve]` -> Stop the level currently being attempted to solve.
-
+>
 > `view vita [vita_level_string]` -> View the Vita level cards.
-
+>
 > `view playvalve [seed] [suit_count]` -> view the PlayValve level cards.
-
+>
 > `shrink` -> Release memory.
-
+>
 > `memory` -> View memory usage.
-
+>
 > `clear` -> Clear console.
-
+>
 > `exit` -> Exit TestMode.
-
+>
 > `quit` -> Exit TestMode
 
 ### DebugMode
@@ -49,66 +49,66 @@ Debug关卡模式
 #### Commands
 
 > `vita [level_string]` -> Try to solve the vita level.
- 
+>
 > `playvalve [seed] [suit_count]` -> Try to solve the PlayValve level.
- 
+>
 > `stop [vita|playvalve]` -> Stop the level currently being attempted to solve.
-
+>
 > `shrink` -> Release memory.
-
+>
 > `clear` -> Clear console.
-
+>
 > `exit` -> Exit TestMode.
-
+>
 > `quit` -> Exit TestMode
 
 ### BatchMode
 批量模式
 
 > `vita [level_json_file_path] [output_path] ([step_limit])` -> Try to solve the Vita level. (Optional: step_limit)
-
+>
 > `playvalve [level_txt_file_path] [output_path] [suit_count] ([step_limit])` -> Try to solve the PlayValve level. (Optional: step_limit)
-
+>
 > `stop [vita|playvalve]` -> Stop the level currently being attempted to solve.
- 
+> 
 > `query` -> Query Vita and PlayValve Exporter.
- 
+> 
 > `shrink` -> Release memory.
-
+>
 > `clear` -> Clear console.
-
+>
 > `exit` -> Exit TestMode.
-
+>
 > `quit` -> Exit TestMode
 
 ### GenMode
 生成关卡模式
 
 > `generate [suit_count] [output_path] [step_limit]` -> Try to generate the level.
-
+>
 > `stop` -> Stop the generation currently being attempted to solve.
-
+>
 > `shrink` -> Release memory.
-
+>
 > `clear` -> Clear console.
-
+>
 > `exit` -> Exit TestMode.
-
+>
 > `quit` -> Exit TestMode
 
 ### StepMode
 Step-By-Step模式
 
 > `vita [level_string]` -> Try to solve the vita level.
-
+>
 > `playvalve [seed] [suit_count]` -> Try to solve the PlayValve level.
-
+>
 > `stop` -> Stop the currently being attempted to solve.
-
+>
 > `shrink` -> Release memory.
-
+>
 > `clear` -> Clear console.
-
+>
 > `exit` -> Exit TestMode.
-
+>
 > `quit` -> Exit TestMode
