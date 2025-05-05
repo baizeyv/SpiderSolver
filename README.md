@@ -65,6 +65,8 @@ Debug关卡模式
 ### BatchMode
 批量模式
 
+#### Commands
+
 > `vita [level_json_file_path] [output_path] ([step_limit])` -> Try to solve the Vita level. (Optional: step_limit)
 >
 > `playvalve [level_txt_file_path] [output_path] [suit_count] ([step_limit])` -> Try to solve the PlayValve level. (Optional: step_limit)
@@ -84,6 +86,8 @@ Debug关卡模式
 ### GenMode
 生成关卡模式
 
+#### Commands
+
 > `generate [suit_count] [output_path] [step_limit]` -> Try to generate the level.
 >
 > `stop` -> Stop the generation currently being attempted to solve.
@@ -98,6 +102,8 @@ Debug关卡模式
 
 ### StepMode
 Step-By-Step模式
+
+#### Commands
 
 > `vita [level_string]` -> Try to solve the vita level.
 >
