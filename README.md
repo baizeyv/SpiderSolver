@@ -7,6 +7,30 @@
 ### TestMode
 测试模式
 
+#### Commands
+
+> `vita [level_string]` -> Try to solve the vita level.
+
+> `playvalve [seed] [suit_count]` -> Try to solve the PlayValve level.
+
+> `query [vita|playvalve]` -> Query the level currently being attempted to solve.
+
+> `stop [vita|playvalve]` -> Stop the level currently being attempted to solve.
+
+> `view vita [vita_level_string]` -> View the Vita level cards.
+
+> `view playvalve [seed] [suit_count]` -> view the PlayValve level cards.
+
+> `shrink` -> Release memory.
+
+> `memory` -> View memory usage.
+
+> `clear` -> Clear console.
+
+> `exit` -> Exit TestMode.
+
+> `quit` -> Exit TestMode
+
 ### DebugMode
 Debug关卡模式
 
