@@ -27,7 +27,7 @@ Poker::Poker(const std::string& asVitaLevel) {
 
     const auto array = Helper::split(asVitaLevel, ",1;");
     // # 牌堆
-    auto deck = array.back().substr(0, array.back().length() - 2);
+    const auto deck = array.back().substr(0, array.back().length() - 2);
 
     std::string value;
     int idx = 0;
@@ -37,7 +37,7 @@ Poker::Poker(const std::string& asVitaLevel) {
             const auto& str = array[i];
             if (str.length() <= x)
                 continue;
-            auto c = str[x];
+            const auto c = str[x];
             value += c;
         }
         idx++;
@@ -66,12 +66,12 @@ Poker::Poker(const std::string& asVitaLevel) {
                 vita_char_map.insert({val, i});
             }
         }
-        int v = vita_char_map.at(item);
+        const int v = vita_char_map.at(item);
         cards.push_back(get_card(v));
     }
     // ########################################################
     std::unordered_set<int> values;
-    for (auto & card : cards) {
+    for (const auto & card : cards) {
         values.insert(card.original_value);
     }
     if (values.size() == 13)

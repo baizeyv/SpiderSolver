@@ -35,14 +35,16 @@ State::State(Poker * &poker) {
     for (int i = 54; i < poker->cards.size(); i++) {
         deckCard.push_back(&poker->cards[i]);
     }
-    for (auto& item : hiddenCards) {
+    for (auto &item: hiddenCards) {
         std::ranges::reverse(item);
     }
-    std::ranges::reverse(deckCard);
+    if (int seed; !Helper::try_parse_int(poker->mark, seed)) {
+        // # vita 的种子, 这个时候需要翻转 deckCards
+        std::ranges::reverse(deckCard);
+    }
 }
 
-State::~State()
-{
+State::~State() {
     deckCard.clear();
     hiddenCards.clear();
     visibleCards.clear();
@@ -99,8 +101,7 @@ bool State::is_blank(const int index) const {
 
 void State::move_card(const int from, const int count, const int to) {
     const size_t tmpCount = std::min<size_t>(count, visibleCards[from].size());
-    for (int i = tmpCount - 1; i >= 0; i--)
-    {
+    for (int i = tmpCount - 1; i >= 0; i--) {
         visibleCards[to].insert(visibleCards[to].begin(), visibleCards[from][i]);
     }
     visibleCards[from].erase(visibleCards[from].begin(), visibleCards[from].begin() + tmpCount);
@@ -230,7 +231,7 @@ bool State::secondary_valuation(const Solver *solver) {
             auto down = cards[i - 1];
             if (top->value == down->value + 1) {
                 if (top->suit == down->suit) {
-                    val ++;
+                    val++;
                     if (i + 1 == cards.size()) {
                         addValue(val, top->value, value);
                     }
@@ -257,13 +258,13 @@ int State::get_suit_count() const {
 std::string State::to_string() const {
     std::string res;
     int max_hidden = 0;
-    for (auto& item : hiddenCards) {
+    for (auto &item: hiddenCards) {
         if (!item.empty() && item.size() > max_hidden) {
             max_hidden = item.size();
         }
     }
     int max_visible = 0;
-    for (auto& item : visibleCards) {
+    for (auto &item: visibleCards) {
         if (!item.empty() && item.size() > max_visible) {
             max_visible = item.size();
         }
@@ -279,64 +280,36 @@ std::string State::to_string() const {
     return res;
 }
 
-std::string State::to_full_string() const
-{
-    std::string result = "[-----------------------------------------------------------------------------------------------------]\n";
-    result += "[CALC: " + std::to_string(calc) + "] [VALUATION: " + std::to_string(valuation) + "] [STEP: " + std::to_string(history.size()) + "] [COLLECTION: " + std::to_string(finished_count()) + "] ";
-    if (previous)
-    {
+std::string State::to_full_string() const {
+    std::string result =
+            "[-----------------------------------------------------------------------------------------------------]\n";
+    result += "[CALC: " + std::to_string(calc) + "] [VALUATION: " + std::to_string(valuation) + "] [STEP: " +
+            std::to_string(history.size()) + "] [COLLECTION: " + std::to_string(finished_count()) + "] ";
+    if (previous) {
         // # 存在上一步
         const auto from = history[0].get_from();
         const auto count = history[0].get_count();
         const auto to = history[0].get_to();
-        result += "[FROM:" + std::to_string(from) + ",COUNT:" + std::to_string(count) + ",TO:" + std::to_string(to) + "]    Previous >> Current\n";
+        result += "[FROM:" + std::to_string(from) + ",COUNT:" + std::to_string(count) + ",TO:" + std::to_string(to) +
+                "]    Previous >> Current\n";
         int current_max_hidden = 0;
-        for (auto& item : hiddenCards) {
+        for (auto &item: hiddenCards) {
             if (!item.empty() && item.size() > current_max_hidden) {
                 current_max_hidden = item.size();
             }
         }
         int previous_max_hidden = 0;
-        for (auto& item : previous->hiddenCards) {
+        for (auto &item: previous->hiddenCards) {
             if (!item.empty() && item.size() > previous_max_hidden) {
                 previous_max_hidden = item.size();
             }
         }
-        if (current_max_hidden > 0 || previous_max_hidden > 0)
-        {
+        if (current_max_hidden > 0 || previous_max_hidden > 0) {
             const int max_hidden = std::max(current_max_hidden, previous_max_hidden);
             result += "\nHIDDEN CARDS:\n";
             const auto previousArray = Helper::split(previous->hidden_string(0, max_hidden), "\n");
             const auto currentArray = Helper::split(hidden_string(0, max_hidden), "\n");
-            for (size_t i = 0; i < previousArray.size(); i ++)
-            {
-                result += previousArray[i];
-                result += " -> ";
-                result += currentArray[i];
-                result += "\n";
-            }
-        }
-        
-        int current_max_visible = 0;
-        for (auto& item : visibleCards) {
-            if (!item.empty() && item.size() > current_max_visible) {
-                current_max_visible = item.size();
-            }
-        }
-        int previous_max_visible = 0;
-        for (auto& item : previous->visibleCards) {
-            if (!item.empty() && item.size() > previous_max_visible) {
-                previous_max_visible = item.size();
-            }
-        }
-        if (current_max_visible > 0 || previous_max_visible > 0)
-        {
-            const int max_visible = std::max(current_max_visible, previous_max_visible);
-            result += "\nVISIBLE CARDS:\n";
-            const auto previousArray = Helper::split(previous->visible_string(0, max_visible), "\n");
-            const auto currentArray = Helper::split(visible_string(0, max_visible), "\n");
-            for (size_t i = 0; i < previousArray.size(); i ++)
-            {
+            for (size_t i = 0; i < previousArray.size(); i++) {
                 result += previousArray[i];
                 result += " -> ";
                 result += currentArray[i];
@@ -344,37 +317,56 @@ std::string State::to_full_string() const
             }
         }
 
-        if (deckCard.size() > 0 || previous->deckCard.size() > 0)
-        {
-            result += "\nDECK CARDS:\n";
-            const int max = std::max(deckCard.size(), previous->deckCard.size());
-            std::string previousStr;
-            for (int i = 0; i < max; i++)
-            {
-                if (i % 10 == 0 && i != 0)
-                    previousStr += "\n";
-                previousStr += i < previous->deckCard.size() ? previous->deckCard[i]->to_string() : spd::EmptyCard;
+        int current_max_visible = 0;
+        for (auto &item: visibleCards) {
+            if (!item.empty() && item.size() > current_max_visible) {
+                current_max_visible = item.size();
             }
-            std::string currentStr;
-            for (int i = 0; i < max; i ++)
-            {
-                if (i % 10 == 0 && i != 0)
-                    currentStr += "\n";
-                currentStr += i < deckCard.size() ? deckCard[i]->to_string() : spd::EmptyCard;
+        }
+        int previous_max_visible = 0;
+        for (auto &item: previous->visibleCards) {
+            if (!item.empty() && item.size() > previous_max_visible) {
+                previous_max_visible = item.size();
             }
-            auto previousArray = Helper::split(previousStr, "\n");
-            auto currentArray = Helper::split(currentStr, "\n");
-            for (size_t i = 0; i < previousArray.size(); i ++)
-            {
+        }
+        if (current_max_visible > 0 || previous_max_visible > 0) {
+            const int max_visible = std::max(current_max_visible, previous_max_visible);
+            result += "\nVISIBLE CARDS:\n";
+            const auto previousArray = Helper::split(previous->visible_string(0, max_visible), "\n");
+            const auto currentArray = Helper::split(visible_string(0, max_visible), "\n");
+            for (size_t i = 0; i < previousArray.size(); i++) {
                 result += previousArray[i];
                 result += " -> ";
                 result += currentArray[i];
                 result += "\n";
             }
         }
-        
-    } else
-    {
+
+        if (deckCard.size() > 0 || previous->deckCard.size() > 0) {
+            result += "\nDECK CARDS:\n";
+            const int max = std::max(deckCard.size(), previous->deckCard.size());
+            std::string previousStr;
+            for (int i = 0; i < max; i++) {
+                if (i % 10 == 0 && i != 0)
+                    previousStr += "\n";
+                previousStr += i < previous->deckCard.size() ? previous->deckCard[i]->to_string() : spd::EmptyCard;
+            }
+            std::string currentStr;
+            for (int i = 0; i < max; i++) {
+                if (i % 10 == 0 && i != 0)
+                    currentStr += "\n";
+                currentStr += i < deckCard.size() ? deckCard[i]->to_string() : spd::EmptyCard;
+            }
+            auto previousArray = Helper::split(previousStr, "\n");
+            auto currentArray = Helper::split(currentStr, "\n");
+            for (size_t i = 0; i < previousArray.size(); i++) {
+                result += previousArray[i];
+                result += " -> ";
+                result += currentArray[i];
+                result += "\n";
+            }
+        }
+    } else {
         result += "\n";
         result += to_string();
     }
@@ -433,7 +425,7 @@ int State::flop_valuation(int limit, bool divide) const {
     return 0;
 }
 
-int State::check_flop(const State * state, int column, int &depth, const int limit) const {
+int State::check_flop(const State *state, int column, int &depth, const int limit) const {
     if (depth++ > limit)
         return 0;
     int result = 0;
@@ -453,8 +445,8 @@ int State::check_flop(const State * state, int column, int &depth, const int lim
             setTo.insert(newState);
             result += 2;
         }
-        std::vector<Card*> moveList;
-        for (size_t x = 0; x < state->visibleCards[i].size(); x ++) {
+        std::vector<Card *> moveList;
+        for (size_t x = 0; x < state->visibleCards[i].size(); x++) {
             if (x == 0) {
                 moveList.push_back(state->visibleCards[i][0]);
                 continue;
@@ -462,8 +454,7 @@ int State::check_flop(const State * state, int column, int &depth, const int lim
             auto cur = state->visibleCards[i][x];
             if (cur->suit == moveList.back()->suit && cur->value == moveList.back()->value + 1) {
                 moveList.push_back(cur);
-            }
-            else
+            } else
                 break;
         }
         if (moveList.back()->value + 1 == value) {
@@ -474,11 +465,11 @@ int State::check_flop(const State * state, int column, int &depth, const int lim
         }
     }
     // # 计算额外翻牌分
-    for (auto & item: setCome) {
+    for (auto &item: setCome) {
         result += item->flop_valuation(limit, true);
         delete item;
     }
-    for (auto & item: setTo) {
+    for (auto &item: setTo) {
         result += item->flop_valuation(limit, false);
         delete item;
     }
@@ -502,17 +493,18 @@ int State::extra_valuation_more_suit() const {
         return result;
     if (previous->is_blank(to)) {
         // # 向空列移动
-        for (size_t i = 0; i < previous->visibleCards.size(); i ++) {
+        for (size_t i = 0; i < previous->visibleCards.size(); i++) {
             if (previous->visibleCards[i].empty())
                 continue;
             if (i == to)
                 continue;
-            std::vector<Card*> list;
-            for (size_t x = 0; x < previous->visibleCards[i].size(); x ++) {
+            std::vector<Card *> list;
+            for (size_t x = 0; x < previous->visibleCards[i].size(); x++) {
                 if (x == 0)
                     list.push_back(previous->visibleCards[i][0]);
                 else {
-                    if (previous->visibleCards[i][x]->suit == list.back()->suit && previous->visibleCards[i][x]->value - 1 == list.back()->value)
+                    if (previous->visibleCards[i][x]->suit == list.back()->suit && previous->visibleCards[i][x]->value -
+                        1 == list.back()->value)
                         list.push_back(previous->visibleCards[i][x]);
                     else
                         break;
@@ -523,12 +515,13 @@ int State::extra_valuation_more_suit() const {
                 if (list.back()->value + 1 == visibleCards[from][0]->value)
                     result += 100;
                 else {
-                    std::vector<Card*> st;
-                    for (size_t c = 0; c < visibleCards[from].size(); c ++) {
+                    std::vector<Card *> st;
+                    for (size_t c = 0; c < visibleCards[from].size(); c++) {
                         if (c == 0)
                             st.push_back(visibleCards[from][0]);
                         else {
-                            if (visibleCards[from][c]->suit == st.back()->suit && visibleCards[from][c]->value - 1 == st.back()->value)
+                            if (visibleCards[from][c]->suit == st.back()->suit && visibleCards[from][c]->value - 1 == st
+                                .back()->value)
                                 st.push_back(visibleCards[from][c]);
                             else
                                 break;
@@ -545,9 +538,9 @@ int State::extra_valuation_more_suit() const {
 
 int State::blank_column_count() const {
     int result = 0;
-    for (size_t i = 0; i < visibleCards.size(); i ++) {
+    for (size_t i = 0; i < visibleCards.size(); i++) {
         if (is_blank(i)) {
-            result ++;
+            result++;
         }
     }
     return result;
@@ -563,7 +556,7 @@ std::string State::hidden_string(const int row, const int max) const {
 
 std::string State::floor_hidden_string(const int row) const {
     std::string result;
-    for (auto& column : hiddenCards) {
+    for (auto &column: hiddenCards) {
         if (column.size() > row) {
             result += column[column.size() - row - 1]->to_string();
         } else {
@@ -583,7 +576,7 @@ std::string State::visible_string(const int row, const int max) const {
 
 std::string State::floor_visible_string(const int row) const {
     std::string result;
-    for (auto& column : visibleCards) {
+    for (auto &column: visibleCards) {
         if (column.size() > row) {
             result += column[column.size() - row - 1]->to_string();
         } else {
@@ -595,7 +588,7 @@ std::string State::floor_visible_string(const int row) const {
 
 std::string State::deck_string() const {
     std::string result;
-    for (size_t i = 0; i < deckCard.size(); i ++) {
+    for (size_t i = 0; i < deckCard.size(); i++) {
         if (i % 10 == 0 && i != 0) {
             result += "\n";
         }
@@ -604,8 +597,7 @@ std::string State::deck_string() const {
     return result;
 }
 
-size_t State::get_memory_usage() const
-{
+size_t State::get_memory_usage() const {
     size_t total = 0;
     total += sizeof(*this);
     total += sizeof(poker);
@@ -619,37 +611,30 @@ size_t State::get_memory_usage() const
     return total;
 }
 
-std::string State::to_serialized() const
-{
+std::string State::to_serialized() const {
     std::string result;
-    for (size_t i = 0; i < 10; i ++)
-    {
+    for (size_t i = 0; i < 10; i++) {
         result += std::to_string(visibleCards[i].size());
         result += ",";
-        for (const auto& card : visibleCards[i])
-        {
+        for (const auto &card: visibleCards[i]) {
             result += card->to_char();
         }
-        for (const auto& card : hiddenCards[i])
-        {
+        for (const auto &card: hiddenCards[i]) {
             result += card->to_char();
         }
         result += ";";
     }
-    if (deckCard.empty())
-    {
+    if (deckCard.empty()) {
         result += "*";
-    } else
-    {
-        for (const auto& card : deckCard)
-        {
+    } else {
+        for (const auto &card: deckCard) {
             result += card->to_char();
         }
     }
     return result;
 }
 
-std::ostream& operator<<(std::ostream &out, const State &state) {
+std::ostream &operator<<(std::ostream &out, const State &state) {
     out << state.to_full_string();
     return out;
 }
