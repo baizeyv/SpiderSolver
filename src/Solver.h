@@ -99,7 +99,7 @@ public:
 
     static bool state_serialized_exists(const std::unordered_set<std::string>& results, State* &newState);
     
-    static std::vector<State *> sort(std::unordered_set<State *, StatePtrHash, StatePtrEqual> states);
+    static std::vector<State *> sort(std::unordered_set<State *, StatePtrHash, StatePtrEqual> states, const Solver *solver);
 };
 
 

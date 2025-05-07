@@ -92,13 +92,38 @@ public:
      */
     bool play_deck();
 
+    double evaluate();
+
     /**
-     * * 一次估值
+     * * 计算估值
+     * @return 估值结果
+     */
+    double calculate_valuation();
+
+    /**
+     * * 一次估值,用于估计当前整个牌面的优先级
      * @return
      */
-    int get_valuation() ;
+    int get_valuation(const Solver *solver) ;
 
-    bool secondary_valuation(const Solver* solver);
+    /**
+     * * 二次估值,用于将无效移动的优先级降低,例如 0:KQJ 1:K 将0:QJ移动到1
+     * @param solver
+     * @return
+     */
+    bool secondary_valuation(const Solver* solver) const;
+
+    /**
+     * * 三次估值,用于处理向空列移动相关的部分
+     * # 1. 用空列移动部分组来合并为同花色组 + 10
+     * # 2. 移动后能翻开面朝下的牌 (可能已经通过FlopValuation处理过了) + 8
+     * # 3. 移动完整的同花色组 + 6
+     * # 4. 产生新空列 + 5
+     * # 5. 移动破坏同花色组 - 10
+     * # 6. 向空列放入K (除非计划重建) - 5
+     * @return 三次估值
+     */
+    int third_valuation() const;
 
     /**
      * * 获取花色数量
@@ -123,7 +148,7 @@ public:
 private:
     int valuation = -9999;
 
-    std::vector<int> columnValuation{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    double evaluate_valuation = -9999;
 
     /**
      * * 检测是否可以收集一套牌
@@ -163,6 +188,13 @@ private:
     std::string floor_visible_string(int row)const;
 
     std::string deck_string() const;
+
+    /**
+     * * 找到指定列牌的可以移动的部分
+     * @param cards
+     * @return
+     */
+    static std::vector<Card *> find_movable_cards_in_columns(const std::vector<Card *>& cards);
 };
 
 /**

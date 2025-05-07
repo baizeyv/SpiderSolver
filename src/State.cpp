@@ -142,7 +142,162 @@ bool State::play_deck() {
     return true;
 }
 
-int State::get_valuation() {
+double State::evaluate() {
+    if (evaluate_valuation != -9999)
+        return evaluate_valuation;
+    double value = 1020; // 初始牌面估值
+    for (size_t i = 0; i < 10; i++) {
+        // ################################################
+        // # 计算隐藏牌(未翻开的)的估值 (翻开的越多越好)
+        // # 翻开一张就 +5 +10 +15 +20 +25 +30
+        int num = 30;
+        for (auto &_: hiddenCards[i]) {
+            value -= num;
+            num -= 5;
+        }
+        // ################################################
+        // # 计算序列价值
+        if (!visibleCards[i].empty()) {
+            const Card *top_card = visibleCards[i][0];
+            int current_sequence_count = 0; // 当前顺子中的构成的小顺数量 3-2-1 包含3-2 2-1 这两个
+            bool punish_flag = false; // 阻断点惩罚标识符
+            for (size_t x = 1; x < visibleCards[i].size(); x++) {
+                top_card = visibleCards[i][x];
+                const Card *down_card = visibleCards[i][x - 1];
+                if (top_card->value == down_card->value + 1) {
+                    // # 目前两张牌可以组成顺子
+                    if (top_card->suit == down_card->suit) {
+                        // # 同花色
+                        current_sequence_count++;
+                    } else {
+                        // # 异花色阻断点
+                        if (current_sequence_count != 0) {
+                            const double cnt = current_sequence_count + 1;
+                            const double factor = static_cast<double>(down_card->value) / 10 + 1;
+                            if (punish_flag)
+                                value -= std::pow(cnt, factor);
+                            else
+                                value += std::pow(cnt, factor);
+                        } else {
+                            // # 单张异花色阻断点
+                            // TODO:
+                        }
+                        punish_flag = true;
+                        current_sequence_count = 0;
+                    }
+                } else {
+                    // # 异值阻断点
+                    if (current_sequence_count != 0) {
+                        const double cnt = current_sequence_count + 1;
+                        const double factor = static_cast<double>(down_card->value) / 10 + 1;
+                        if (punish_flag)
+                            value -= std::pow(cnt, factor);
+                        else
+                            value += std::pow(cnt, factor);
+                    } else {
+                        // # 单张异值阻断点
+                        // TODO:
+                    }
+                    punish_flag = true;
+                    current_sequence_count = 0;
+                }
+            }
+            if (current_sequence_count != 0) {
+                const double cnt = current_sequence_count + 1;
+                const double factor = static_cast<double>(top_card->value) / 10 + 1;
+                if (punish_flag)
+                    value -= std::pow(cnt, factor);
+                else
+                    value += std::pow(cnt, factor);
+            } else {
+                // # 单张阻断点
+                // TODO:
+            }
+        }
+        // TODO:
+        // ################################################
+        // # 计算空列价值
+        if (is_blank(i)) {
+            // # 一个空列提升50价值
+            value += 50; // TODO: 这个值需要修改,需要和翻开的牌的情况进行比较找到最优值
+        }
+    }
+    // ################################################
+    // # 计算完成牌价值,完成一套牌提升200价值
+    value += finished_count() * 200;
+    if (history.size() > 0) {
+        if (history[0].get_count() < 0) {
+            evaluate_valuation = -7777;
+            return evaluate_valuation;
+        }
+    }
+    // TODO:
+    evaluate_valuation = value;
+    return evaluate_valuation;
+}
+
+double State::calculate_valuation() {
+    double valuation = 0;
+    // ! 基础评分维度
+    // # 计算可移动性价值 (权重w1)
+
+    auto calculate_movable_valuation = [](const std::vector<Card *> &cards) {
+        const Card *first = cards[0];
+        int result = 0;
+        int current_sequence_count = 0; // 当前序列中元素数量
+        for (size_t i = 1; i < cards.size(); i++) {
+            if (cards[i]->suit == first->suit && cards[i]->value - 1 == first->value) {
+                // # 同色序列
+                current_sequence_count++;
+            } else {
+                // # 异花色或非序列
+                if (current_sequence_count != 0) {
+                    const double cnt = current_sequence_count + 1;
+                    constexpr double factor = 1.2;
+                    result += std::pow(cnt, factor) * 1.5;
+                }
+                current_sequence_count = 0;
+            }
+            first = cards[i];
+        }
+        return result;
+    };
+    // # 计算潜在信息价值 (权重w2)
+    auto calculate_potential_valuation = []() {
+        // TODO:
+    };
+    // # 计算空间资源价值 (权重w3)
+    constexpr auto calculate_space_valuation = [](const int empty_columns) {
+        constexpr double exponent = 1.5;
+        return std::pow(static_cast<double>(empty_columns), exponent);
+    };
+    // ! 高级策略
+    // # 计算同色连续性奖励 (动态权重)
+    auto calculate_same_suit_sequence_reward = []() {
+        // TODO:
+    };
+    // # 计算阻塞惩罚
+    auto calculate_block_punish = []() {
+        // TODO:
+    };
+    // # 计算终局优化因子
+    auto calculate_complete_factor = []() {
+        // TODO:
+    };
+    // !
+    // # 动态权重调整
+    auto calculate_weight = []() {
+        // TODO:
+    };
+    // # 计算综合估值
+    auto calculate_comprehensive_valuation = []() {
+        // TODO:
+    };
+    // TODO:
+    return valuation;
+}
+
+int State::get_valuation(const Solver *solver) {
     if (valuation != -9999)
         return valuation;
     auto addValue = [](const int num, const int topPoint, int &result) {
@@ -159,7 +314,6 @@ int State::get_valuation() {
             value -= num;
             num--;
         }
-        int tmp = value;
         if (!visibleCards[i].empty()) {
             int val = 0;
             auto top = visibleCards[i][0];
@@ -180,6 +334,7 @@ int State::get_valuation() {
                 } else {
                     addValue(val, down->value, value);
                     val = 0;
+                    // # 阻塞点
                     //一个乱序组
                     //eg. 7 1 -> -7
                     //eg. 1 7 -> -14
@@ -192,15 +347,14 @@ int State::get_valuation() {
             }
             addValue(val, top->value, value);
         }
-        columnValuation[i] = value - tmp;
     }
     const int flop = flop_valuation(6, false);
     const int extra = extra_valuation_more_suit();
-    valuation = value + flop + extra;
+    valuation = value + flop + extra + (secondary_valuation(solver) ? 150 : 0); // + third_valuation();
     return valuation;
 }
 
-bool State::secondary_valuation(const Solver *solver) {
+bool State::secondary_valuation(const Solver *solver) const {
     if (previous == nullptr)
         return true;
     const auto from = history[0].get_from();
@@ -214,7 +368,7 @@ bool State::secondary_valuation(const Solver *solver) {
         // # 目标列为空列
         return true;
     if (previous->visibleCards[from].size() == count || collection)
-        // # 一列去不都移动或收牌了
+        // # 一列全部都移动或收牌了
         return true;
     if (!solver->special_filter)
         // # 不启动过滤器的不进行二次估值
@@ -226,10 +380,10 @@ bool State::secondary_valuation(const Solver *solver) {
         };
         int value = 0;
         int val = 0;
+        // # 获取列最下边可移动部分的估值
         for (size_t i = 1; i < cards.size(); i++) {
-            auto top = cards[i];
-            auto down = cards[i - 1];
-            if (top->value == down->value + 1) {
+            const auto top = cards[i];
+            if (const auto down = cards[i - 1]; top->value == down->value + 1) {
                 if (top->suit == down->suit) {
                     val++;
                     if (i + 1 == cards.size()) {
@@ -246,9 +400,108 @@ bool State::secondary_valuation(const Solver *solver) {
         }
         return value;
     };
+    // # from 的那一列移动前的估值
     const int previousValue = calculate(previous->visibleCards[from]);
+    // # to 移动到之后的估值
     const int currentValue = calculate(visibleCards[to]);
     return currentValue > previousValue;
+}
+
+int State::third_valuation() const {
+    constexpr int true_value = 100000;
+    if (previous == nullptr)
+        return true_value;
+    const auto from = history[0].get_from();
+    const auto count = history[0].get_count();
+    const auto to = history[0].get_to();
+    const auto collection = history[0].get_collection();
+    if (from < 0 || count < 0 || to < 0)
+        // # 发牌
+        return true_value;
+    if (!previous->is_blank(to))
+        // # 要移动到非空列
+        // TODO: 需要判断是否可以构建出新空列,即之后几步可以连续将这列清空
+        // TODO: 也需要判断序列合并优先:在搜索中优先尝试能合并序列的动作，降低中间状态复杂度。 (这个可以进行四次估值排序) (且四次估值需要放在三次估值前,因为三次估值是处理空列的,空列更重要) (这个四次估值也可和三次估值进行合并)
+        return true_value;
+    if (collection)
+        // # 收牌了
+        return true_value;
+    // if (is_blank(from) && previous->is_blank(to)) {
+    // # 从空列移动到空列,这个情况在尝试移动的时候已经排除掉了,所以可以调用这个方法的一定不是从空列移动到空列
+    // }
+
+    // # 即将得到的值
+    int value = 0;
+    // ! 以下部分均为移动到空列的状态
+
+    // 可以移动的牌型
+    std::vector<Card *> current_movable_cards = find_movable_cards_in_columns(visibleCards[to]);
+
+    std::vector<Card *> other_movable_cards = current_movable_cards;
+
+    // # 模式B: 移动下边部分后,其上之前隐藏的部分和翻面的均可以移动走,可构建出新空列
+    // TODO:
+
+    // # 模式D: 优先向空列移动一整个顺子,最下牌为1的优先级降低,因为这样最多出来一个可用牌
+    if (current_movable_cards.back()->value == 1) {
+        // # 最下的牌是1,此时减少了很多机会,权重降低
+        value -= 10;
+    }
+
+    // # 模式A: 移动下边部分后,其上之前隐藏部分可以移动到新的列,此时三次估值需要增加权重
+    // # 模式C: 用空列移动部分组来合并为同花色组
+    // * 0:J,X,8 1:9  8移动到空列后9移动到10下,再把8移动到9下 (需要注意花色)
+    std::vector<Card *> tmp_visible = visibleCards[from];
+    std::vector<Card *> tmp_hidden = hiddenCards[from];
+    int operation_count = 0;
+    while (true) {
+        operation_count++;
+        if (!tmp_visible.empty()) {
+            const auto tmp_movable_cards = find_movable_cards_in_columns(tmp_visible);
+            // # from 列还存在可以移动的序列
+            // >1 是为了排除刚移动到空列再移动回去的情况
+            if (operation_count > 1 && tmp_movable_cards[0]->value - 1 == current_movable_cards.back()->value) {
+                // # 当前可以移动回去
+                if (tmp_movable_cards[0]->suit == current_movable_cards.back()->suit) {
+                    // # 同花色
+                    value += 6;
+                } else {
+                    // # 异花色
+                    value += 3;
+                }
+                break;
+            }
+            if (tmp_movable_cards.back()->value + 1 == current_movable_cards[0]->value) {
+                // # 可以再向这个空列下移动一部分
+                if (tmp_movable_cards.back()->suit == current_movable_cards[0]->suit) {
+                    // # 同花色
+                    value += 4;
+                } else {
+                    // # 异花色
+                    value += 2;
+                }
+                current_movable_cards.insert(current_movable_cards.begin(), tmp_movable_cards.begin(),
+                                             tmp_movable_cards.end());
+                continue;
+            }
+            break;
+        } else {
+            if (!tmp_hidden.empty()) {
+                // # 存在隐藏牌
+                tmp_visible.push_back(tmp_hidden[0]);
+                tmp_hidden.erase(tmp_hidden.begin(), tmp_hidden.begin() + 1);
+                operation_count--;
+                continue;
+            } else {
+                // # 构建出了新的空列
+                value += 20;
+                break;
+            }
+        }
+    }
+
+
+    return value;
 }
 
 int State::get_suit_count() const {
@@ -432,6 +685,7 @@ int State::check_flop(const State *state, int column, int &depth, const int limi
     int value = state->visibleCards[column][0]->value;
     std::unordered_set<State *, StatePtrHash, StatePtrEqual> setTo;
     std::unordered_set<State *, StatePtrHash, StatePtrEqual> setCome;
+    // TODO: 如果移动后可以收牌则加大分
     for (size_t i = 0; i < state->visibleCards.size(); i++) {
         if (i == column)
             continue;
@@ -477,7 +731,7 @@ int State::check_flop(const State *state, int column, int &depth, const int limi
 }
 
 int State::extra_valuation_more_suit() const {
-    if (get_suit_count() <= 1)
+    if (const int suit_count = get_suit_count(); suit_count <= 1)
         return 0;
     int result = blank_column_count() * 200; // # 空列加200分
     if (history.empty())
@@ -597,6 +851,22 @@ std::string State::deck_string() const {
     return result;
 }
 
+std::vector<Card *> State::find_movable_cards_in_columns(const std::vector<Card *> &cards) {
+    std::vector<Card *> result;
+    if (cards.empty())
+        return result;
+    auto first = cards[0];
+    for (size_t i = 1; i < cards.size(); i++) {
+        if (cards[i]->value - 1 == first->value && cards[i]->suit == first->suit) {
+            result.push_back(cards[i]);
+        } else {
+            break;
+        }
+        first = cards[i];
+    }
+    return result;
+}
+
 size_t State::get_memory_usage() const {
     size_t total = 0;
     total += sizeof(*this);
@@ -607,7 +877,6 @@ size_t State::get_memory_usage() const {
     total += get_vector_memory(history);
     total += get_vector_memory(collection_steps);
     total += sizeof(previous);
-    total += sizeof(columnValuation);
     return total;
 }
 

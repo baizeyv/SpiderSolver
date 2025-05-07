@@ -37,12 +37,12 @@ std::vector<State *> Solver::take_a_step(State *state, Solver *solver) {
     constexpr std::vector<Card *> tmp;
     auto newState = create_new_state(state, tmp, -1, -1);
     if (!newState->play_deck())
-        return sort(results);
+        return sort(results, solver);
     if (!state_exists(results, newState))
         results.insert(newState);
     else
         delete newState;
-    return sort(results);
+    return sort(results, solver);
 }
 
 std::vector<Card *> Solver::find_movable_card_in_column(
@@ -107,12 +107,10 @@ std::vector<State *> Solver::move_movable_cards(const std::vector<Card *> &movab
                             continue;
                         }
                     }
-                    std::vector cards(movableCards.begin(), movableCards.begin() + i);
-                    if (!state->visibleCards[column].empty() && !cards.empty() && state->visibleCards[column][0]->value
-                        == cards.back()->value + 1) {
+                    if (std::vector cards(movableCards.begin(), movableCards.begin() + i); !state->visibleCards[column].empty() && !cards.empty() && state->visibleCards[column][0]->value
+                                                                                           == cards.back()->value + 1) {
                         // # 可以放到目标列 (符合差值为1的条件)
-                        auto newState = create_new_state(state, cards, fromIndex, column);
-                        if (!state_exists(result, newState))
+                        if (auto newState = create_new_state(state, cards, fromIndex, column); !state_exists(result, newState))
                             result.insert(newState);
                         else
                             delete newState;
@@ -269,7 +267,8 @@ void Solver::depth_first_search_sync(State *&root, const std::function<void()> &
     auto no_filter_states = take_a_step(root, this);
     for (auto &item: no_filter_states) {
         // if (!state_exists(all_states, item) && item->secondary_valuation(this))
-        if (!state_serialized_exists(all_serialized_states, item) && item->secondary_valuation(this)) {
+        // if (!state_serialized_exists(all_serialized_states, item) && item->secondary_valuation(this)) { // TODO: 二次估值应该在排序中向后排,而不是在这里一刀切
+        if (!state_serialized_exists(all_serialized_states, item)) {
             states.push_back(item);
         } else {
             delete item;
@@ -354,12 +353,14 @@ bool Solver::state_serialized_exists(const std::unordered_set<std::string> &resu
     return results.contains(str);
 }
 
-std::vector<State *> Solver::sort(std::unordered_set<State *, StatePtrHash, StatePtrEqual> states) {
+std::vector<State *> Solver::sort(std::unordered_set<State *, StatePtrHash, StatePtrEqual> states, const Solver *solver) {
     std::vector<State *> list(states.begin(), states.end());
     // # 第一层,按Valuation降序排序
-    std::ranges::stable_sort(list, [](State *a, State *b) {
-        const int av = a->get_valuation();
-        const int bv = b->get_valuation();
+    std::ranges::stable_sort(list, [solver](State *a, State *b) {
+        const int av = a->get_valuation(solver);
+        const int bv = b->get_valuation(solver);
+        // const double av = a->evaluate();
+        // const double bv = b->evaluate();
         // return av > bv;
         if (av > bv)
             return true;
@@ -387,8 +388,8 @@ std::vector<State *> Solver::sort(std::unordered_set<State *, StatePtrHash, Stat
             // }
             // else
             // {
-            auto getPriority = [](State *p) -> int {
-                if (!p->previous || p->get_suit_count() <= 1)
+            auto getPriority = [](const State *p) -> int {
+                if (const int suit_count = p->get_suit_count(); !p->previous || suit_count <= 1)
                     return -1;
 
                 const auto from = p->history[0].get_from();
