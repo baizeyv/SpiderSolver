@@ -317,6 +317,10 @@ void Solver::depth_first_search_sync(State *&root, const std::function<void()> &
         sync_end_flag = true;
         return;
     }
+    if (depth >= 100 && root->finished_count() == 0) // 剪枝剪掉100步也没收集一套牌的
+        return;
+    if (depth >= 300) // # 深度限制
+        return;
     // delete root; // ! 不能在这里删除,因为State内部使用了上一步的State,只有在剪枝的时候才时候delete
     // # 完成后需要continue去delete state pointer
     bool completed_continue_flag = false;
