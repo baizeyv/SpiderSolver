@@ -70,8 +70,6 @@ namespace spd {
         after_deal = 1, // # 后发牌
         deal = 2, // # 发牌
         sequence_move = 3, // # 序列移动
-        create_blank = 4, // # 未来可构建空列
-        flop_new = 5, // # 可翻开新牌
         blank_without_blank = 6, // #未来不需要借助空白列就可以构建新的空白列
         blank_by_blank = 7, // # 未来可借助空列重新构建新空列
         blank = 8, // # 当前已构建出空列

@@ -118,3 +118,6 @@ Step-By-Step模式
 > `exit` -> Exit TestMode.
 >
 > `quit` -> Exit TestMode
+
+## TODO:
+两种算法应该齐头并进,谁先解出来用谁的 (双线程)
