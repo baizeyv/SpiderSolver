@@ -45,4 +45,6 @@ add_executable(spider src/main.cpp
         src/data/VitaBean2.h
         src/mode/StepMode.cpp
         src/mode/StepMode.h
+        src/calculator.cpp
+        src/calculator.h
 )

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <unordered_set>
 
+#include "calculator.h"
 #include "Const.h"
 #include "Helper.h"
 #include "Solver.h"
@@ -100,13 +101,13 @@ bool State::is_blank(const int index) const {
 }
 
 void State::move_card(const int from, const int count, const int to) {
-    const size_t tmpCount = std::min<size_t>(count, visibleCards[from].size());
+    const int tmpCount = std::min<int>(count, visibleCards[from].size());
     for (int i = tmpCount - 1; i >= 0; i--) {
         visibleCards[to].insert(visibleCards[to].begin(), visibleCards[from][i]);
     }
     visibleCards[from].erase(visibleCards[from].begin(), visibleCards[from].begin() + tmpCount);
     // # 检测收牌
-    bool collection = detect_collection(to);
+    const bool collection = detect_collection(to);
     // # 来源列再没有可见牌的时候要翻开hidden牌
     if (visibleCards[from].empty() && !hiddenCards[from].empty()) {
         visibleCards[from].insert(visibleCards[from].begin(), std::make_move_iterator(hiddenCards[from].begin()),
@@ -142,6 +143,70 @@ bool State::play_deck() {
     return true;
 }
 
+double State::evaluate() const {
+    // # 最终估值
+    double value = 0.0;
+    auto priority = spd::priority::sequence_move;
+    const auto count_v = history[0].get_count();
+    const auto from_v = history[0].get_from();
+    const auto to_v = history[0].get_to();
+    const auto collection_v = history[0].get_collection();
+    // # 检查是否可收牌
+    if (!history.empty() && collection_v) {
+        // # 矫正为收牌的优先级
+        priority = std::max(priority, spd::priority::collection);
+    }
+    // ###################################
+    if (priority < spd::priority::indirect_collection) {
+        // # 不能收牌的情况再判断是否可以间接收牌
+        if (spd::calculator::detect_indirect_collection(visibleCards)) {
+            // # 存在可间接收牌的模式
+            priority = std::max(priority, spd::priority::indirect_collection);
+        }
+    }
+    // ###################################
+    if (priority < spd::priority::blank) {
+        // # 已构成空列
+        if (!history.empty() && previous->blank_column_count() < blank_column_count()) {
+            priority = std::max(priority, spd::priority::blank);
+        }
+    }
+    // ###################################
+    if (priority < spd::priority::blank_by_blank) {
+        // # 优先级小于借助空列再次形成空列
+        if (spd::calculator::detect_form_blank_with_help_of_blank(this)) {
+            // # 可以借助空白列再次形成空白列 (且顺子增大了)
+            priority = std::max(priority, spd::priority::blank_by_blank);
+        }
+    }
+    // ###################################
+    if (priority < spd::priority::blank_without_blank) {
+        if (spd::calculator::detect_form_blank_without_blank(this)) {
+            priority = std::max(priority, spd::priority::blank_without_blank);
+        }
+    }
+    // ###################################
+    // # 牌面估值
+    for (size_t i = 0; i < visibleCards.size(); i++) {
+        value += spd::calculator::calculate_valuation_in_column(visibleCards[i]);
+        value -= spd::calculator::calculate_penalty_in_hidden_column(hiddenCards[i]);
+    }
+    // # 翻牌估值
+    value += flop_valuation(6, false);
+    // ###################################
+    // TODO:
+    // ###################################
+    if (!history.empty() && count_v < 0) {
+        // # 这是发牌的情况
+        priority = spd::priority::deal;
+    }
+    // ###################################
+    // ###################################
+    value += priority * spd::priority_unit;
+    // TODO: 新估值方法
+    return value;
+}
+
 int State::get_valuation() {
     if (valuation != -9999)
         return valuation;
@@ -159,7 +224,6 @@ int State::get_valuation() {
             value -= num;
             num--;
         }
-        int tmp = value;
         if (!visibleCards[i].empty()) {
             int val = 0;
             auto top = visibleCards[i][0];
@@ -192,7 +256,6 @@ int State::get_valuation() {
             }
             addValue(val, top->value, value);
         }
-        columnValuation[i] = value - tmp;
     }
     const int flop = flop_valuation(6, false);
     const int extra = extra_valuation_more_suit();
@@ -216,9 +279,9 @@ bool State::secondary_valuation(const Solver *solver) {
     if (previous->visibleCards[from].size() == count || collection)
         // # 一列去不都移动或收牌了
         return true;
-    if (!solver->special_filter)
-        // # 不启动过滤器的不进行二次估值
-        return true;
+    //if (!solver->special_filter)
+    // # 不启动过滤器的不进行二次估值
+    //return true;
     auto calculate = [](const std::vector<Card *> &cards) {
         auto addValue = [](const int num, const int topPoint, int &result) {
             if (num != 0)
@@ -374,27 +437,11 @@ std::string State::to_full_string() const {
 }
 
 bool State::detect_collection(const int index) {
-    int set = 1;
-    if (!visibleCards[index].empty()) {
-        // # 该列存在可见牌
-        int suit = visibleCards[index][0]->suit;
-        for (auto card: visibleCards[index]) {
-            if (card->value == set && suit == card->suit) {
-                // # 同色才能收牌
-                set++;
-            } else {
-                set = -1;
-                break;
-            }
-        }
-    }
-
     bool collection = false;
-    if (set == 14) {
+    if (spd::calculator::find_movable_cards_in_column(visibleCards[index]).size() == 13) {
         // # 1-13全了,可以收一套牌
         collection = true;
-        const size_t tmpCount = std::min<size_t>(13, visibleCards[index].size());
-        visibleCards[index].erase(visibleCards[index].begin(), visibleCards[index].begin() + tmpCount);
+        visibleCards[index].erase(visibleCards[index].begin(), visibleCards[index].begin() + 13);
         card_count -= 13;
         collection_steps.push_back(history.size() + 1);
         if (visibleCards[index].empty() && !hiddenCards[index].empty()) {
@@ -538,12 +585,69 @@ int State::extra_valuation_more_suit() const {
 
 int State::blank_column_count() const {
     int result = 0;
-    for (size_t i = 0; i < visibleCards.size(); i++) {
+    for (int i = 0; i < visibleCards.size(); i++) {
         if (is_blank(i)) {
             result++;
         }
     }
     return result;
+}
+
+bool State::blank_prediction_dfs(const int base_from, const int base_to, bool &allow_use_other_blank) const {
+    // # 根据当前history移动的行为来预判是否会构造出新空列
+    if (history.empty())
+        // # 排除根节点,但是理论上根节点是不会执行这个的
+        return false;
+    if (base_from < 0 || base_to < 0)
+        // # 排除发牌模式,这个只会出现在dfs的第一层深度
+        return false;
+    // # 这种情况是从其他列移动到了空列 (to本来是空列,现在放上了一个序列)
+    const auto movable_from = spd::calculator::find_movable_cards_in_column(visibleCards[base_from]); // 当前from可以移动的牌
+    if (!movable_from.empty()) {
+        for (int i = 0; i < visibleCards.size(); ++i) {
+            if (i == base_from) {
+                const auto to_last_card = visibleCards[base_to].back();
+                const auto from_first_card = visibleCards[base_from].front();
+                if (from_first_card->value - 1 == to_last_card->value) {
+                    // # 可以放回之前的列
+                    return true;
+                }
+                // # 排除起点列
+                continue;
+            }
+            if (!allow_use_other_blank) {
+                if (is_blank(i)) {
+                    // # 要移动到空列
+                    // if (visibleCards[from_index].size() + hiddenCards[from_index].size() == movable_from.size()) {
+                    // # 从from_index列移动后就变为空列了
+                    // # 此时代表无效移动
+                    continue; // !不允许刚借用了一个空列就再借用一个空列
+                    // }
+                }
+            } else {
+                if (is_blank(i)) {
+                    // # 要移动到空列
+                    if (visibleCards[base_from].size() + hiddenCards[base_from].size() == movable_from.size()) {
+                        // # 从from_index列移动后就变为空列了
+                        // # 此时代表无效移动
+                        continue; // !不允许刚借用了一个空列就再借用一个空列
+                    }
+                    allow_use_other_blank = false;
+                }
+            }
+            const auto newState = Solver::create_new_state(this, movable_from, base_from, i);
+            if (newState->blank_prediction_dfs(base_from, base_to, allow_use_other_blank)) {
+                // # 构成空列了
+                delete newState;
+                return true;
+            }
+            delete newState;
+        }
+    } else {
+        // # from这一列空了,构建出了新的空列
+        return true;
+    }
+    return false;
 }
 
 std::string State::hidden_string(const int row, const int max) const {
@@ -607,7 +711,6 @@ size_t State::get_memory_usage() const {
     total += get_vector_memory(history);
     total += get_vector_memory(collection_steps);
     total += sizeof(previous);
-    total += sizeof(columnValuation);
     return total;
 }
 

@@ -92,6 +92,8 @@ public:
      */
     bool play_deck();
 
+    double evaluate() const;
+
     /**
      * * 一次估值
      * @return
@@ -120,10 +122,20 @@ public:
      */
     std::string to_serialized() const;
 
+    /**
+     * * 获取空白列的数量
+     * @return
+     */
+    int blank_column_count() const;
+
+    /**
+     * * 空白列的预判DFS
+     * @return
+     */
+    bool blank_prediction_dfs(const int base_from, const int base_to, bool &allow_use_other_blank) const;
+
 private:
     int valuation = -9999;
-
-    std::vector<int> columnValuation{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     /**
      * * 检测是否可以收集一套牌
@@ -147,12 +159,6 @@ private:
      * @return
      */
     int extra_valuation_more_suit() const;
-
-    /**
-     * * 获取空白列的数量
-     * @return
-     */
-    int blank_column_count() const;
 
     std::string hidden_string(int row, int max) const;
 

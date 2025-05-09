@@ -54,7 +54,7 @@ public:
      * * 特殊算法过滤器,当使用过滤器无解时再关闭过滤器重新执行一次
      * true->代表开启过滤器
      */
-    bool special_filter = true;
+    // bool special_filter = true;
 
     uint8_t prepare_query : 1 = 0;
 
