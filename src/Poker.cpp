@@ -235,12 +235,23 @@ Card Poker::build_card(const int suit, const int value) {
 std::string Poker::get_level() const
 {
     std::string result;
-    for (size_t i = 0; i < cards.size(); i ++)
-    {
-        result += std::to_string(cards[i].original_value);
-        if (i != cards.size() - 1)
-        {
+    if (int seed; !Helper::try_parse_int(mark, seed)) {
+        // # vita 的 种子
+        for (int i = 0; i < 54; i++) {
+            result += std::to_string(cards[i].original_value);
             result += ",";
+        }
+        for (int i = 103; i >= 54; i--) {
+            result += std::to_string(cards[i].original_value);
+            if (i != 54)
+                result += ",";
+        }
+    } else {
+        for (size_t i = 0; i < cards.size(); i++) {
+            result += std::to_string(cards[i].original_value);
+            if (i != cards.size() - 1) {
+                result += ",";
+            }
         }
     }
     return result;
@@ -274,7 +285,10 @@ std::string Poker::to_serialized() const
     for (auto& item : hiddenCards) {
         std::ranges::reverse(item);
     }
-    std::ranges::reverse(deckCard);
+    if (int seed; !Helper::try_parse_int(mark, seed)) {
+        // # vita 的种子
+        std::ranges::reverse(deckCard);
+    }
 
     
     std::string result;
