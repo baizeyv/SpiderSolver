@@ -22,7 +22,7 @@ Poker::Poker(const int seed, const int suit_count) : suitCount(suit_count) {
     cards = generate_deck(seed, suit_count);
 }
 
-Poker::Poker(const std::string& asVitaLevel) {
+Poker::Poker(const std::string &asVitaLevel) {
     mark = asVitaLevel;
 
     const auto array = Helper::split(asVitaLevel, ",1;");
@@ -32,9 +32,9 @@ Poker::Poker(const std::string& asVitaLevel) {
     std::string value;
     int idx = 0;
     // # 遍历10列
-    for (int x = 0; x < 6; x ++) {
-        for (int i = 0; i < 10; i ++) {
-            const auto& str = array[i];
+    for (int x = 0; x < 6; x++) {
+        for (int i = 0; i < 10; i++) {
+            const auto &str = array[i];
             if (str.length() <= x)
                 continue;
             const auto c = str[x];
@@ -59,9 +59,9 @@ Poker::Poker(const std::string& asVitaLevel) {
         }
         return build_card(999, 999);
     };
-    for (char& item : s) {
+    for (char &item: s) {
         if (vita_char_map.empty()) {
-            for (int i = 1; i <= 54; i ++) {
+            for (int i = 1; i <= 54; i++) {
                 char val = card_value_to_char(i);
                 vita_char_map.insert({val, i});
             }
@@ -71,7 +71,7 @@ Poker::Poker(const std::string& asVitaLevel) {
     }
     // ########################################################
     std::unordered_set<int> values;
-    for (const auto & card : cards) {
+    for (const auto &card: cards) {
         values.insert(card.original_value);
     }
     if (values.size() == 13)
@@ -88,56 +88,54 @@ Poker::Poker(const std::string& asVitaLevel) {
 
 std::string Poker::get_string() const {
     std::string res;
-    for (size_t i = 0; i < 44; i ++) {
+    for (size_t i = 0; i < 44; i++) {
         if (i % 10 == 0)
             res += "\n";
         res += cards[i].to_string();
     }
     res += "\n";
     res += "\n";
-    for (size_t i = 50; i < 54; i ++) {
+    for (size_t i = 50; i < 54; i++) {
         res += cards[i].to_string();
     }
-    for (size_t i = 44; i < 50; i ++) {
+    for (size_t i = 44; i < 50; i++) {
         res += cards[i].to_string();
     }
     res += "\n";
     res += "\n";
     int idx = 0;
-    for (size_t i = cards.size() - 1; i >= 54; i --) {
+    for (size_t i = cards.size() - 1; i >= 54; i--) {
         if (idx != 0 && idx % 10 == 0)
             res += "\n";
         res += cards[i].to_string();
-        idx ++;
+        idx++;
     }
     return res;
 }
 
 std::vector<Card> Poker::generate_deck(const int seed, const int suitCount) {
     std::vector<int> cards;
-    for (int i = 0; i < 13; i ++) {
-        for (int j = 1; j <= 8; j ++) {
+    for (int i = 0; i < 13; i++) {
+        for (int j = 1; j <= 8; j++) {
             const int tmp = j % suitCount;
             cards.push_back(i + 1 + tmp * 13);
         }
     }
 
     auto rds = Helper::get_randoms(seed, 104);
-    std::vector<std::pair<int, int>> key_vec;
-    for (size_t i = 0; i < cards.size(); i ++)
-    {
+    std::vector<std::pair<int, int> > key_vec;
+    for (size_t i = 0; i < cards.size(); i++) {
         auto random_value = rds[i];
         key_vec.emplace_back(random_value, cards[i]);
     }
     std::ranges::stable_sort(key_vec);
-    for (size_t i = 0; i < cards.size(); i ++)
-    {
+    for (size_t i = 0; i < cards.size(); i++) {
         cards[i] = key_vec[i].second;
     }
 
-    
+
     std::vector<Card> deck;
-    for (const int card : cards) {
+    for (const int card: cards) {
         if (card >= 1 && card <= 13) {
             deck.push_back(build_card(2, card));
         } else if (card >= 14 && card <= 26) {
@@ -232,22 +230,31 @@ Card Poker::build_card(const int suit, const int value) {
     // return Card(-1, -1);
 }
 
-std::string Poker::get_level() const
-{
+std::string Poker::get_level() const {
     std::string result;
-    for (size_t i = 0; i < cards.size(); i ++)
-    {
-        result += std::to_string(cards[i].original_value);
-        if (i != cards.size() - 1)
-        {
+    if (int seed; !Helper::try_parse_int(mark, seed)) {
+        // # vita 的 种子
+        for (int i = 0; i < 54; i++) {
+            result += std::to_string(cards[i].original_value);
             result += ",";
+        }
+        for (int i = 103; i >= 54; i--) {
+            result += std::to_string(cards[i].original_value);
+            if (i != 54)
+                result += ",";
+        }
+    } else {
+        for (size_t i = 0; i < cards.size(); i++) {
+            result += std::to_string(cards[i].original_value);
+            if (i != cards.size() - 1) {
+                result += ",";
+            }
         }
     }
     return result;
 }
 
-std::string Poker::to_serialized() const
-{
+std::string Poker::to_serialized() const {
     std::vector<std::vector<Card> > hiddenCards;
     std::vector<std::vector<Card> > visibleCards;
     std::vector<Card> deckCard;
@@ -271,41 +278,39 @@ std::string Poker::to_serialized() const
     for (int i = 54; i < cards.size(); i++) {
         deckCard.push_back(cards[i]);
     }
-    for (auto& item : hiddenCards) {
+    for (auto &item: hiddenCards) {
         std::ranges::reverse(item);
     }
-    std::ranges::reverse(deckCard);
+
+    if (int seed; !Helper::try_parse_int(mark, seed)) {
+        // # vita 的种子
+        std::ranges::reverse(deckCard);
+    }
 
     
     std::string result;
-    for (size_t i = 0; i < 10; i ++)
-    {
+    for (size_t i = 0; i < 10; i++) {
         result += std::to_string(visibleCards[i].size());
         result += ",";
-        for (const auto& card : visibleCards[i])
-        {
+        for (const auto &card: visibleCards[i]) {
             result += card.to_char();
         }
-        for (const auto& card : hiddenCards[i])
-        {
+        for (const auto &card: hiddenCards[i]) {
             result += card.to_char();
         }
         result += ";";
     }
-    if (deckCard.empty())
-    {
+    if (deckCard.empty()) {
         result += "*";
-    } else
-    {
-        for (const auto& card : deckCard)
-        {
+    } else {
+        for (const auto &card: deckCard) {
             result += card.to_char();
         }
     }
     return result;
 }
 
-std::ostream & operator<<(std::ostream &out, const Poker &poker) {
+std::ostream &operator<<(std::ostream &out, const Poker &poker) {
     out << poker.get_string();
     return out;
 }
