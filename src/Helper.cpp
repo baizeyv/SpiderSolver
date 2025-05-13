@@ -71,6 +71,18 @@ bool Helper::try_parse_int(const std::string& str, int& out)
     }
 }
 
+bool Helper::try_parse_float(const std::string &str, float &out) {
+    try {
+        size_t pos;
+        out = std::stof(str, &pos);
+        if (pos != str.length())
+            return false;
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
 std::vector<std::string> Helper::parse_arguments(const std::string& str)
 {
     std::vector<std::string> result;

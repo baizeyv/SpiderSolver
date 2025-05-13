@@ -16,6 +16,7 @@ public:
     static void rtrim(std::string& s);
     static void trim(std::string& s);
     static bool try_parse_int(const std::string& str, int& out);
+    static bool try_parse_float(const std::string& str, float& out);
     static std::vector<std::string> parse_arguments(const std::string& str);
     static std::vector<int> run_csharp_random_and_get_numbers(const std::string& exe_path, int seed, int count);
     static std::string get_current_exe_directory();

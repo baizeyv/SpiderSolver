@@ -29,6 +29,8 @@ public:
     std::string level;
     std::string serialized;
 
+    LevelData();
+    LevelData(int id, const std::string &seed, int suit_count, int calc, float difficulty, int step1, int step2, int step3, int step4, int step5, int step6, int step7, int step8, const std::string &history, const std::string &level, const std::string &serialized);
     LevelData(int id, const State& state, bool is_null = false);
     ~LevelData();
 };

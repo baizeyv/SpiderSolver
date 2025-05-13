@@ -45,4 +45,8 @@ add_executable(spider src/main.cpp
         src/data/VitaBean2.h
         src/mode/StepMode.cpp
         src/mode/StepMode.h
+        src/parser/csv_parser.cpp
+        src/parser/csv_parser.h
+        src/parser/csv_data.cpp
+        src/parser/csv_data.h
 )
