@@ -16,7 +16,6 @@
 class Solver {
 private:
 
-    State* root_state;
 
     /**
      * * 所有尝试过的状态的指针HashSet
@@ -48,6 +47,7 @@ private:
     static std::vector<State*> move_movable_cards(const std::vector<Card*>& movableCards, const int& fromIndex, State*& state, Solver*& solver);
 
 public:
+    State* root_state;
 
     Poker* poker;
     /**

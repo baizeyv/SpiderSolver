@@ -25,8 +25,11 @@ public:
     static std::string read_file(const std::string& path);
     static std::string get_current_timestamp_millis();
     static void prepare_spider_random_exe();
+    static std::vector<int> shuffle_vector_differentFromOriginal(const std::vector<int>& input);
+
     static size_t get_memory_usage();
     static void trim_memory();
+
 };
 inline std::string SpiderRandom;
 
@@ -47,5 +50,23 @@ size_t get_nested_vector_memory(const std::vector<std::vector<T>>& nestedVec)
     return total;
 }
 
+
+template<typename... Args>
+std::vector<int> shuffle_int_vector(Args... args) {
+    static_assert((std::is_same_v<Args, int> && ...), "All arguments must be of type int");
+    const std::vector<int> input{args...};
+    return Helper::shuffle_vector_differentFromOriginal(input);
+}
+
+template<typename T>
+std::vector<T> reorder_vector(const std::vector<T> &input, const std::vector<int> &mapping) {
+    std::vector<T> result;
+    result.reserve(mapping.size());
+
+    for (size_t i = 0; i < mapping.size(); ++i) {
+        result.push_back(input[mapping[i]]);
+    }
+    return result;
+}
 
 #endif //HELPER_H

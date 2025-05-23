@@ -44,6 +44,67 @@ State::State(Poker * &poker) {
     }
 }
 
+State::State(std::vector<std::vector<Card *> > vec, const State *previous_state) {
+    std::vector<std::vector<Card *> > newVisibleCards;
+    std::vector<std::vector<Card *> > newHiddenCards;
+    std::vector<Card *> newDeckCards;
+
+    std::vector<std::vector<Card *> > tmpDeck;
+    // ###############################################
+    // # main part
+    for (size_t i = 0; i < 10; i++) {
+        std::vector<Card *> visibleTmp;
+        std::vector<Card *> hiddenTmp;
+        std::vector<Card *> deckTmp;
+        if (i < 4) {
+            // # 左边4列 5张隐藏牌
+            for (size_t j = 0; j < vec[i].size(); j++) {
+                if (j < 5) {
+                    hiddenTmp.insert(hiddenTmp.begin(), vec[i][j]);
+                } else if (j == 5) {
+                    // # visible
+                    visibleTmp.insert(visibleTmp.begin(), vec[i][j]);
+                } else {
+                    deckTmp.push_back(vec[i][j]);
+                }
+            }
+        } else {
+            // # 右边6列 4张隐藏牌
+            for (size_t j = 0; j < vec[i].size(); j++) {
+                if (j < 4) {
+                    hiddenTmp.insert(hiddenTmp.begin(), vec[i][j]);
+                } else if (j == 4) {
+                    // # visible
+                    visibleTmp.insert(visibleTmp.begin(), vec[i][j]);
+                } else {
+                    deckTmp.push_back(vec[i][j]);
+                }
+            }
+        }
+        newVisibleCards.push_back(visibleTmp);
+        newHiddenCards.push_back(hiddenTmp);
+        tmpDeck.push_back(deckTmp);
+    }
+
+    // # 整理tmpDeck
+    for (size_t j = 0; j < 5; j++) {
+        for (size_t i = 0; i < 10; i++) {
+            newDeckCards.push_back(tmpDeck[i][j]);
+        }
+    }
+
+    // ###############################################
+    const std::vector newHistory(previous_state->history.begin(), previous_state->history.end());
+    visibleCards = newVisibleCards;
+    hiddenCards = newHiddenCards;
+    deckCard = newDeckCards;
+    history = newHistory;
+    previous = previous_state;
+    card_count = previous_state->card_count;
+    collection_steps = previous_state->collection_steps;
+    poker = previous_state->poker;
+}
+
 State::~State() {
     deckCard.clear();
     hiddenCards.clear();
@@ -126,7 +187,7 @@ bool State::play_deck() {
     if (deckCard.empty())
         return false;
     bool collection = false;
-    for (size_t i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
         visibleCards[i].insert(visibleCards[i].begin(), std::make_move_iterator(deckCard.begin()),
                                std::make_move_iterator(deckCard.begin() + 1));
         deckCard.erase(deckCard.begin(), deckCard.begin() + 1);
@@ -597,6 +658,53 @@ std::string State::deck_string() const {
     return result;
 }
 
+State State::shuffle() const {
+    // # 打乱前的每一列从上到下的牌型
+    std::vector<std::vector<Card *> > original;
+    // ######################################################
+    for (int i = 0; i < 10; ++i) {
+        std::vector<Card *> tmp;
+        for (int j = hiddenCards[i].size() - 1; j >= 0; j--) {
+            tmp.push_back(hiddenCards[i][j]);
+        }
+        for (int j = visibleCards[i].size() - 1; j >= 0; j--) {
+            tmp.push_back(visibleCards[i][j]);
+        }
+
+        for (int row = 0; row < 5; ++row) {
+            int index = row * 10 + i;
+            tmp.push_back(deckCard[index]);
+        }
+        original.push_back(tmp);
+    }
+    auto a_mapping = shuffle_int_vector(0, 1, 2, 3);
+    auto b_mapping = shuffle_int_vector(0, 1, 2, 3, 4, 5);
+
+    std::vector<std::vector<Card *> > a_input;
+    std::vector<std::vector<Card *> > b_input;
+    a_input.reserve(4);
+    b_input.reserve(6);
+    for (size_t i = 0; i < 10; i++) {
+        if (i < 4) {
+            a_input.push_back(original[i]);
+        } else {
+            b_input.push_back(original[i]);
+        }
+    }
+
+    const auto a_result = reorder_vector(a_input, a_mapping);
+    const auto b_result = reorder_vector(b_input, b_mapping);
+
+    std::vector<std::vector<Card *> > shuffled_vector;
+    for (size_t i = 0; i < a_result.size(); i++) {
+        shuffled_vector.push_back(a_result[i]);
+    }
+    for (size_t i = 0; i < b_result.size(); i++) {
+        shuffled_vector.push_back(b_result[i]);
+    }
+    return State(shuffled_vector, this);
+}
+
 size_t State::get_memory_usage() const {
     size_t total = 0;
     total += sizeof(*this);
@@ -631,6 +739,48 @@ std::string State::to_serialized() const {
             result += card->to_char();
         }
     }
+    return result;
+}
+
+std::string State::to_level() const {
+    std::string result;
+
+    for (int k = 4; k > 0; k--) {
+        for (size_t j = 0; j < 4; j++) {
+            result += std::to_string(hiddenCards[j][k]->original_value);
+            result += ",";
+        }
+        for (size_t j = 4; j < 10; j++) {
+            result += std::to_string(hiddenCards[j][k - 1]->original_value);
+            result += ",";
+        }
+    }
+    // #####################################################
+    // # 左4列多出的hidden card
+    for (size_t j = 0; j < 4; j++) {
+        result += std::to_string(hiddenCards[j][0]->original_value);
+        result += ",";
+    }
+    // #####################################################
+    // # 先放入右6列的visible cards
+    for (size_t j = 4; j < 10; j++) {
+        result += std::to_string(visibleCards[j][0]->original_value);
+        result += ",";
+    }
+    // # 后放入左4列的visible cards
+    for (size_t j = 0; j < 4; j++) {
+        result += std::to_string(visibleCards[j][0]->original_value);
+        result += ",";
+    }
+
+    // # 放入deck cards
+    for (size_t i = 0; i < deckCard.size(); i++) {
+        result += std::to_string(deckCard[i]->original_value);
+        if (i != deckCard.size() - 1) {
+            result += ",";
+        }
+    }
+
     return result;
 }
 

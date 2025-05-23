@@ -49,4 +49,10 @@ add_executable(spider src/main.cpp
         src/parser/csv_parser.h
         src/parser/csv_data.cpp
         src/parser/csv_data.h
+        src/exporter/shuffle_exporter.cpp
+        src/exporter/shuffle_exporter.h
+        src/data/shuffle_data.cpp
+        src/data/shuffle_data.h
+        src/mode/shuffle_mode.cpp
+        src/mode/shuffle_mode.h
 )
