@@ -207,16 +207,16 @@ void Solver::call_step_dfs()
     {
     }, "", 0, false, -1, true);
     Helper::trim_memory();
-    if (!solved)
-    {
-        all_serialized_states.clear();
-        special_filter = false;
-        depth_first_search_sync(root_state, []()
-        {
-        }, "", 0, false, -1, true);
-        special_filter = true;
-        Helper::trim_memory();
-    }
+    // if (!solved)
+    // {
+    //     all_serialized_states.clear();
+    //     special_filter = false;
+    //     depth_first_search_sync(root_state, []()
+    //     {
+    //     }, "", 0, false, -1, true);
+    //     special_filter = true;
+    //     Helper::trim_memory();
+    // }
 }
 
 void Solver::call_test_dfs()
@@ -225,16 +225,16 @@ void Solver::call_test_dfs()
     {
     }, "", 0, false, -1);
     Helper::trim_memory();
-    if (!solved)
-    {
-        all_serialized_states.clear();
-        special_filter = false;
-        depth_first_search_sync(root_state, []()
-        {
-        }, "", 0, false, -1);
-        special_filter = true;
-        Helper::trim_memory();
-    }
+    // if (!solved)
+    // {
+    //     all_serialized_states.clear();
+    //     special_filter = false;
+    //     depth_first_search_sync(root_state, []()
+    //     {
+    //     }, "", 0, false, -1);
+    //     special_filter = true;
+    //     Helper::trim_memory();
+    // }
 }
 
 void Solver::call_dfs(const std::string& file, const int id, const bool exportNull, const int stepLimit)
@@ -243,16 +243,16 @@ void Solver::call_dfs(const std::string& file, const int id, const bool exportNu
     {
     }, file, id, exportNull, stepLimit);
     Helper::trim_memory();
-    if (!solved)
-    {
-        all_serialized_states.clear();
-        special_filter = false;
-        depth_first_search_sync(root_state, []()
-        {
-        }, file, id, exportNull, stepLimit);
-        special_filter = true;
-        Helper::trim_memory();
-    }
+    // if (!solved)
+    // {
+    //     all_serialized_states.clear();
+    //     special_filter = false;
+    //     depth_first_search_sync(root_state, []()
+    //     {
+    //     }, file, id, exportNull, stepLimit);
+    //     special_filter = true;
+    //     Helper::trim_memory();
+    // }
 }
 
 void Solver::depth_first_search_sync(State*& root, const std::function<void()>& onCompleted, const std::string& file,
