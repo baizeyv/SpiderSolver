@@ -57,6 +57,8 @@ public:
 
     explicit State(Poker * &poker);
 
+    explicit State(std::vector<std::vector<Card*>> vec, const State *previous_state);
+
     ~State() override;
 
     /**
@@ -121,6 +123,14 @@ public:
      * @return 
      */
     std::string to_serialized() const;
+
+    std::string to_level() const;
+
+    /**
+     * 洗牌
+     * @return
+     */
+    State shuffle() const;
 
     /**
      * * 获取空白列的数量
