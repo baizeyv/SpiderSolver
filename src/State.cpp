@@ -690,7 +690,6 @@ State State::shuffle() const {
             tmp.push_back(visibleCards[i][j]);
         }
 
-        // TODO: 分max
         for (int row = 0; row < 5; ++row) {
             int index = row * 10 + i;
             if (index >= deckCard.size())
