@@ -3,7 +3,7 @@ project(SpiderSolver)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(spider src/main.cpp
+add_executable(spider-basic src/main.cpp
         src/Card.cpp
         src/Card.h
         src/Poker.cpp
