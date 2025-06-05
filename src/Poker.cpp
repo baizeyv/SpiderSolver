@@ -16,13 +16,14 @@
  * * Public Constructor
  * @param seed random seed
  * @param suit_count suit count
+ * @param max_value
  */
-Poker::Poker(const int seed, const int suit_count) : suitCount(suit_count) {
+Poker::Poker(const int seed, const int suit_count, const int max_value) : suitCount(suit_count), max_value(max_value) {
     mark = std::to_string(seed);
-    cards = generate_deck(seed, suit_count);
+    cards = generate_deck(seed, suit_count, max_value);
 }
 
-Poker::Poker(const std::string& asVitaLevel) {
+Poker::Poker(const std::string& asVitaLevel) : max_value(13) {
     mark = asVitaLevel;
 
     const auto array = Helper::split(asVitaLevel, ",1;");
@@ -113,9 +114,9 @@ std::string Poker::get_string() const {
     return res;
 }
 
-std::vector<Card> Poker::generate_deck(const int seed, const int suitCount) {
+std::vector<Card> Poker::generate_deck(const int seed, const int suitCount, const int max_value) {
     std::vector<int> cards;
-    for (int i = 0; i < 13; i ++) {
+    for (int i = 0; i < max_value; i ++) {
         for (int j = 1; j <= 8; j ++) {
             const int tmp = j % suitCount;
             cards.push_back(i + 1 + tmp * 13);
