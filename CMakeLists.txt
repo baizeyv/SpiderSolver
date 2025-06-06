@@ -57,4 +57,6 @@ add_executable(spider-dev src/main.cpp
         src/mode/shuffle_mode.h
         src/calculator.cpp
         src/calculator.h
+        src/mode/merge_mode.cpp
+        src/mode/merge_mode.h
 )

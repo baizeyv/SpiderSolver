@@ -8,6 +8,7 @@
 #include "mode/BatchMode.h"
 #include "mode/DebugMode.h"
 #include "mode/GenMode.h"
+#include "mode/merge_mode.h"
 #include "mode/shuffle_mode.h"
 #include "mode/StepMode.h"
 #include "mode/TestMode.h"
@@ -32,6 +33,7 @@ int main(const int argc, char* argv[])
         ("s,step", "Enter `step` mode.")
         ("o,output", "Debug mode output path.", cxxopts::value<std::string>()->default_value(""))
         ("f,shuffle", "Enter export shuffled csv mode.")
+        ("m,merge", "Enter export merged csv mode.")
         ("v,version", "Show spider version.");
     try
     {
@@ -101,6 +103,15 @@ int main(const int argc, char* argv[])
             spd::output_icon();
             // # shuffle mode
             const auto mode = new shuffle_mode();
+            mode->setup();
+            mode->enter();
+            delete mode;
+        }
+        else if (result.count("merge")) {
+            system("cls");
+            spd::output_icon();
+            // # merge mode
+            const auto mode = new merge_mode();
             mode->setup();
             mode->enter();
             delete mode;

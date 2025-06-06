@@ -12,8 +12,7 @@
 shuffle_mode::shuffle_mode() : is_input(true) {
 }
 
-shuffle_mode::~shuffle_mode() {
-}
+shuffle_mode::~shuffle_mode() = default;
 
 void shuffle_mode::setup() {
     arg_commands = new std::map<std::string, std::function<void(const std::string &)> >;
