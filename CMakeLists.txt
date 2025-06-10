@@ -2,6 +2,7 @@
 project(SpiderSolver)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 add_executable(spider-basic src/main.cpp
         src/Card.cpp
