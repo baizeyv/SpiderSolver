@@ -285,7 +285,7 @@ void Solver::depth_first_search_sync(State *&root, const std::function<void()> &
         }
     }
     // std::cout << std::to_string(states.size()) << " !!! " << std::endl;
-    if (calc >= stepLimit && stepLimit > 0) {
+    if ((calc >= stepLimit && stepLimit > 0) || depth >= 1000) {
         // # 超出步骤限制了
         if (!file.empty() && exportNull) {
             // # Export null
@@ -294,10 +294,14 @@ void Solver::depth_first_search_sync(State *&root, const std::function<void()> &
             delete exporter;
         }
         sync_end_flag = true;
+        // ! >= 1000 防止 StackOverflow
+        // # 如果调用栈达到这么多的时候,用这个算法基本上就不好求解了,直接结束
         return;
     }
-    if (depth >= 100 && root->finished_count() == 0) // 剪枝剪掉100步也没收集一套牌的
+    if (depth >= 100 && root->finished_count() == 0) {
+        // 剪枝剪掉100步也没收集一套牌的
         return;
+    }
     // delete root; // ! 不能在这里删除,因为State内部使用了上一步的State,只有在剪枝的时候才时候delete
     // # 完成后需要continue去delete state pointer
     bool completed_continue_flag = false;
