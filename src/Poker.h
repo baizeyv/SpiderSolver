@@ -26,7 +26,12 @@ public:
 
     int max_value;
 
-    Poker(int seed, int suit_count, int max_value = 13);
+    /**
+     * * playvalve 和 pgmaker 的 deck 输出需要翻转
+     */
+    bool reverse_output;
+
+    Poker(int seed, int suit_count, int max_value = 13, bool pg_maker = false);
 
     Poker(const std::string& asVitaLevel);
 
@@ -38,7 +43,7 @@ private:
 
     std::unordered_map<char, int> vita_char_map;
 
-    static std::vector<Card> generate_deck(int seed, int suitCount, int max_value = 13);
+    static std::vector<Card> generate_deck(int seed, int suitCount, int max_value = 13, bool pg_maker = false);
 
     // static std::vector<Card> vita_level_convert_to_poker(const std::string &vitaLevel, const Poker* poker);
     //

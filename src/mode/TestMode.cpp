@@ -105,6 +105,31 @@ void TestMode::setup()
         }));
     }));
 
+    arg_commands->insert(std::make_pair("pgmaker", [this](const std::string& args) {
+        if (!pgmaker_test_thread_done && pgmaker_test_thread != nullptr && pgmaker_test_solver != nullptr) {
+            std::cout << spd::PlayValveTestRunning << std::endl;
+            return;
+        }
+        const auto params = Helper::parse_arguments(args);
+        if (params.size() != 2) {
+            std::cout << spd::PlayValveTestArgumentsException << std::endl;
+            return;
+        }
+        int seed, suit;
+        if (!Helper::try_parse_int(params[0], seed) || !Helper::try_parse_int(params[1], suit)) {
+            std::cout << spd::PlayValveTestOptionsException << std::endl;
+            return;
+        }
+        join(3); // # 终止上一个线程
+        std::cout << spd::PlayValveTestStart << seed << " " << suit << std::endl;
+        pgmaker_test_thread_done = false;
+        this->pgmaker_test_thread = std::make_unique<std::thread>(std::thread([seed, suit, this]() {
+            pgmaker_test_solver = new Solver(seed, suit, true);
+            pgmaker_test_solver->call_test_dfs();
+            pgmaker_test_thread_done = true;
+        }));
+    }));
+
     arg_commands->insert(std::make_pair("query", [this](const std::string& args)
     {
         const auto params = Helper::parse_arguments(args);
@@ -159,6 +184,21 @@ void TestMode::setup()
                 return;
             }
         }
+        else if (params[0] == "pgmaker") {
+            if (pgmaker_test_solver != nullptr) {
+                if (pgmaker_test_solver->solved) {
+                    std::cout << spd::PlayValveTestSolved << pgmaker_test_solver->calc << std::endl;
+                    return;
+                } else {
+                    std::cout << spd::PlayValveTestSolving << pgmaker_test_solver->calc << std::endl;
+                    pgmaker_test_solver->prepare_query = 1;
+                    return;
+                }
+            } else {
+                std::cout << spd::NoPlayValveTestTask << std::endl;
+                return;
+            }
+        }
         else
         {
             std::cout << spd::TaskTestOptionsException << std::endl;
@@ -181,6 +221,9 @@ void TestMode::setup()
         else if (params[0] == "playvalve")
         {
             join(1);
+        }
+        else if (params[0] == "pgmaker") {
+            join(3);
         }
         else
         {
@@ -236,6 +279,25 @@ void TestMode::setup()
                 return;
             }
         }
+        else if (params[0] == "pgmaker")
+        {
+            if (params.size() != 3)
+            {
+                std::cout << spd::ViewTestArgumentsException << std::endl;
+                return;
+            }
+            if (int seed, suit; Helper::try_parse_int(params[1], seed) && Helper::try_parse_int(params[2], suit))
+            {
+                const auto poker = new Poker(seed, suit, 13, true);
+                std::cout << *poker << std::endl;
+                delete poker;
+            }
+            else
+            {
+                std::cout << spd::ViewSpdSeedException << std::endl;
+                return;
+            }
+        }
         else
         {
             std::cout << spd::ViewTestOptionsException << std::endl;
@@ -275,10 +337,12 @@ void TestMode::setup()
             << "Commands:" << std::endl
             << "    vita `level_string` -> Try to solve the Vita level." << std::endl
             << "    playvalve `seed` `suit_count` -> Try to solve the PlayValve level." << std::endl
+            << "    pgmaker `seed` `suit_count` -> Try to solve the PGMaker level." << std::endl
             << "    query `vita | playvalve` -> Query the level currently being attempted to solve." << std::endl
             << "    stop `vita | playvalve` -> Stop the level currently being attempted to solve." << std::endl
             << "    view `vita` `vita_level_string` -> View the Vita level cards." << std::endl
             << "    view `playvalve` `seed` `suit_count` -> View the PlayValve level cards." << std::endl
+            << "    view `pgmaker` `seed` `suit_count` -> View the PGMaker level cards." << std::endl
             << "    shrink -> Trim memory." << std::endl;
     }));
 }
@@ -334,6 +398,30 @@ void TestMode::join(const int type)
         {
             delete playvalve_test_solver;
             playvalve_test_solver = nullptr;
+        }
+
+    }
+    if (type == 0 || type == 3) {
+
+        if (pgmaker_test_thread_done && pgmaker_test_thread != nullptr && pgmaker_test_thread->joinable())
+        {
+            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            pgmaker_test_thread->join();
+            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+        }
+        else if (!pgmaker_test_thread_done && pgmaker_test_thread != nullptr)
+        {
+            if (pgmaker_test_solver)
+                pgmaker_test_solver->stop();
+            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            pgmaker_test_thread->join();
+            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            pgmaker_test_thread.reset();
+        }
+        if (pgmaker_test_solver != nullptr)
+        {
+            delete pgmaker_test_solver;
+            pgmaker_test_solver = nullptr;
         }
     }
 }

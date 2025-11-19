@@ -35,7 +35,12 @@ private:
     Solver* playvalve_test_solver;
     std::unique_ptr<std::thread> playvalve_test_thread;
     std::atomic<bool> playvalve_test_thread_done = false;
-    
+
+    // #region pgmaker test
+    Solver* pgmaker_test_solver;
+    std::unique_ptr<std::thread> pgmaker_test_thread;
+    std::atomic<bool> pgmaker_test_thread_done = false;
+
 };
 
 #endif //TESTMODE_H

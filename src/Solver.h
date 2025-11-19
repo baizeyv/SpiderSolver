@@ -69,7 +69,7 @@ public:
 
     bool solved;
 
-    explicit Solver(int seed, int suitCount, int max_value = 13);
+    explicit Solver(int seed, int suitCount, int max_value = 13, bool pg_maker = false);
 
     explicit Solver(const std::string &vitaLevel);
 

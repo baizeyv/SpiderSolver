@@ -175,9 +175,9 @@ std::vector<State*> Solver::move_movable_cards(const std::vector<Card*>& movable
     return vec;
 }
 
-Solver::Solver(const int seed, const int suitCount, const int max_value): depth(0), sync_end_flag(false), calc(0), solved(false)
+Solver::Solver(const int seed, const int suitCount, const int max_value, const bool pg_maker): depth(0), sync_end_flag(false), calc(0), solved(false)
 {
-    poker = new Poker(seed, suitCount, max_value);
+    poker = new Poker(seed, suitCount, max_value, pg_maker);
     root_state = new State(poker);
 }
 

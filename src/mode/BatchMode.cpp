@@ -40,6 +40,19 @@ BatchMode::~BatchMode()
         delete playvalve_batch_solver;
     if (playvalve_batch_thread != nullptr)
         playvalve_batch_thread.reset();
+
+    // # region pgmaker test
+    if (pgmaker_batch_solver != nullptr)
+    {
+        pgmaker_batch_stop_flag = true;
+        pgmaker_batch_solver->stop();
+    }
+    if (pgmaker_batch_thread != nullptr && pgmaker_batch_thread->joinable())
+        pgmaker_batch_thread->join();
+    if (pgmaker_batch_solver != nullptr)
+        delete pgmaker_batch_solver;
+    if (pgmaker_batch_thread != nullptr)
+        pgmaker_batch_thread.reset();
 }
 
 void BatchMode::setup()
@@ -47,7 +60,8 @@ void BatchMode::setup()
     arg_commands = new std::map<std::string, std::function<void(const std::string&)>>;
     commands = new std::map<std::string, std::function<void()>>;
     // vita C:\foo\bar\level.json C:\foo\bar\output 1000000
-    // playvalve C:\foo\bar\level.txt C:\foo\bar\output 1000000
+    // playvalve C:\foo\bar\level.txt C:\foo\bar\output  1 1000000
+    // pgmaker C:\foo\bar\level.txt C:\foo\bar\output  1 1000000
     arg_commands->insert(std::make_pair("vita", [this](const std::string& args)
     {
         if (!vita_batch_thread_done && vita_batch_thread != nullptr && vita_batch_solver != nullptr)
@@ -191,6 +205,65 @@ void BatchMode::setup()
             playvalve_batch_thread_done = true;
         }));
     }));
+
+    arg_commands->insert(std::make_pair("pgmaker", [this](const std::string& args)
+    {
+        if (!pgmaker_batch_thread_done && pgmaker_batch_thread != nullptr && pgmaker_batch_solver != nullptr)
+        {
+            std::cout << spd::PlayValveTestRunning << std::endl;
+            return;
+        }
+        const auto params = Helper::parse_arguments(args);
+        if (params.size() != 4 && params.size() != 3)
+        {
+            std::cout << spd::PlayValveTestArgumentsException << std::endl;
+            return;
+        }
+        auto txt_path = params[0];
+        auto output_path = params[1];
+        auto txt_content = Helper::read_file(txt_path);
+        auto seeds = Helper::split(txt_content, ",");
+        int step_limit = -1;
+        int suit_count = 1;
+        if (params.size() == 4)
+        {
+            if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit))
+            {
+                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                return;
+            }
+        }
+        else if (params.size() == 3)
+        {
+            if (!Helper::try_parse_int(params[2], suit_count))
+            {
+                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                return;
+            }
+        }
+        join(3); // # 终止上一个线程
+        pgmaker_batch_thread_done = false;
+        this->pgmaker_batch_thread = std::make_unique<std::thread>(std::thread([params, seeds, suit_count, step_limit, this]()
+        {
+            const auto output = params[1] + "\\pgmaker\\pgmaker_" + Helper::get_current_timestamp_millis() + ".csv";
+            int id = 0;
+            for (auto& item : seeds)
+            {
+                id++;
+                if (int seed; Helper::try_parse_int(item, seed))
+                {
+                    pgmaker_batch_solver = new Solver(seed, suit_count, 13, true);
+                    pgmaker_batch_solver->call_dfs(output, id, true, step_limit);
+                }
+                if (pgmaker_batch_stop_flag)
+                {
+                    break;
+                }
+            }
+            pgmaker_batch_stop_flag = false;
+            pgmaker_batch_thread_done = true;
+        }));
+    }));
     arg_commands->insert(std::make_pair("stop", [this](const std::string& args)
     {
         const auto params = Helper::parse_arguments(args);
@@ -206,6 +279,10 @@ void BatchMode::setup()
         else if (params[0] == "playvalve")
         {
             join(1);
+        }
+        else if (params[0] == "pgmaker")
+        {
+            join(3);
         }
         else
         {
@@ -331,5 +408,30 @@ void BatchMode::join(const int type)
             playvalve_batch_solver = nullptr;
         }
         playvalve_batch_stop_flag = false;
+    }
+    if (type == 0 || type == 3)
+    {
+        pgmaker_batch_stop_flag = true;
+        if (pgmaker_batch_thread_done && pgmaker_batch_thread != nullptr && pgmaker_batch_thread->joinable())
+        {
+            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            pgmaker_batch_thread->join();
+            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+        }
+        else if (!pgmaker_batch_thread_done && pgmaker_batch_thread != nullptr)
+        {
+            if (pgmaker_batch_solver != nullptr)
+                pgmaker_batch_solver->stop();
+            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            pgmaker_batch_thread->join();
+            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            pgmaker_batch_thread.reset();
+        }
+        if (pgmaker_batch_solver != nullptr)
+        {
+            delete pgmaker_batch_solver;
+            pgmaker_batch_solver = nullptr;
+        }
+        pgmaker_batch_stop_flag = false;
     }
 }

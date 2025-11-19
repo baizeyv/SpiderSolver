@@ -91,15 +91,15 @@ State::State(const std::vector<std::vector<Card *> > &vec, const State *previous
     int col_count = 0;
     switch (poker->max_value) {
         case 8:
-        // # 8的情况是发10张牌
+            // # 8的情况是发10张牌
             col_count = 1;
             break;
         case 10:
-        // # 10的情况是发26张牌
+            // # 10的情况是发26张牌
             col_count = 3;
             break;
         case 13:
-        // # 13的情况是发50张牌
+            // # 13的情况是发50张牌
         default:
             col_count = 5;
             break;
