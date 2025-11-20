@@ -88,6 +88,11 @@ Poker::Poker(const std::string& asVitaLevel) : max_value(13), reverse_output(fal
         suitCount = -1;
 }
 
+Poker::Poker(const std::vector<int> &cds, const int suit_count) : suitCount(suit_count), max_value(13), reverse_output(true) {
+    mark = "0";
+    cards = generate_pg_maker_specific_deck(cds, suit_count);
+}
+
 std::string Poker::get_string() const {
     std::string res;
     for (size_t i = 0; i < 44; i ++) {
@@ -195,6 +200,59 @@ std::vector<Card> Poker::generate_deck(const int seed, const int suitCount, cons
         }
     }
     
+    std::vector<Card> deck;
+    for (const int card : cards) {
+        if (card >= 1 && card <= 13) {
+            deck.push_back(build_card(2, card));
+        } else if (card >= 14 && card <= 26) {
+            deck.push_back(build_card(1, card));
+        } else if (card >= 27 && card <= 39) {
+            deck.push_back(build_card(4, card));
+        } else if (card >= 40 && card <= 52) {
+            deck.push_back(build_card(3, card));
+        } else {
+            deck.push_back(build_card(-1, card));
+        }
+    }
+    return deck;
+}
+
+std::vector<Card> Poker::generate_pg_maker_specific_deck(std::vector<int> cards, int suit_count) {
+    std::vector<int> tmpNew;
+    for (int k = 0; k < 2; k ++) {
+        for (int j = 0; j < 4; j ++) {
+            const auto tmp = j % suit_count;
+            for (int i = 0; i < 13; i ++) {
+                tmpNew.push_back(tmp * 13 + i + 1);
+            }
+        }
+    }
+
+    std::vector<int> question;
+    for (size_t i = 0; i < tmpNew.size(); i ++) {
+        question.push_back(tmpNew[cards[i]]);
+    }
+
+    std::vector<int> res;
+    for (size_t i = 50; i < 94; i ++) { // # 所有隐藏牌
+        res.push_back(question[i]);
+    }
+    for (size_t i = 98; i < 104; i ++) { // # 右侧6个可见的
+        res.push_back(question[i]);
+    }
+    for (size_t i = 94; i < 98; i ++) { // # 左侧4个可见
+        res.push_back(question[i]);
+    }
+    for (size_t i = 0; i < 50; i ++) {
+        res.push_back(question[i]);
+    }
+
+
+    // # 将question赋值给cards
+    for (size_t i = 0; i < cards.size(); i ++)
+    {
+        cards[i] = res[i];
+    }
     std::vector<Card> deck;
     for (const int card : cards) {
         if (card >= 1 && card <= 13) {

@@ -10,6 +10,7 @@
 #include "mode/DebugMode.h"
 #include "mode/GenMode.h"
 #include "mode/level_mode.h"
+#include "mode/misc_mode.h"
 #include "mode/shuffle_mode.h"
 #include "mode/StepMode.h"
 #include "mode/TestMode.h"
@@ -35,6 +36,7 @@ int main(const int argc, char* argv[])
         ("o,output", "Debug mode output path.", cxxopts::value<std::string>()->default_value(""))
         ("f,shuffle", "Enter export shuffled csv mode.")
         ("l,level", "Enter export level csv mode.")
+        ("m,misc", "Enter Misc mode.")
         ("v,version", "Show spider version.");
     try
     {
@@ -113,6 +115,15 @@ int main(const int argc, char* argv[])
             spd::output_icon();
             // # level mode
             const auto mode = new level_mode();
+            mode->setup();
+            mode->enter();
+            delete mode;
+        }
+        else if (result.count("misc")) {
+            system("cls");
+            spd::output_icon();
+            // # misc mode
+            const auto mode = new misc_mode();
             mode->setup();
             mode->enter();
             delete mode;

@@ -9,16 +9,16 @@
 LevelData::LevelData() : id(0), seed(""), suit_count(-1), calc(-1),
                                                       difficulty(-1), step1(-1), step2(-1), step3(-1),
                                                       step4(-1), step5(-1), step6(-1), step7(-1), step8(-1),
-                                                      history(""), level(""), serialized("") {
+                                                      history(""), level(""), serialized(""), str("") {
 }
 
 LevelData::LevelData(const int id, const std::string &seed, const int suit_count, const int calc, const float difficulty, const int step1, const int step2,
                      const int step3, const int step4, const int step5, const int step6, const int step7, const int step8, const std::string &history,
                      const std::string &level,
-                     const std::string &serialized) : id(id), seed(seed), suit_count(suit_count), calc(calc),
+                     const std::string &serialized, const std::string & str) : id(id), seed(seed), suit_count(suit_count), calc(calc),
                                                       difficulty(difficulty), step1(step1), step2(step2), step3(step3),
                                                       step4(step4), step5(step5), step6(step6), step7(step7), step8(step8),
-                                                      history(history), level(level), serialized(serialized) {
+                                                      history(history), level(level), serialized(serialized), str(str) {
 }
 
 LevelData::LevelData(const int id, const State &state, const bool is_null) : id(id) {
@@ -57,6 +57,7 @@ LevelData::LevelData(const int id, const State &state, const bool is_null) : id(
     }
     level = state.poker->get_level();
     serialized = state.poker->to_serialized();
+    str = state.poker->to_level_string();
 }
 
 LevelData::~LevelData() = default;
@@ -79,6 +80,7 @@ std::ostream &operator<<(std::ostream &os, const LevelData &data) {
             << quotation << std::to_string(data.suit_count) << quotation << split
             << quotation << data.history << quotation << split
             << quotation << data.level << quotation << split
-            << quotation << data.serialized << quotation;
+            << quotation << data.serialized << quotation << split
+            << quotation << data.str << quotation;
     return os;
 }

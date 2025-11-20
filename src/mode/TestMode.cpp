@@ -297,6 +297,24 @@ void TestMode::setup()
                 std::cout << spd::ViewSpdSeedException << std::endl;
                 return;
             }
+        } else if (params[0] == "pgmakerspec") {
+            if (params.size() != 3)
+            {
+                std::cout << spd::ViewTestArgumentsException << std::endl;
+                return;
+            }
+
+            const auto lv_str = params[1];
+            const auto array = Helper::split(lv_str, ",");
+            std::vector<int> cds;
+            for (const auto& item : array) {
+                cds.push_back(std::stoi(item));
+            }
+            if (int suit = 1; Helper::try_parse_int(params[2], suit)) {
+                const auto poker = new Poker(cds, suit);
+                std::cout << *poker << std::endl;
+                delete poker;
+            }
         }
         else
         {

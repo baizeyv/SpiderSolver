@@ -61,4 +61,6 @@ add_executable(spider src/main.cpp
         src/data/shuffle_data.h
         src/mode/shuffle_mode.cpp
         src/mode/shuffle_mode.h
+        src/mode/misc_mode.cpp
+        src/mode/misc_mode.h
 )

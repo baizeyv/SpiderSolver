@@ -204,7 +204,7 @@ LevelData csv_parser::parse(const csv_data &data) {
     }
 
     return LevelData(id, data.seed, suit_count, calc, difficulty, step1, step2, step3, step4, step5, step6, step7,
-                     step8, data.history, data.level, data.serialized);
+                     step8, data.history, data.level, data.serialized, data.str);
 }
 
 std::vector<LevelData> csv_parser::convert(const std::vector<csv_data> &data) {

@@ -28,7 +28,7 @@ void Exporter::export_csv(const int id, const State& state, bool is_null) const
     if (!std::filesystem::exists(full_file_path))
     {
         std::ofstream writer(full_file_path, std::ios::app);
-        writer << "id,seed,calc,difficulty,step1,step2,step3,step4,step5,step6,step7,step8,suitCount,history,level,serialized\n";
+        writer << "id,seed,calc,difficulty,step1,step2,step3,step4,step5,step6,step7,step8,suitCount,history,level,serialized,str\n";
         writer << content << "\n";
     }
     else
