@@ -333,7 +333,10 @@ std::string Poker::to_serialized() const
     for (auto& item : hiddenCards) {
         std::ranges::reverse(item);
     }
-    std::ranges::reverse(deckCard);
+    if (!reverse_output) {
+        // # playvalve 和 pgmaker 的在这里不需要翻转
+        std::ranges::reverse(deckCard);
+    }
 
     
     std::string result;
@@ -360,6 +363,58 @@ std::string Poker::to_serialized() const
         {
             result += card.to_char();
         }
+    }
+    return result;
+}
+
+std::string Poker::to_level_string() const {
+    std::vector<std::vector<Card> > hiddenCards;
+    std::vector<std::vector<Card> > visibleCards;
+    std::vector<Card> deckCard;
+
+    // # 44张隐藏的
+    for (int i = 0; i < 44; ++i) {
+        const int tmp = i % 10;
+        if (hiddenCards.size() <= tmp) {
+            hiddenCards.resize(tmp + 1);
+        }
+        hiddenCards[tmp].push_back(cards[i]);
+    }
+    for (int i = 44; i < 54; i++) {
+        const int tmp = i % 10;
+        if (visibleCards.size() <= tmp) {
+            visibleCards.resize(tmp + 1);
+        }
+        visibleCards[tmp].push_back(cards[i]);
+    }
+    // # 初始化牌堆指针数组
+    for (int i = 54; i < cards.size(); i++) {
+        deckCard.push_back(cards[i]);
+    }
+    for (auto& item : hiddenCards) {
+        std::ranges::reverse(item);
+    }
+    if (!reverse_output) {
+        // # playvalve 和 pgmaker 的在这里不需要翻转
+        std::ranges::reverse(deckCard);
+    }
+
+
+    std::string result;
+    for (size_t i = 0; i < 10; i ++)
+    {
+        for (const auto& card : visibleCards[i])
+        {
+            result += card.to_char();
+        }
+        for (const auto& card : hiddenCards[i])
+        {
+            result += card.to_char();
+        }
+    }
+    for (const auto& card : deckCard)
+    {
+        result += card.to_char();
     }
     return result;
 }

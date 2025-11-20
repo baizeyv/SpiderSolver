@@ -805,6 +805,23 @@ std::string State::to_level() const {
     return result;
 }
 
+std::string State::to_level_str() const {
+    std::string result;
+
+    for (size_t i = 0; i < 10; i ++) {
+        for (size_t j = 0; j < visibleCards[i].size(); j ++) {
+            result += visibleCards[i][j]->to_char();
+        }
+        for (size_t j = 0; j < hiddenCards[i].size(); j ++) {
+            result += hiddenCards[i][j]->to_char();
+        }
+    }
+    for (const auto& card : deckCard) {
+        result += card->to_char();
+    }
+    return result;
+}
+
 std::ostream &operator<<(std::ostream &out, const State &state) {
     out << state.to_full_string();
     return out;

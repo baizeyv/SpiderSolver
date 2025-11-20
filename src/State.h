@@ -124,6 +124,8 @@ public:
 
     std::string to_level() const;
 
+    std::string to_level_str() const;
+
     /**
      * 洗牌
      * @return

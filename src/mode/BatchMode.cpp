@@ -8,7 +8,7 @@
 #include "../data/VitaBean.h"
 #include "../data/VitaBean2.h"
 
-BatchMode::BatchMode() : is_input(true), vita_batch_solver(nullptr), playvalve_batch_solver(nullptr)
+BatchMode::BatchMode() : is_input(true), vita_batch_solver(nullptr), playvalve_batch_solver(nullptr), pgmaker_batch_solver(nullptr)
 {
 }
 

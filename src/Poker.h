@@ -64,6 +64,8 @@ public:
 
     std::string to_serialized() const;
 
+    std::string to_level_string() const;
+
 };
 
 
