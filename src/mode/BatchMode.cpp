@@ -264,6 +264,74 @@ void BatchMode::setup()
             pgmaker_batch_thread_done = true;
         }));
     }));
+
+    arg_commands->insert(std::make_pair("pgmakerskip", [this](const std::string& args)
+    {
+        if (!pgmaker_batch_thread_done && pgmaker_batch_thread != nullptr && pgmaker_batch_solver != nullptr)
+        {
+            std::cout << spd::PlayValveTestRunning << std::endl;
+            return;
+        }
+        const auto params = Helper::parse_arguments(args);
+        if (params.size() != 5 && params.size() != 4)
+        {
+            std::cout << spd::PlayValveTestArgumentsException << std::endl;
+            return;
+        }
+        auto txt_path = params[0];
+        auto output_path = params[1];
+        auto txt_content = Helper::read_file(txt_path);
+        auto seeds = Helper::split(txt_content, ",");
+        int step_limit = -1;
+        int suit_count = 1;
+        int seed_limit = 0;
+        if (params.size() == 5)
+        {
+            if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit) || !Helper::try_parse_int(params[4], seed_limit))
+            {
+                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                return;
+            }
+        }
+        else if (params.size() == 4)
+        {
+            if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], seed_limit))
+            {
+                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                return;
+            }
+        }
+        join(3); // # 终止上一个线程
+        pgmaker_batch_thread_done = false;
+        this->pgmaker_batch_thread = std::make_unique<std::thread>(std::thread([params, seeds, suit_count, step_limit, seed_limit, this]()
+        {
+            const auto output = params[1] + "\\pgmaker\\pgmaker_" + Helper::get_current_timestamp_millis() + ".csv";
+            int id = 0;
+            bool can_execute = false;
+            for (auto& item : seeds)
+            {
+                id++;
+                if (int seed; Helper::try_parse_int(item, seed))
+                {
+                    if (seed == seed_limit) {
+                        can_execute = true;
+                        continue;
+                    }
+                    if (!can_execute)
+                        continue;
+                    pgmaker_batch_solver = new Solver(seed, suit_count, 13, true);
+                    pgmaker_batch_solver->call_dfs(output, id, true, step_limit);
+                }
+                if (pgmaker_batch_stop_flag)
+                {
+                    break;
+                }
+            }
+            pgmaker_batch_stop_flag = false;
+            pgmaker_batch_thread_done = true;
+        }));
+    }));
+
     arg_commands->insert(std::make_pair("stop", [this](const std::string& args)
     {
         const auto params = Helper::parse_arguments(args);
@@ -336,6 +404,19 @@ void BatchMode::setup()
             else
             {
                 std::cout << spd::PlayValveTestSolving << playvalve_batch_solver->poker->mark << " ->CALC:" << playvalve_batch_solver->calc << std::endl;
+                return;
+            }
+        }
+        if (pgmaker_batch_solver != nullptr)
+        {
+            if (pgmaker_batch_solver->solved)
+            {
+                std::cout << spd::PlayValveTestSolved << pgmaker_batch_solver->poker->mark << " ->CALC:" << pgmaker_batch_solver->calc << std::endl;
+                return;
+            }
+            else
+            {
+                std::cout << spd::PlayValveTestSolving << pgmaker_batch_solver->poker->mark << " ->CALC:" << pgmaker_batch_solver->calc << std::endl;
                 return;
             }
         }
