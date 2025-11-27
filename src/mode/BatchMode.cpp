@@ -374,6 +374,8 @@ void BatchMode::setup() {
             join(1);
         } else if (params[0] == "pgmaker") {
             join(3);
+        } else if (params[0] == "custom") {
+            join(4);
         } else {
             std::cout << spd::StopTestOptionsException << std::endl;
             return;
