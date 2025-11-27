@@ -19,7 +19,7 @@ public:
     bool input() override;
     /**
      * 
-     * @param type 0->vita and playvalve 1->playvalve 2->vita
+     * @param type 0->vita and playvalve 1->playvalve 2->vita 3->pgmaker
      */
     void join(int type) ;
 private:
@@ -35,7 +35,12 @@ private:
     Solver* playvalve_test_solver;
     std::unique_ptr<std::thread> playvalve_test_thread;
     std::atomic<bool> playvalve_test_thread_done = false;
-    
+
+    // #region pgmaker test
+    Solver* pgmaker_test_solver;
+    std::unique_ptr<std::thread> pgmaker_test_thread;
+    std::atomic<bool> pgmaker_test_thread_done = false;
+
 };
 
 #endif //TESTMODE_H

@@ -44,16 +44,24 @@ add_executable(spider-basic src/main.cpp
         src/data/LevelBean2.h
         src/data/VitaBean2.cpp
         src/data/VitaBean2.h
+        src/data/level_data.cpp
+        src/data/level_data.h
         src/mode/StepMode.cpp
         src/mode/StepMode.h
+        src/mode/level_mode.cpp
+        src/mode/level_mode.h
         src/parser/csv_parser.cpp
         src/parser/csv_parser.h
         src/parser/csv_data.cpp
         src/parser/csv_data.h
         src/exporter/shuffle_exporter.cpp
         src/exporter/shuffle_exporter.h
+        src/exporter/level_exporter.cpp
+        src/exporter/level_exporter.h
         src/data/shuffle_data.cpp
         src/data/shuffle_data.h
         src/mode/shuffle_mode.cpp
         src/mode/shuffle_mode.h
+        src/mode/misc_mode.cpp
+        src/mode/misc_mode.h
 )

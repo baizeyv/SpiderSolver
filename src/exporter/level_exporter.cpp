@@ -1,26 +1,21 @@
-//
-// Created by baizeyv on 2025/5/1.
+﻿//
+// Created by baizeyv on 11/20/2025.
 //
 
-#include "Exporter.h"
+#include "level_exporter.h"
 
+#include "../data/level_data.h"
 #include <filesystem>
 #include <sstream>
 #include <fstream>
-#include <utility>
 
 #include "../Helper.h"
-#include "../data/LevelData.h"
 
-Exporter::Exporter(std::string file_path) : full_file_path(std::move(file_path))
-{
+level_exporter::level_exporter(std::string file_path) : full_file_path(std::move(file_path)) {
 }
 
-Exporter::~Exporter() = default;
-
-void Exporter::export_csv(const int id, const State& state, bool is_null) const
-{
-    const LevelData data(id, state, is_null);
+void level_exporter::export_csv(int id, const State &state) const {
+    const level_data data(id, state);
     std::ostringstream oss;
     oss << data;
     auto content = oss.str();
@@ -28,7 +23,7 @@ void Exporter::export_csv(const int id, const State& state, bool is_null) const
     if (!std::filesystem::exists(full_file_path))
     {
         std::ofstream writer(full_file_path, std::ios::app);
-        writer << "id,seed,calc,difficulty,step1,step2,step3,step4,step5,step6,step7,step8,suitCount,history,level,serialized,str\n";
+        writer << "id,suit_count,level_num,level_str\n";
         writer << content << "\n";
     }
     else
@@ -37,3 +32,4 @@ void Exporter::export_csv(const int id, const State& state, bool is_null) const
         writer << content << "\n";
     }
 }
+

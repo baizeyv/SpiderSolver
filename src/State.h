@@ -57,7 +57,7 @@ public:
 
     explicit State(Poker * &poker);
 
-    explicit State(std::vector<std::vector<Card*>> vec, const State *previous_state);
+    explicit State(const std::vector<std::vector<Card*>> &vec, const State *previous_state);
 
     ~State() override;
 
@@ -123,6 +123,8 @@ public:
     std::string to_serialized() const;
 
     std::string to_level() const;
+
+    std::string to_level_str() const;
 
     /**
      * 洗牌

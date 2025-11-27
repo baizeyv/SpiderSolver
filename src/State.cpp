@@ -44,7 +44,8 @@ State::State(Poker * &poker) {
     }
 }
 
-State::State(std::vector<std::vector<Card *> > vec, const State *previous_state) {
+State::State(const std::vector<std::vector<Card *> > &vec, const State *previous_state) {
+    this->poker = previous_state->poker;
     std::vector<std::vector<Card *> > newVisibleCards;
     std::vector<std::vector<Card *> > newHiddenCards;
     std::vector<Card *> newDeckCards;
@@ -87,9 +88,27 @@ State::State(std::vector<std::vector<Card *> > vec, const State *previous_state)
     }
 
     // # 整理tmpDeck
-    for (size_t j = 0; j < 5; j++) {
+    int col_count = 0;
+    switch (poker->max_value) {
+        case 8:
+            // # 8的情况是发10张牌
+            col_count = 1;
+            break;
+        case 10:
+            // # 10的情况是发26张牌
+            col_count = 3;
+            break;
+        case 13:
+            // # 13的情况是发50张牌
+        default:
+            col_count = 5;
+            break;
+    }
+    for (size_t j = 0; j < col_count; j++) {
         for (size_t i = 0; i < 10; i++) {
-            newDeckCards.push_back(tmpDeck[i][j]);
+            if (j < tmpDeck[i].size()) {
+                newDeckCards.push_back(tmpDeck[i][j]);
+            }
         }
     }
 
@@ -673,6 +692,8 @@ State State::shuffle() const {
 
         for (int row = 0; row < 5; ++row) {
             int index = row * 10 + i;
+            if (index >= deckCard.size())
+                continue;
             tmp.push_back(deckCard[index]);
         }
         original.push_back(tmp);
@@ -781,6 +802,23 @@ std::string State::to_level() const {
         }
     }
 
+    return result;
+}
+
+std::string State::to_level_str() const {
+    std::string result;
+
+    for (size_t i = 0; i < 10; i ++) {
+        for (size_t j = 0; j < visibleCards[i].size(); j ++) {
+            result += visibleCards[i][j]->to_char();
+        }
+        for (size_t j = 0; j < hiddenCards[i].size(); j ++) {
+            result += hiddenCards[i][j]->to_char();
+        }
+    }
+    for (const auto& card : deckCard) {
+        result += card->to_char();
+    }
     return result;
 }
 

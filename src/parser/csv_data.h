@@ -25,6 +25,7 @@ public:
     std::string history;
     std::string level;
     std::string serialized;
+    std::string str;
 };
 
 

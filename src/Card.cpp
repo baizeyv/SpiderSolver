@@ -64,3 +64,15 @@ char Card::to_char() const
     else
         return 'A' + offest_index - 26;
 }
+
+int Card::to_value(const char c) {
+    // * Z->52 A->27
+    // * z->26 a->1
+    if (c >= 'a' && c <= 'z') {
+        return c - 'a' + 1;
+    }
+    if (c >= 'A' && c <= 'Z') {
+        return c - 'A' + 27;
+    }
+    return 999;
+}

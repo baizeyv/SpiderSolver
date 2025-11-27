@@ -9,33 +9,41 @@
 #include "../Solver.h"
 
 
-class DebugMode : public IMode{
+class DebugMode : public IMode {
 public:
     DebugMode();
+
     ~DebugMode() override;
+
     void setup() override;
+
     bool input() override;
+
     /**
      * 
-     * @param type 0->vita and playvalve 1->playvalve 2->vita
+     * @param type 0->vita and playvalve and pgmaker 1->playvalve 2->vita 3->pgmaker
      */
-    void join(int type) ;
+    void join(int type);
+
 private:
     bool is_input;
-    
+
     // #region vita test
-    
-    Solver* vita_debug_solver;
+
+    Solver *vita_debug_solver;
     std::unique_ptr<std::thread> vita_debug_thread;
     std::atomic<bool> vita_debug_thread_done = false;
 
     // #region playvalve test
-    
-    Solver* playvalve_debug_solver;
+    Solver *playvalve_debug_solver;
     std::unique_ptr<std::thread> playvalve_debug_thread;
     std::atomic<bool> playvalve_debug_thread_done = false;
-};
 
+    // #region pgmaker test
+    Solver *pgmaker_debug_solver;
+    std::unique_ptr<std::thread> pgmaker_debug_thread;
+    std::atomic<bool> pgmaker_debug_thread_done = false;
+};
 
 
 #endif //DEBUGMODE_H

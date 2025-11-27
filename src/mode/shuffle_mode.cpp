@@ -57,7 +57,7 @@ void shuffle_mode::setup() {
     }));
     arg_commands->insert(std::make_pair("playvalve", [this](const std::string &args) {
         const auto params = Helper::parse_arguments(args);
-        if (params.size() != 3) {
+        if (params.size() != 3 && params.size() != 4) {
             std::cout << spd::PlayValveTestArgumentsException << std::endl;
             return;
         }
@@ -70,13 +70,20 @@ void shuffle_mode::setup() {
             std::cout << spd::PlayValveTestArgumentsException << std::endl;
             return;
         }
+        int max_value = 13;
+        if (params.size() == 4) {
+            if (!Helper::try_parse_int(params[3], max_value)) {
+                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                return;
+            }
+        }
         const auto output = params[1] + "\\playvalve_shuffle\\playvalve_" + Helper::get_current_timestamp_millis() +
                             ".csv";
         int id = 0;
         for (auto &item: seeds) {
             id++;
             if (int seed; Helper::try_parse_int(item, seed)) {
-                Solver solver(seed, suit_count);
+                Solver solver(seed, suit_count, max_value);
                 auto shuffled = solver.root_state->shuffle();
                 shuffle_exporter exporter(output);
                 exporter.export_csv(seed, shuffled);
