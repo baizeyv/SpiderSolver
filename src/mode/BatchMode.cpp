@@ -405,7 +405,7 @@ void BatchMode::setup() {
             }
         }
     }));
-    commands->insert(std::make_pair("help", [this]() {
+    commands->insert(std::make_pair("help", []() {
         std::cout << "You are in `batch mode(spider --batch)` now." << std::endl
                 << "Commands:" << std::endl << std::endl
                 << "    Try to batch solve vita levels." << std::endl

@@ -19,7 +19,7 @@ void shuffle_mode::setup() {
     arg_commands = new std::map<std::string, std::function<void(const std::string &)> >;
     commands = new std::map<std::string, std::function<void()> >;
 
-    arg_commands->insert(std::make_pair("vita", [this](const std::string &args) {
+    arg_commands->insert(std::make_pair("vita", [](const std::string &args) {
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 2) {
             std::cout << spd::VitaTestArgumentsException << std::endl;
@@ -55,7 +55,7 @@ void shuffle_mode::setup() {
             }
         }
     }));
-    arg_commands->insert(std::make_pair("playvalve", [this](const std::string &args) {
+    arg_commands->insert(std::make_pair("playvalve", [](const std::string &args) {
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 3 && params.size() != 4) {
             std::cout << spd::PlayValveTestArgumentsException << std::endl;

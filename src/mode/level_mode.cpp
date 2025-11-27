@@ -17,7 +17,7 @@ void level_mode::setup() {
     arg_commands = new std::map<std::string, std::function<void(const std::string &)> >;
     commands = new std::map<std::string, std::function<void()> >;
 
-    arg_commands->insert(std::make_pair("pgmaker", [this](const std::string &args) {
+    arg_commands->insert(std::make_pair("pgmaker", [](const std::string &args) {
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 3 && params.size() != 4) {
             std::cout << spd::PlayValveTestArgumentsException << std::endl;
@@ -52,7 +52,7 @@ void level_mode::setup() {
             }
         }
     }));
-    arg_commands->insert(std::make_pair("pgmakershuffle", [this](const std::string &args) {
+    arg_commands->insert(std::make_pair("pgmakershuffle", [](const std::string &args) {
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 3 && params.size() != 4) {
             std::cout << spd::PlayValveTestArgumentsException << std::endl;
@@ -87,7 +87,6 @@ void level_mode::setup() {
             }
         }
     }));
-
     commands->insert(std::make_pair("exit", [this]() {
         is_input = false;
     }));
