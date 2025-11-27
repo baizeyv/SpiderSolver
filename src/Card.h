@@ -32,6 +32,8 @@ public:
 
     char to_char() const;
 
+    static int to_value(char c);
+
     friend std::ostream& operator<<(std::ostream& out, const Card& card);
 
 };

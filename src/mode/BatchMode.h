@@ -41,6 +41,12 @@ private:
     std::unique_ptr<std::thread> pgmaker_batch_thread;
     std::atomic<bool> pgmaker_batch_thread_done = false;
     bool pgmaker_batch_stop_flag = false;
+
+    // #region custom test
+    Solver* custom_batch_solver;
+    std::unique_ptr<std::thread> custom_batch_thread;
+    std::atomic<bool> custom_batch_thread_done = false;
+    bool custom_batch_stop_flag = false;
 };
 
 

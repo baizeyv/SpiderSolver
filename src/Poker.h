@@ -33,6 +33,8 @@ public:
 
     Poker(int seed, int suit_count, int max_value = 13, bool pg_maker = false);
 
+    Poker(int fake_seed, const std::string& str104, int suit_count, int max_value = 13);
+
     explicit Poker(const std::string& asVitaLevel);
 
     Poker(const std::vector<int> &cds, int suit_count);
@@ -46,6 +48,8 @@ private:
     std::unordered_map<char, int> vita_char_map;
 
     static std::vector<Card> generate_deck(int seed, int suitCount, int max_value = 13, bool pg_maker = false);
+
+    static std::vector<Card> generate_deck(const std::string &str104);
 
     static std::vector<Card> generate_pg_maker_specific_deck(std::vector<int> cards, int suit_count);
 

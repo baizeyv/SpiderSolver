@@ -151,13 +151,27 @@ void Helper::check_file_and_create_dir_when_needed(const std::string &file) {
 }
 
 std::string Helper::read_file(const std::string &path) {
-    std::ifstream file(path);
+    const std::ifstream file(path);
     if (!file) {
         throw std::runtime_error("Failed to open file " + path);
     }
     std::stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
+}
+
+std::vector<std::string> Helper::read_file_line(const std::string &path) {
+    std::ifstream file(path);
+    if (!file) {
+        throw std::runtime_error("Failed to open file " + path);
+    }
+    std::vector<std::string> lines;
+    std::string line;
+    while (std::getline(file, line)) {
+        lines.push_back(line);
+    }
+    file.close();
+    return lines;
 }
 
 std::string Helper::get_current_timestamp_millis() {

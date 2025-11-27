@@ -19,12 +19,19 @@
  * @param max_value
  * @param pg_maker 是否是pgMaker的
  */
-Poker::Poker(const int seed, const int suit_count, const int max_value, const bool pg_maker) : suitCount(suit_count), max_value(max_value), reverse_output(true) {
+Poker::Poker(const int seed, const int suit_count, const int max_value, const bool pg_maker) : suitCount(suit_count),
+    max_value(max_value), reverse_output(true) {
     mark = std::to_string(seed);
     cards = generate_deck(seed, suit_count, max_value, pg_maker);
 }
 
-Poker::Poker(const std::string& asVitaLevel) : max_value(13), reverse_output(false) {
+Poker::Poker(const int fake_seed, const std::string &str104, const int suit_count, const int max_value) : suitCount(suit_count),
+    max_value(max_value), reverse_output(true) {
+    mark = std::to_string(fake_seed);
+    cards = generate_deck(str104);
+}
+
+Poker::Poker(const std::string &asVitaLevel) : max_value(13), reverse_output(false) {
     mark = asVitaLevel;
 
     const auto array = Helper::split(asVitaLevel, ",1;");
@@ -34,9 +41,9 @@ Poker::Poker(const std::string& asVitaLevel) : max_value(13), reverse_output(fal
     std::string value;
     int idx = 0;
     // # 遍历10列
-    for (int x = 0; x < 6; x ++) {
-        for (int i = 0; i < 10; i ++) {
-            const auto& str = array[i];
+    for (int x = 0; x < 6; x++) {
+        for (int i = 0; i < 10; i++) {
+            const auto &str = array[i];
             if (str.length() <= x)
                 continue;
             const auto c = str[x];
@@ -61,9 +68,9 @@ Poker::Poker(const std::string& asVitaLevel) : max_value(13), reverse_output(fal
         }
         return build_card(999, 999);
     };
-    for (char& item : s) {
+    for (char &item: s) {
         if (vita_char_map.empty()) {
-            for (int i = 1; i <= 54; i ++) {
+            for (int i = 1; i <= 54; i++) {
                 char val = card_value_to_char(i);
                 vita_char_map.insert({val, i});
             }
@@ -73,7 +80,7 @@ Poker::Poker(const std::string& asVitaLevel) : max_value(13), reverse_output(fal
     }
     // ########################################################
     std::unordered_set<int> values;
-    for (const auto & card : cards) {
+    for (const auto &card: cards) {
         values.insert(card.original_value);
     }
     if (values.size() == 13)
@@ -88,42 +95,43 @@ Poker::Poker(const std::string& asVitaLevel) : max_value(13), reverse_output(fal
         suitCount = -1;
 }
 
-Poker::Poker(const std::vector<int> &cds, const int suit_count) : suitCount(suit_count), max_value(13), reverse_output(true) {
+Poker::Poker(const std::vector<int> &cds, const int suit_count) : suitCount(suit_count), max_value(13),
+                                                                  reverse_output(true) {
     mark = "0";
     cards = generate_pg_maker_specific_deck(cds, suit_count);
 }
 
 std::string Poker::get_string() const {
     std::string res;
-    for (size_t i = 0; i < 44; i ++) {
+    for (size_t i = 0; i < 44; i++) {
         if (i % 10 == 0)
             res += "\n";
         res += cards[i].to_string();
     }
     res += "\n";
     res += "\n";
-    for (size_t i = 50; i < 54; i ++) {
+    for (size_t i = 50; i < 54; i++) {
         res += cards[i].to_string();
     }
-    for (size_t i = 44; i < 50; i ++) {
+    for (size_t i = 44; i < 50; i++) {
         res += cards[i].to_string();
     }
     res += "\n";
     res += "\n";
     int idx = 0;
     if (reverse_output) {
-        for (size_t i = 54; i < cards.size(); i ++) {
+        for (size_t i = 54; i < cards.size(); i++) {
             if (idx != 0 && idx % 10 == 0)
                 res += "\n";
             res += cards[i].to_string();
-            idx ++;
+            idx++;
         }
     } else {
-        for (size_t i = cards.size() - 1; i >= 54; i --) {
+        for (size_t i = cards.size() - 1; i >= 54; i--) {
             if (idx != 0 && idx % 10 == 0)
                 res += "\n";
             res += cards[i].to_string();
-            idx ++;
+            idx++;
         }
     }
     return res;
@@ -134,15 +142,15 @@ std::vector<Card> Poker::generate_deck(const int seed, const int suitCount, cons
 
     if (pg_maker) {
         // # pgmaker
-        for (int j = 0; j < 8; j ++) {
-            for (int i = 0; i < 13; i ++) {
+        for (int j = 0; j < 8; j++) {
+            for (int i = 0; i < 13; i++) {
                 cards.push_back(j * 13 + i);
             }
         }
     } else {
         // # playvalve
-        for (int i = 0; i < max_value; i ++) {
-            for (int j = 1; j <= 8; j ++) {
+        for (int i = 0; i < max_value; i++) {
+            for (int j = 1; j <= 8; j++) {
                 const int tmp = j % suitCount;
                 cards.push_back(i + 1 + tmp * 13);
             }
@@ -150,58 +158,112 @@ std::vector<Card> Poker::generate_deck(const int seed, const int suitCount, cons
     }
 
     const auto rds = Helper::get_randoms(seed, 104);
-    std::vector<std::pair<int, int>> key_vec;
-    for (size_t i = 0; i < cards.size(); i ++)
-    {
+    std::vector<std::pair<int, int> > key_vec;
+    for (size_t i = 0; i < cards.size(); i++) {
         auto random_value = rds[i];
         key_vec.emplace_back(random_value, cards[i]);
     }
     std::ranges::stable_sort(key_vec);
-    for (size_t i = 0; i < cards.size(); i ++)
-    {
+    for (size_t i = 0; i < cards.size(); i++) {
         cards[i] = key_vec[i].second;
     }
 
     if (pg_maker) {
         std::vector<int> tmpNew;
-        for (int k = 0; k < 2; k ++) {
-            for (int j = 0; j < 4; j ++) {
+        for (int k = 0; k < 2; k++) {
+            for (int j = 0; j < 4; j++) {
                 auto tmp = j % suitCount;
-                for (int i = 0; i < 13; i ++) {
+                for (int i = 0; i < 13; i++) {
                     tmpNew.push_back(tmp * 13 + i + 1);
                 }
             }
         }
 
         std::vector<int> question;
-        for (size_t i = 0; i < tmpNew.size(); i ++) {
+        for (size_t i = 0; i < tmpNew.size(); i++) {
             question.push_back(tmpNew[cards[i]]);
         }
 
         std::vector<int> res;
-        for (size_t i = 50; i < 94; i ++) { // # 所有隐藏牌
+        for (size_t i = 50; i < 94; i++) {
+            // # 所有隐藏牌
             res.push_back(question[i]);
         }
-        for (size_t i = 98; i < 104; i ++) { // # 右侧6个可见的
+        for (size_t i = 98; i < 104; i++) {
+            // # 右侧6个可见的
             res.push_back(question[i]);
         }
-        for (size_t i = 94; i < 98; i ++) { // # 左侧4个可见
+        for (size_t i = 94; i < 98; i++) {
+            // # 左侧4个可见
             res.push_back(question[i]);
         }
-        for (size_t i = 0; i < 50; i ++) {
+        for (size_t i = 0; i < 50; i++) {
             res.push_back(question[i]);
         }
 
 
         // # 将question赋值给cards
-        for (size_t i = 0; i < cards.size(); i ++)
-        {
+        for (size_t i = 0; i < cards.size(); i++) {
             cards[i] = res[i];
         }
     }
-    
+
     std::vector<Card> deck;
-    for (const int card : cards) {
+    for (const int card: cards) {
+        if (card >= 1 && card <= 13) {
+            deck.push_back(build_card(2, card));
+        } else if (card >= 14 && card <= 26) {
+            deck.push_back(build_card(1, card));
+        } else if (card >= 27 && card <= 39) {
+            deck.push_back(build_card(4, card));
+        } else if (card >= 40 && card <= 52) {
+            deck.push_back(build_card(3, card));
+        } else {
+            deck.push_back(build_card(-1, card));
+        }
+    }
+    return deck;
+}
+
+std::vector<Card> Poker::generate_deck(const std::string &str104) {
+    std::vector<int> cards;
+
+    std::vector<std::vector<char>> list;
+    std::vector<char> deck_list;
+    int idx = 0;
+    for (int i = 1; i <= 4; i ++) {
+        std::vector<char> l;
+        for (int j = 1; j <= 6; j ++) {
+            l.push_back(str104[idx++]);
+        }
+        std::ranges::reverse(l);
+        list.push_back(l);
+    }
+    for (int i = 1; i <= 6; i ++) {
+        std::vector<char> l;
+        for (int j = 1; j <= 5; j ++) {
+            l.push_back(str104[idx++]);
+        }
+        std::ranges::reverse(l);
+        list.push_back(l);
+    }
+    for (; idx < 104; idx ++) {
+        deck_list.push_back(str104[idx]);
+    }
+
+    for (int i = 0; i < 6; i ++) {
+        for (auto l : list) {
+            if (l.size() > i) {
+                cards.push_back(Card::to_value(l[i]));
+            }
+        }
+    }
+    for (const auto item : deck_list) {
+        cards.push_back(Card::to_value(item));
+    }
+
+    std::vector<Card> deck;
+    for (const int card: cards) {
         if (card >= 1 && card <= 13) {
             deck.push_back(build_card(2, card));
         } else if (card >= 14 && card <= 26) {
@@ -219,42 +281,44 @@ std::vector<Card> Poker::generate_deck(const int seed, const int suitCount, cons
 
 std::vector<Card> Poker::generate_pg_maker_specific_deck(std::vector<int> cards, int suit_count) {
     std::vector<int> tmpNew;
-    for (int k = 0; k < 2; k ++) {
-        for (int j = 0; j < 4; j ++) {
+    for (int k = 0; k < 2; k++) {
+        for (int j = 0; j < 4; j++) {
             const auto tmp = j % suit_count;
-            for (int i = 0; i < 13; i ++) {
+            for (int i = 0; i < 13; i++) {
                 tmpNew.push_back(tmp * 13 + i + 1);
             }
         }
     }
 
     std::vector<int> question;
-    for (size_t i = 0; i < tmpNew.size(); i ++) {
+    for (size_t i = 0; i < tmpNew.size(); i++) {
         question.push_back(tmpNew[cards[i]]);
     }
 
     std::vector<int> res;
-    for (size_t i = 50; i < 94; i ++) { // # 所有隐藏牌
+    for (size_t i = 50; i < 94; i++) {
+        // # 所有隐藏牌
         res.push_back(question[i]);
     }
-    for (size_t i = 98; i < 104; i ++) { // # 右侧6个可见的
+    for (size_t i = 98; i < 104; i++) {
+        // # 右侧6个可见的
         res.push_back(question[i]);
     }
-    for (size_t i = 94; i < 98; i ++) { // # 左侧4个可见
+    for (size_t i = 94; i < 98; i++) {
+        // # 左侧4个可见
         res.push_back(question[i]);
     }
-    for (size_t i = 0; i < 50; i ++) {
+    for (size_t i = 0; i < 50; i++) {
         res.push_back(question[i]);
     }
 
 
     // # 将question赋值给cards
-    for (size_t i = 0; i < cards.size(); i ++)
-    {
+    for (size_t i = 0; i < cards.size(); i++) {
         cards[i] = res[i];
     }
     std::vector<Card> deck;
-    for (const int card : cards) {
+    for (const int card: cards) {
         if (card >= 1 && card <= 13) {
             deck.push_back(build_card(2, card));
         } else if (card >= 14 && card <= 26) {
@@ -349,22 +413,18 @@ Card Poker::build_card(const int suit, const int value) {
     // return Card(-1, -1);
 }
 
-std::string Poker::get_level() const
-{
+std::string Poker::get_level() const {
     std::string result;
-    for (size_t i = 0; i < cards.size(); i ++)
-    {
+    for (size_t i = 0; i < cards.size(); i++) {
         result += std::to_string(cards[i].original_value);
-        if (i != cards.size() - 1)
-        {
+        if (i != cards.size() - 1) {
             result += ",";
         }
     }
     return result;
 }
 
-std::string Poker::to_serialized() const
-{
+std::string Poker::to_serialized() const {
     std::vector<std::vector<Card> > hiddenCards;
     std::vector<std::vector<Card> > visibleCards;
     std::vector<Card> deckCard;
@@ -388,7 +448,7 @@ std::string Poker::to_serialized() const
     for (int i = 54; i < cards.size(); i++) {
         deckCard.push_back(cards[i]);
     }
-    for (auto& item : hiddenCards) {
+    for (auto &item: hiddenCards) {
         std::ranges::reverse(item);
     }
     if (!reverse_output) {
@@ -396,29 +456,23 @@ std::string Poker::to_serialized() const
         std::ranges::reverse(deckCard);
     }
 
-    
+
     std::string result;
-    for (size_t i = 0; i < 10; i ++)
-    {
+    for (size_t i = 0; i < 10; i++) {
         result += std::to_string(visibleCards[i].size());
         result += ",";
-        for (const auto& card : visibleCards[i])
-        {
+        for (const auto &card: visibleCards[i]) {
             result += card.to_char();
         }
-        for (const auto& card : hiddenCards[i])
-        {
+        for (const auto &card: hiddenCards[i]) {
             result += card.to_char();
         }
         result += ";";
     }
-    if (deckCard.empty())
-    {
+    if (deckCard.empty()) {
         result += "*";
-    } else
-    {
-        for (const auto& card : deckCard)
-        {
+    } else {
+        for (const auto &card: deckCard) {
             result += card.to_char();
         }
     }
@@ -449,7 +503,7 @@ std::string Poker::to_level_string() const {
     for (int i = 54; i < cards.size(); i++) {
         deckCard.push_back(cards[i]);
     }
-    for (auto& item : hiddenCards) {
+    for (auto &item: hiddenCards) {
         std::ranges::reverse(item);
     }
     if (!reverse_output) {
@@ -459,25 +513,21 @@ std::string Poker::to_level_string() const {
 
 
     std::string result;
-    for (size_t i = 0; i < 10; i ++)
-    {
-        for (const auto& card : visibleCards[i])
-        {
+    for (size_t i = 0; i < 10; i++) {
+        for (const auto &card: visibleCards[i]) {
             result += card.to_char();
         }
-        for (const auto& card : hiddenCards[i])
-        {
+        for (const auto &card: hiddenCards[i]) {
             result += card.to_char();
         }
     }
-    for (const auto& card : deckCard)
-    {
+    for (const auto &card: deckCard) {
         result += card.to_char();
     }
     return result;
 }
 
-std::ostream & operator<<(std::ostream &out, const Poker &poker) {
+std::ostream &operator<<(std::ostream &out, const Poker &poker) {
     out << poker.get_string();
     return out;
 }
