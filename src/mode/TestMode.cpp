@@ -13,7 +13,7 @@
 #include "../Helper.h"
 #include "../Solver.h"
 
-TestMode::TestMode() : is_input(true), vita_test_solver(nullptr), playvalve_test_solver(nullptr)
+TestMode::TestMode() : is_input(true), vita_test_solver(nullptr), playvalve_test_solver(nullptr), pgmaker_test_solver(nullptr)
 {
 }
 
@@ -30,6 +30,7 @@ TestMode::~TestMode()
         delete vita_test_solver;
     if (vita_test_thread != nullptr)
         vita_test_thread.reset();
+
     // # region playvalve test
     if (playvalve_test_solver != nullptr)
         playvalve_test_solver->stop();
@@ -39,6 +40,16 @@ TestMode::~TestMode()
         delete playvalve_test_solver;
     if (playvalve_test_thread != nullptr)
         playvalve_test_thread.reset();
+
+    // # region playvalve test
+    if (pgmaker_test_solver != nullptr)
+        pgmaker_test_solver->stop();
+    if (pgmaker_test_thread != nullptr && pgmaker_test_thread->joinable())
+        pgmaker_test_thread->join();
+    if (pgmaker_test_solver != nullptr)
+        delete pgmaker_test_solver;
+    if (pgmaker_test_thread != nullptr)
+        pgmaker_test_thread.reset();
 }
 
 void TestMode::setup()
@@ -279,7 +290,7 @@ void TestMode::setup()
                 return;
             }
         }
-        else if (params[0] == "pgmaker")
+        else if (params[0] == "pgmaker") // # 查看 pgmaker 的种子的关卡
         {
             if (params.size() != 3)
             {
@@ -297,7 +308,7 @@ void TestMode::setup()
                 std::cout << spd::ViewSpdSeedException << std::endl;
                 return;
             }
-        } else if (params[0] == "pgmakerspec") {
+        } else if (params[0] == "pgmakerspec") { // # 查看 pgmaker 的字符串的关卡
             if (params.size() != 3)
             {
                 std::cout << spd::ViewTestArgumentsException << std::endl;

@@ -88,7 +88,7 @@ namespace spd {
                 "  \\__ \\/ /_/ // // / / / __/ / /_/ /" << std::endl <<
                 " ___/ / ____// // /_/ / /___/ _, _/ " << std::endl <<
                 "/____/_/   /___/_____/_____/_/ |_|  " << std::endl <<
-                "     Welcome to Spider Solver!" << std::endl;
+                "\033[34m     Welcome to Spider Solver!\033[0m" << std::endl;
     }
 }
 

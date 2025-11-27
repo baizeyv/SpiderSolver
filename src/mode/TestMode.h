@@ -19,7 +19,7 @@ public:
     bool input() override;
     /**
      * 
-     * @param type 0->vita and playvalve 1->playvalve 2->vita
+     * @param type 0->vita and playvalve 1->playvalve 2->vita 3->pgmaker
      */
     void join(int type) ;
 private:

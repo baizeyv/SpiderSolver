@@ -9,7 +9,7 @@
 #include "../Solver.h"
 
 
-class BatchMode : public IMode {
+class BatchMode final : public IMode {
 public:
     BatchMode();
     ~BatchMode() override;

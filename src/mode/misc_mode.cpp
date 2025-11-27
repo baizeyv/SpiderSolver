@@ -10,14 +10,13 @@
 misc_mode::misc_mode() : is_input(true) {
 }
 
-misc_mode::~misc_mode() {
-}
+misc_mode::~misc_mode() = default;
 
 void misc_mode::setup() {
     arg_commands = new std::map<std::string, std::function<void(const std::string &)> >;
     commands = new std::map<std::string, std::function<void()> >;
 
-    arg_commands->insert(std::make_pair("pgmaker", [this](const std::string &args) {
+    arg_commands->insert(std::make_pair("pgmaker", [](const std::string &args) {
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 2) {
             std::cout << spd::VitaTestArgumentsException << std::endl;
@@ -43,8 +42,7 @@ void misc_mode::setup() {
         delete state;
         delete pk;
     }));
-
-    arg_commands->insert(std::make_pair("pgmakerspec", [this](const std::string &args) {
+    arg_commands->insert(std::make_pair("pgmakerspec", [](const std::string &args) {
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 2) {
             std::cout << spd::VitaTestArgumentsException << std::endl;
@@ -58,7 +56,7 @@ void misc_mode::setup() {
         const auto lv_str = params[0];
         const auto array = Helper::split(lv_str, ",");
         std::vector<int> cds;
-        for (const auto& item : array) {
+        for (const auto &item: array) {
             cds.push_back(std::stoi(item));
         }
         auto pk = new Poker(cds, suit_count);
@@ -71,9 +69,7 @@ void misc_mode::setup() {
         delete state;
         delete pk;
     }));
-
-
-    arg_commands->insert(std::make_pair("pgmakerspecshuffle", [this](const std::string &args) {
+    arg_commands->insert(std::make_pair("pgmakerspecshuffle", [](const std::string &args) {
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 2) {
             std::cout << spd::VitaTestArgumentsException << std::endl;
@@ -87,7 +83,7 @@ void misc_mode::setup() {
         const auto lv_str = params[0];
         const auto array = Helper::split(lv_str, ",");
         std::vector<int> cds;
-        for (const auto& item : array) {
+        for (const auto &item: array) {
             cds.push_back(std::stoi(item));
         }
         auto pk = new Poker(cds, suit_count);

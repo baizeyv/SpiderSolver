@@ -8,7 +8,6 @@
 
 
 class Exporter {
-private:
     std::string full_file_path;
 public:
     explicit Exporter(std::string  file_path);

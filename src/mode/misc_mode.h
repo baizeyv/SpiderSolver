@@ -7,7 +7,7 @@
 #include "../IMode.h"
 
 
-class misc_mode : public IMode {
+class misc_mode final : public IMode {
 public:
     misc_mode();
     ~misc_mode() override;
