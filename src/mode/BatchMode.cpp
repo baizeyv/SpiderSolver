@@ -321,6 +321,7 @@ void BatchMode::setup() {
                 }
                 custom_batch_stop_flag = false;
                 custom_batch_thread_done = true;
+                std::cout << "COMPLETED!!!" << std::endl << "> ";
             }));
     }));
     arg_commands->insert(std::make_pair("stop", [this](const std::string &args) {
