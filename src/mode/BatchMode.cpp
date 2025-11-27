@@ -71,12 +71,12 @@ void BatchMode::setup() {
     // pgmaker C:\foo\bar\level.txt C:\foo\bar\output  1 1000000
     arg_commands->insert(std::make_pair("vita", [this](const std::string &args) {
         if (!vita_batch_thread_done && vita_batch_thread != nullptr && vita_batch_solver != nullptr) {
-            std::cout << spd::VitaTestRunning << std::endl;
+            std::cout << spd::BatchVitaRunning << std::endl;
             return;
         }
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 3 && params.size() != 2) {
-            std::cout << spd::VitaTestArgumentsException << std::endl;
+            std::cout << spd::BatchVitaArgumentsException << std::endl;
             return;
         }
         auto json_path = params[0];
@@ -86,7 +86,7 @@ void BatchMode::setup() {
         int step_limit = -1;
         if (params.size() == 3) {
             if (!Helper::try_parse_int(params[2], step_limit)) {
-                std::cout << spd::VitaTestArgumentsException << std::endl;
+                std::cout << spd::BatchVitaArgumentsException << std::endl;
                 return;
             }
         }
@@ -139,12 +139,12 @@ void BatchMode::setup() {
     }));
     arg_commands->insert(std::make_pair("playvalve", [this](const std::string &args) {
         if (!playvalve_batch_thread_done && playvalve_batch_thread != nullptr && playvalve_batch_solver != nullptr) {
-            std::cout << spd::PlayValveTestRunning << std::endl;
+            std::cout << spd::BatchPlayValveRunning << std::endl;
             return;
         }
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 4 && params.size() != 3) {
-            std::cout << spd::PlayValveTestArgumentsException << std::endl;
+            std::cout << spd::BatchPlayValveArgumentsException << std::endl;
             return;
         }
         auto txt_path = params[0];
@@ -155,12 +155,12 @@ void BatchMode::setup() {
         int suit_count = 1;
         if (params.size() == 4) {
             if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit)) {
-                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                std::cout << spd::BatchPlayValveArgumentsException << std::endl;
                 return;
             }
         } else if (params.size() == 3) {
             if (!Helper::try_parse_int(params[2], suit_count)) {
-                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                std::cout << spd::BatchPlayValveArgumentsException << std::endl;
                 return;
             }
         }
@@ -185,15 +185,14 @@ void BatchMode::setup() {
                 playvalve_batch_thread_done = true;
             }));
     }));
-
     arg_commands->insert(std::make_pair("pgmaker", [this](const std::string &args) {
         if (!pgmaker_batch_thread_done && pgmaker_batch_thread != nullptr && pgmaker_batch_solver != nullptr) {
-            std::cout << spd::PlayValveTestRunning << std::endl;
+            std::cout << spd::BatchPGMakerRunning << std::endl;
             return;
         }
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 4 && params.size() != 3) {
-            std::cout << spd::PlayValveTestArgumentsException << std::endl;
+            std::cout << spd::BatchPGMakerArgumentsException << std::endl;
             return;
         }
         auto txt_path = params[0];
@@ -204,12 +203,12 @@ void BatchMode::setup() {
         int suit_count = 1;
         if (params.size() == 4) {
             if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit)) {
-                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                std::cout << spd::BatchPGMakerArgumentsException << std::endl;
                 return;
             }
         } else if (params.size() == 3) {
             if (!Helper::try_parse_int(params[2], suit_count)) {
-                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                std::cout << spd::BatchPGMakerArgumentsException << std::endl;
                 return;
             }
         }
@@ -233,15 +232,14 @@ void BatchMode::setup() {
                 pgmaker_batch_thread_done = true;
             }));
     }));
-
     arg_commands->insert(std::make_pair("pgmakerskip", [this](const std::string &args) {
         if (!pgmaker_batch_thread_done && pgmaker_batch_thread != nullptr && pgmaker_batch_solver != nullptr) {
-            std::cout << spd::PlayValveTestRunning << std::endl;
+            std::cout << spd::BatchPGMakerRunning << std::endl;
             return;
         }
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 5 && params.size() != 4) {
-            std::cout << spd::PlayValveTestArgumentsException << std::endl;
+            std::cout << spd::BatchPGMakerArgumentsException << std::endl;
             return;
         }
         const auto txt_path = params[0];
@@ -254,12 +252,12 @@ void BatchMode::setup() {
         if (params.size() == 5) {
             if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit) || !
                 Helper::try_parse_int(params[4], seed_limit)) {
-                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                std::cout << spd::BatchPGMakerArgumentsException << std::endl;
                 return;
             }
         } else if (params.size() == 4) {
             if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], seed_limit)) {
-                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                std::cout << spd::BatchPGMakerArgumentsException << std::endl;
                 return;
             }
         }
@@ -290,18 +288,17 @@ void BatchMode::setup() {
                 pgmaker_batch_thread_done = true;
             }));
     }));
-
-    // ! custom input_csv_path output_csv_path suit_count step_limit seed_limit
     arg_commands->insert(std::make_pair("custom", [this](const std::string &args) {
+        // ! custom input_csv_path output_csv_path suit_count step_limit seed_limit
         // # 传入一个csv文件,这个文件中不能有标题,第一列是id, 第二列是104字符题目信息
 
         if (!custom_batch_thread_done && custom_batch_thread != nullptr && custom_batch_solver != nullptr) {
-            std::cout << spd::PlayValveTestRunning << std::endl;
+            std::cout << spd::BatchCustomRunning << std::endl;
             return;
         }
         const auto params = Helper::parse_arguments(args);
         if (params.size() != 5 && params.size() != 4) {
-            std::cout << spd::PlayValveTestArgumentsException << std::endl;
+            std::cout << spd::BatchCustomArgumentsException << std::endl;
             return;
         }
 
@@ -317,12 +314,12 @@ void BatchMode::setup() {
         if (params.size() == 5) {
             if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit) || !
                 Helper::try_parse_int(params[4], seed_limit)) {
-                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                std::cout << spd::BatchCustomArgumentsException << std::endl;
                 return;
             }
         } else if (params.size() == 4) {
             if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit)) {
-                std::cout << spd::PlayValveTestArgumentsException << std::endl;
+                std::cout << spd::BatchCustomArgumentsException << std::endl;
                 return;
             }
         }
@@ -361,11 +358,10 @@ void BatchMode::setup() {
                 custom_batch_thread_done = true;
             }));
     }));
-
     arg_commands->insert(std::make_pair("stop", [this](const std::string &args) {
         const auto params = Helper::parse_arguments(args);
         if (params.size() > 1 || params.empty()) {
-            std::cout << spd::StopTestArgumentsException << std::endl;
+            std::cout << spd::BatchStopArgumentsException << std::endl;
             return;
         }
         if (params[0] == "vita") {
@@ -377,12 +373,11 @@ void BatchMode::setup() {
         } else if (params[0] == "custom") {
             join(4);
         } else {
-            std::cout << spd::StopTestOptionsException << std::endl;
+            std::cout << spd::BatchStopOptionsException << std::endl;
             return;
         }
         Helper::trim_memory();
     }));
-
     commands->insert(std::make_pair("exit", [this]() {
         join(0);
         is_input = false;
@@ -401,46 +396,47 @@ void BatchMode::setup() {
     commands->insert(std::make_pair("query", [this]() {
         if (vita_batch_solver != nullptr) {
             if (vita_batch_solver->solved) {
-                std::cout << spd::VitaTestSolved << vita_batch_solver->poker->mark << " ->CALC:" << vita_batch_solver->
+                std::cout << spd::BatchVitaSolved << vita_batch_solver->poker->mark << spd::Calc << vita_batch_solver->
                         calc << std::endl;
                 return;
             } else {
-                std::cout << spd::VitaTestSolving << vita_batch_solver->poker->mark << " ->CALC:" << vita_batch_solver->
+                std::cout << spd::BatchVitaSolving << vita_batch_solver->poker->mark << spd::Calc << vita_batch_solver->
                         calc << std::endl;
                 return;
             }
         }
         if (playvalve_batch_solver != nullptr) {
             if (playvalve_batch_solver->solved) {
-                std::cout << spd::PlayValveTestSolved << playvalve_batch_solver->poker->mark << " ->CALC:" <<
+                std::cout << spd::BatchPlayValveSolved << playvalve_batch_solver->poker->mark << spd::Calc <<
                         playvalve_batch_solver->calc << std::endl;
                 return;
             } else {
-                std::cout << spd::PlayValveTestSolving << playvalve_batch_solver->poker->mark << " ->CALC:" <<
+                std::cout << spd::BatchPlayValveSolved << playvalve_batch_solver->poker->mark << spd::Calc <<
                         playvalve_batch_solver->calc << std::endl;
                 return;
             }
         }
         if (pgmaker_batch_solver != nullptr) {
             if (pgmaker_batch_solver->solved) {
-                std::cout << spd::PlayValveTestSolved << pgmaker_batch_solver->poker->mark << " ->CALC:" <<
+                std::cout << spd::BatchPGMakerSolved << pgmaker_batch_solver->poker->mark << spd::Calc <<
                         pgmaker_batch_solver->calc << std::endl;
                 return;
             } else {
-                std::cout << spd::PlayValveTestSolving << pgmaker_batch_solver->poker->mark << " ->CALC:" <<
+                std::cout << spd::BatchPGMakerSolving << pgmaker_batch_solver->poker->mark << spd::Calc <<
                         pgmaker_batch_solver->calc << std::endl;
                 return;
             }
         }
     }));
     commands->insert(std::make_pair("help", [this]() {
+        // TODO: desc
         std::cout << "You are in `BatchMode(spider --batch)` now." << std::endl
-                << "Commands:" << std::endl
+                << "Sub-Commands:" << std::endl
                 << "    vita `level_json_file_path` `output_path` (`step_limit`) -> Try to solve the Vita level." <<
                 std::endl
                 << "    playvalve `level_txt_file_path` `output_path` `suit_count` (`step_limit`) -> Try to solve the PlayValve level."
                 << std::endl
-                << "    stop `vita | playvalve` -> Stop the level currently being attempted to solve." << std::endl
+                << "    stop `vita | playvalve | pgmaker | custom` -> Stop the level currently being attempted to solve." << std::endl
                 << "    query -> Query Vita and PlayValve Exporter." << std::endl
                 << "    shrink -> Trim memory." << std::endl
                 << "    custom input_csv_path output_csv_path suit_count step_limit seed_limit" << std::endl;
@@ -455,15 +451,15 @@ void BatchMode::join(const int type) {
     if (type == 0 || type == 2) {
         vita_batch_stop_flag = true;
         if (vita_batch_thread_done && vita_batch_thread != nullptr && vita_batch_thread->joinable()) {
-            std::cout << spd::VitaTestWaitThread << std::endl;
+            std::cout << spd::BatchVitaWaitThread << std::endl;
             vita_batch_thread->join();
-            std::cout << spd::VitaTestThreadEnd << std::endl;
+            std::cout << spd::BatchVitaThreadEnd << std::endl;
         } else if (!vita_batch_thread_done && vita_batch_thread != nullptr) {
             if (vita_batch_solver != nullptr)
                 vita_batch_solver->stop();
-            std::cout << spd::VitaTestWaitThread << std::endl;
+            std::cout << spd::BatchVitaWaitThread << std::endl;
             vita_batch_thread->join();
-            std::cout << spd::VitaTestThreadEnd << std::endl;
+            std::cout << spd::BatchVitaThreadEnd << std::endl;
             vita_batch_thread.reset();
         }
         if (vita_batch_solver != nullptr) {
@@ -475,15 +471,15 @@ void BatchMode::join(const int type) {
     if (type == 0 || type == 1) {
         playvalve_batch_stop_flag = true;
         if (playvalve_batch_thread_done && playvalve_batch_thread != nullptr && playvalve_batch_thread->joinable()) {
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::BatchPlayValveWaitThread << std::endl;
             playvalve_batch_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::BatchPlayValveThreadEnd << std::endl;
         } else if (!playvalve_batch_thread_done && playvalve_batch_thread != nullptr) {
             if (playvalve_batch_solver != nullptr)
                 playvalve_batch_solver->stop();
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::BatchPlayValveWaitThread << std::endl;
             playvalve_batch_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::BatchPlayValveThreadEnd << std::endl;
             playvalve_batch_thread.reset();
         }
         if (playvalve_batch_solver != nullptr) {
@@ -495,15 +491,15 @@ void BatchMode::join(const int type) {
     if (type == 0 || type == 3) {
         pgmaker_batch_stop_flag = true;
         if (pgmaker_batch_thread_done && pgmaker_batch_thread != nullptr && pgmaker_batch_thread->joinable()) {
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::BatchPGMakerWaitThread << std::endl;
             pgmaker_batch_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::BatchPGMakerThreadEnd << std::endl;
         } else if (!pgmaker_batch_thread_done && pgmaker_batch_thread != nullptr) {
             if (pgmaker_batch_solver != nullptr)
                 pgmaker_batch_solver->stop();
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::BatchPGMakerWaitThread << std::endl;
             pgmaker_batch_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::BatchPGMakerThreadEnd << std::endl;
             pgmaker_batch_thread.reset();
         }
         if (pgmaker_batch_solver != nullptr) {
@@ -512,19 +508,18 @@ void BatchMode::join(const int type) {
         }
         pgmaker_batch_stop_flag = false;
     }
-    // # custom
     if (type == 0 || type == 4) {
         custom_batch_stop_flag = true;
         if (custom_batch_thread_done && custom_batch_thread != nullptr && custom_batch_thread->joinable()) {
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::BatchCustomWaitThread << std::endl;
             custom_batch_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::BatchCustomThreadEnd << std::endl;
         } else if (!custom_batch_thread_done && custom_batch_thread != nullptr) {
             if (custom_batch_solver != nullptr)
                 custom_batch_solver->stop();
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::BatchCustomWaitThread << std::endl;
             custom_batch_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::BatchCustomThreadEnd << std::endl;
             custom_batch_thread.reset();
         }
         if (custom_batch_solver != nullptr) {
