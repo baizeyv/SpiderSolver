@@ -191,54 +191,7 @@ void BatchMode::setup() {
             return;
         }
         const auto params = Helper::parse_arguments(args);
-        if (params.size() != 4 && params.size() != 3) {
-            std::cout << spd::BatchPGMakerArgumentsException << std::endl;
-            return;
-        }
-        auto txt_path = params[0];
-        auto output_path = params[1];
-        auto txt_content = Helper::read_file(txt_path);
-        auto seeds = Helper::split(txt_content, ",");
-        int step_limit = -1;
-        int suit_count = 1;
-        if (params.size() == 4) {
-            if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit)) {
-                std::cout << spd::BatchPGMakerArgumentsException << std::endl;
-                return;
-            }
-        } else if (params.size() == 3) {
-            if (!Helper::try_parse_int(params[2], suit_count)) {
-                std::cout << spd::BatchPGMakerArgumentsException << std::endl;
-                return;
-            }
-        }
-        join(3); // # 终止上一个线程
-        pgmaker_batch_thread_done = false;
-        this->pgmaker_batch_thread = std::make_unique<std::thread>(std::thread(
-            [params, seeds, suit_count, step_limit, this]() {
-                const auto output = params[1] + "\\pgmaker\\pgmaker_" + Helper::get_current_timestamp_millis() + ".csv";
-                int id = 0;
-                for (auto &item: seeds) {
-                    id++;
-                    if (int seed; Helper::try_parse_int(item, seed)) {
-                        pgmaker_batch_solver = new Solver(seed, suit_count, 13, true);
-                        pgmaker_batch_solver->call_dfs(output, id, true, step_limit);
-                    }
-                    if (pgmaker_batch_stop_flag) {
-                        break;
-                    }
-                }
-                pgmaker_batch_stop_flag = false;
-                pgmaker_batch_thread_done = true;
-            }));
-    }));
-    arg_commands->insert(std::make_pair("pgmakerskip", [this](const std::string &args) {
-        if (!pgmaker_batch_thread_done && pgmaker_batch_thread != nullptr && pgmaker_batch_solver != nullptr) {
-            std::cout << spd::BatchPGMakerRunning << std::endl;
-            return;
-        }
-        const auto params = Helper::parse_arguments(args);
-        if (params.size() != 5 && params.size() != 4) {
+        if (params.size() != 5 && params.size() != 4 && params.size() != 3) {
             std::cout << spd::BatchPGMakerArgumentsException << std::endl;
             return;
         }
@@ -248,7 +201,7 @@ void BatchMode::setup() {
         auto seeds = Helper::split(txt_content, ",");
         int step_limit = -1;
         int suit_count = 1;
-        int seed_limit = 0;
+        int seed_limit = -1;
         if (params.size() == 5) {
             if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit) || !
                 Helper::try_parse_int(params[4], seed_limit)) {
@@ -257,6 +210,11 @@ void BatchMode::setup() {
             }
         } else if (params.size() == 4) {
             if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], seed_limit)) {
+                std::cout << spd::BatchPGMakerArgumentsException << std::endl;
+                return;
+            }
+        } else if (params.size() == 3) {
+            if (!Helper::try_parse_int(params[2], suit_count)) {
                 std::cout << spd::BatchPGMakerArgumentsException << std::endl;
                 return;
             }
@@ -271,12 +229,14 @@ void BatchMode::setup() {
                 for (auto &item: seeds) {
                     id++;
                     if (int seed; Helper::try_parse_int(item, seed)) {
-                        if (seed == seed_limit) {
-                            can_execute = true;
-                            continue;
+                        if (seed_limit >= 0) {
+                            if (seed == seed_limit) {
+                                can_execute = true;
+                                continue;
+                            }
+                            if (!can_execute)
+                                continue;
                         }
-                        if (!can_execute)
-                            continue;
                         pgmaker_batch_solver = new Solver(seed, suit_count, 13, true);
                         pgmaker_batch_solver->call_dfs(output, id, true, step_limit);
                     }
@@ -297,7 +257,7 @@ void BatchMode::setup() {
             return;
         }
         const auto params = Helper::parse_arguments(args);
-        if (params.size() != 5 && params.size() != 4) {
+        if (params.size() != 5 && params.size() != 4 && params.size() != 3) {
             std::cout << spd::BatchCustomArgumentsException << std::endl;
             return;
         }
@@ -319,6 +279,11 @@ void BatchMode::setup() {
             }
         } else if (params.size() == 4) {
             if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit)) {
+                std::cout << spd::BatchCustomArgumentsException << std::endl;
+                return;
+            }
+        } else if (params.size() == 3) {
+            if (!Helper::try_parse_int(params[2], suit_count)) {
                 std::cout << spd::BatchCustomArgumentsException << std::endl;
                 return;
             }
@@ -427,19 +392,55 @@ void BatchMode::setup() {
                 return;
             }
         }
+        if (custom_batch_solver != nullptr) {
+            if (custom_batch_solver->solved) {
+                std::cout << spd::BatchCustomSolved << custom_batch_solver->poker->mark << spd::Calc <<
+                        custom_batch_solver->calc << std::endl;
+                return;
+            } else {
+                std::cout << spd::BatchCustomSolving << custom_batch_solver->poker->mark << spd::Calc <<
+                        custom_batch_solver->calc << std::endl;
+                return;
+            }
+        }
     }));
     commands->insert(std::make_pair("help", [this]() {
-        // TODO: desc
-        std::cout << "You are in `BatchMode(spider --batch)` now." << std::endl
-                << "Sub-Commands:" << std::endl
-                << "    vita `level_json_file_path` `output_path` (`step_limit`) -> Try to solve the Vita level." <<
+        std::cout << "You are in `batch mode(spider --batch)` now." << std::endl
+                << "Commands:" << std::endl << std::endl
+                << "    Try to batch solve vita levels." << std::endl
+                << "        [[ vita `level_json_file_path` `output_path` (`step_limit`) ]]" << std::endl << std::endl
+                << "        --->[[\033[32m vita E:/foo/bar/test.json E:/foo/bar/output 1000000 \033[0m]]<---" <<
+                std::endl << std::endl
+                << "    Try to batch solve play-valve levels." << std::endl
+                << "        [[ playvalve `level_txt_file_path` `output_path` `suit_count` (`step_limit`) ]]" <<
+                std::endl << std::endl
+                << "        --->[[\033[32m playvalve E:/foo/bar/test.txt E:/foo/bar/output 1 1000000 \033[0m]]<---" <<
+                std::endl <<
                 std::endl
-                << "    playvalve `level_txt_file_path` `output_path` `suit_count` (`step_limit`) -> Try to solve the PlayValve level."
+                << "    Try to batch solve pg-maker levels. (contains skip seed)" << std::endl
+                << "        [[ pgmaker `level_txt_file_path` `output_path` `suit_count` (`step_limit` `seed_limit`) ]]"
                 << std::endl
-                << "    stop `vita | playvalve | pgmaker | custom` -> Stop the level currently being attempted to solve." << std::endl
-                << "    query -> Query Vita and PlayValve Exporter." << std::endl
-                << "    shrink -> Trim memory." << std::endl
-                << "    custom input_csv_path output_csv_path suit_count step_limit seed_limit" << std::endl;
+                << std::endl
+                << "        --->[[\033[32m pgmaker E:/foo/bar/test.txt E:/foo/bar/output 1 1000000 7373 \033[0m]]<---"
+                << std::endl <<
+                std::endl
+                << "    Try to batch solve custom levels (contains skip seed)." << std::endl
+                << "        [[ custom `level_csv_file_path` `output_path` `suit_count` (`step_limit` `seed_limit`) ]]"
+                << std::endl << std::endl
+                << "        --->[[\033[32m custom E:/foobar/test.csv E:/foo/bar/output 1 1000000 7373 \033[0m]]<---" <<
+                std::endl <<
+                std::endl
+                << "    Stop the level currently being attempted to solve." << std::endl
+                << "        [[\033[32m stop `vita | playvalve | pgmaker | custom` \033[0m]]" << std::endl << std::endl
+                << "    Query vita/play-valve/pg-maker/custom exporter." << std::endl
+                << "        [[\033[32m query \033[0m]]" << std::endl << std::endl
+                << "    Clear screen." << std::endl
+                << "        [[\033[32m clear \033[0m]]" << std::endl << std::endl
+                << "    Exit." << std::endl
+                << "        [[\033[32m exit \033[0m]]" << std::endl
+                << "        [[\033[32m quit \033[0m]]" << std::endl << std::endl
+                << "    Trim memory." << std::endl
+                << "        [[\033[32m shrink \033[0m]]" << std::endl << std::endl;
     }));
 }
 

@@ -48,7 +48,6 @@ namespace spd {
     static std::string PlayValveTestRunning = "PlayValve Test Is Running!Please Stop It First By `stop vita`";
 
     // # part of batch mode
-
     static std::string BatchVitaRunning = "ERROR(SPD400001): [Batch vita mode is running! Please stop it by `stop vita` firstly.]";
     static std::string BatchVitaArgumentsException = "ERROR(SPD400000): [Batch vita solver arguments error.]";
     static std::string BatchPlayValveRunning = "ERROR(SPD500001): [Batch play-valve mode is running! Please stop it by `stop playvalve` firstly.]";
@@ -65,6 +64,8 @@ namespace spd {
     static std::string BatchPlayValveSolving = "PlayValve solving -> ";
     static std::string BatchPGMakerSolved = "PGMaker solved -> ";
     static std::string BatchPGMakerSolving = "PGMaker solving -> ";
+    static std::string BatchCustomSolved = "Custom solved -> ";
+    static std::string BatchCustomSolving = "Custom solving -> ";
     static std::string BatchVitaWaitThread = "Wait Batch Vita Thread End ...";
     static std::string BatchVitaThreadEnd = "Batch Vita Thread End";
     static std::string BatchPlayValveWaitThread = "Wait Batch PlayValve Thread End ...";
