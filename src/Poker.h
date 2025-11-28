@@ -33,7 +33,7 @@ public:
 
     Poker(int seed, int suit_count, int max_value = 13, bool pg_maker = false);
 
-    Poker(int fake_seed, const std::string& str104, int suit_count, int max_value = 13);
+    Poker(int fake_seed, const std::string& str104, int max_value = 13);
 
     explicit Poker(const std::string& asVitaLevel);
 

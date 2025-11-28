@@ -120,7 +120,7 @@ void StepMode::setup() {
         join();
         is_input = false;
     }));
-    commands->insert(std::make_pair("memory", [this]() {
+    commands->insert(std::make_pair("memory", []() {
         std::cout << Helper::get_memory_usage() << "KB Memory Usage." << std::endl;
     }));
     commands->insert(std::make_pair("clear", []() {
@@ -130,7 +130,7 @@ void StepMode::setup() {
     commands->insert(std::make_pair("shrink", []() {
         Helper::trim_memory();
     }));
-    commands->insert(std::make_pair("help", [this]() {
+    commands->insert(std::make_pair("help", []() {
         std::cout << "You are in `StepMode(spider --step)` now." << std::endl
                 << "Commands:" << std::endl
                 << "    vita `level_string` -> Try to solve the Vita level." << std::endl

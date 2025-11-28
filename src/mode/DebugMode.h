@@ -21,7 +21,7 @@ public:
 
     /**
      * 
-     * @param type 0->vita and playvalve and pgmaker 1->playvalve 2->vita 3->pgmaker
+     * @param type 0->vita and playvalve and pgmaker 1->playvalve 2->vita 3->pgmaker 4->custom
      */
     void join(int type);
 
@@ -43,6 +43,11 @@ private:
     Solver *pgmaker_debug_solver;
     std::unique_ptr<std::thread> pgmaker_debug_thread;
     std::atomic<bool> pgmaker_debug_thread_done = false;
+
+    // #region custom test
+    Solver *doodle_debug_solver;
+    std::unique_ptr<std::thread> doodle_debug_thread;
+    std::atomic<bool> doodle_debug_thread_done = false;
 };
 
 

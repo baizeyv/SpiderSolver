@@ -155,11 +155,11 @@ Solver::Solver(const int seed, const int suitCount, const int max_value, const b
     root_state = new State(poker);
 }
 
-Solver::Solver(const int fake_seed, const std::string &str104, const int suit_count, const int max_value) : depth(0),
+Solver::Solver(const int fake_seed, const std::string &str104, const int max_value) : depth(0),
     sync_end_flag(false),
     calc(0),
     solved(false) {
-    poker = new Poker(fake_seed, str104, suit_count, max_value);
+    poker = new Poker(fake_seed, str104, max_value);
     root_state = new State(poker);
 }
 
@@ -261,7 +261,7 @@ void Solver::depth_first_search_sync(State *&root, const std::function<void()> &
         if (spd::OutputPath.empty()) {
             spd::OutputPath = Helper::get_current_exe_directory();
         }
-        std::string suffix = "\\log\\";
+        std::string suffix = "\\debug_log\\";
         if (int tmp; Helper::try_parse_int(poker->mark, tmp)) {
             // playvalve
             suffix += "playvalve_" + std::to_string(tmp) + ".log";

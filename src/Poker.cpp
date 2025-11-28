@@ -25,9 +25,25 @@ Poker::Poker(const int seed, const int suit_count, const int max_value, const bo
     cards = generate_deck(seed, suit_count, max_value, pg_maker);
 }
 
-Poker::Poker(const int fake_seed, const std::string &str104, const int suit_count, const int max_value) : suitCount(suit_count),
-    max_value(max_value), reverse_output(true) {
+Poker::Poker(const int fake_seed, const std::string &str104, const int max_value) : max_value(max_value),
+    reverse_output(true) {
     mark = std::to_string(fake_seed);
+
+    std::unordered_set<char> values;
+    for (const auto &item: str104) {
+        values.insert(item);
+    }
+    if (values.size() == 13)
+        suitCount = 1;
+    else if (values.size() == 26)
+        suitCount = 2;
+    else if (values.size() == 39)
+        suitCount = 3;
+    else if (values.size() == 52)
+        suitCount = 4;
+    else
+        suitCount = -1;
+
     cards = generate_deck(str104);
 }
 
@@ -228,37 +244,37 @@ std::vector<Card> Poker::generate_deck(const int seed, const int suitCount, cons
 std::vector<Card> Poker::generate_deck(const std::string &str104) {
     std::vector<int> cards;
 
-    std::vector<std::vector<char>> list;
+    std::vector<std::vector<char> > list;
     std::vector<char> deck_list;
     int idx = 0;
-    for (int i = 1; i <= 4; i ++) {
+    for (int i = 1; i <= 4; i++) {
         std::vector<char> l;
-        for (int j = 1; j <= 6; j ++) {
+        for (int j = 1; j <= 6; j++) {
             l.push_back(str104[idx++]);
         }
         std::ranges::reverse(l);
         list.push_back(l);
     }
-    for (int i = 1; i <= 6; i ++) {
+    for (int i = 1; i <= 6; i++) {
         std::vector<char> l;
-        for (int j = 1; j <= 5; j ++) {
+        for (int j = 1; j <= 5; j++) {
             l.push_back(str104[idx++]);
         }
         std::ranges::reverse(l);
         list.push_back(l);
     }
-    for (; idx < 104; idx ++) {
+    for (; idx < 104; idx++) {
         deck_list.push_back(str104[idx]);
     }
 
-    for (int i = 0; i < 6; i ++) {
-        for (auto l : list) {
+    for (int i = 0; i < 6; i++) {
+        for (auto l: list) {
             if (l.size() > i) {
                 cards.push_back(Card::to_value(l[i]));
             }
         }
     }
-    for (const auto item : deck_list) {
+    for (const auto item: deck_list) {
         cards.push_back(Card::to_value(item));
     }
 

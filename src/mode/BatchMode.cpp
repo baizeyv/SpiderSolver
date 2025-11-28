@@ -9,7 +9,7 @@
 #include "../data/VitaBean2.h"
 
 BatchMode::BatchMode() : is_input(true), vita_batch_solver(nullptr), playvalve_batch_solver(nullptr),
-                         pgmaker_batch_solver(nullptr), custom_batch_solver(nullptr) {
+                         pgmaker_batch_solver(nullptr), doodle_batch_solver(nullptr) {
 }
 
 BatchMode::~BatchMode() {
@@ -51,24 +51,21 @@ BatchMode::~BatchMode() {
         pgmaker_batch_thread.reset();
 
     // # region custom test
-    if (custom_batch_solver != nullptr) {
-        custom_batch_stop_flag = true;
-        custom_batch_solver->stop();
+    if (doodle_batch_solver != nullptr) {
+        doodle_batch_stop_flag = true;
+        doodle_batch_solver->stop();
     }
-    if (custom_batch_thread != nullptr && custom_batch_thread->joinable())
-        custom_batch_thread->join();
-    if (custom_batch_solver != nullptr)
-        delete custom_batch_solver;
-    if (custom_batch_thread != nullptr)
-        custom_batch_thread.reset();
+    if (doodle_batch_thread != nullptr && doodle_batch_thread->joinable())
+        doodle_batch_thread->join();
+    if (doodle_batch_solver != nullptr)
+        delete doodle_batch_solver;
+    if (doodle_batch_thread != nullptr)
+        doodle_batch_thread.reset();
 }
 
 void BatchMode::setup() {
     arg_commands = new std::map<std::string, std::function<void(const std::string &)> >;
     commands = new std::map<std::string, std::function<void()> >;
-    // vita C:\foo\bar\level.json C:\foo\bar\output 1000000
-    // playvalve C:\foo\bar\level.txt C:\foo\bar\output  1 1000000
-    // pgmaker C:\foo\bar\level.txt C:\foo\bar\output  1 1000000
     arg_commands->insert(std::make_pair("vita", [this](const std::string &args) {
         if (!vita_batch_thread_done && vita_batch_thread != nullptr && vita_batch_solver != nullptr) {
             std::cout << spd::BatchVitaRunning << std::endl;
@@ -248,56 +245,50 @@ void BatchMode::setup() {
                 pgmaker_batch_thread_done = true;
             }));
     }));
-    arg_commands->insert(std::make_pair("custom", [this](const std::string &args) {
-        // ! custom input_csv_path output_csv_path suit_count step_limit seed_limit
+    arg_commands->insert(std::make_pair("doodle", [this](const std::string &args) {
+        // ! custom input_csv_path output_csv_path step_limit seed_limit
         // # 传入一个csv文件,这个文件中不能有标题,第一列是id, 第二列是104字符题目信息
 
-        if (!custom_batch_thread_done && custom_batch_thread != nullptr && custom_batch_solver != nullptr) {
-            std::cout << spd::BatchCustomRunning << std::endl;
+        if (!doodle_batch_thread_done && doodle_batch_thread != nullptr && doodle_batch_solver != nullptr) {
+            std::cout << spd::BatchDoodleRunning << std::endl;
             return;
         }
         const auto params = Helper::parse_arguments(args);
-        if (params.size() != 5 && params.size() != 4 && params.size() != 3) {
-            std::cout << spd::BatchCustomArgumentsException << std::endl;
+        if (params.size() != 4 && params.size() != 3) {
+            std::cout << spd::BatchDoodleArgumentsException << std::endl;
             return;
         }
 
         // # 输入的csv文件的绝对路径
         const std::string csv_path = params[0];
         // # 输出的csv文件的绝对路径
-        std::string output_path = params[1];
+        const std::string output_path = params[1];
         auto csv_content = Helper::read_file_line(csv_path);
 
         int step_limit = -1;
-        int suit_count = 1;
         int seed_limit = -1;
-        if (params.size() == 5) {
-            if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit) || !
+        if (params.size() == 4) {
+            if (!Helper::try_parse_int(params[3], step_limit) || !
                 Helper::try_parse_int(params[4], seed_limit)) {
-                std::cout << spd::BatchCustomArgumentsException << std::endl;
-                return;
-            }
-        } else if (params.size() == 4) {
-            if (!Helper::try_parse_int(params[2], suit_count) || !Helper::try_parse_int(params[3], step_limit)) {
-                std::cout << spd::BatchCustomArgumentsException << std::endl;
+                std::cout << spd::BatchDoodleArgumentsException << std::endl;
                 return;
             }
         } else if (params.size() == 3) {
-            if (!Helper::try_parse_int(params[2], suit_count)) {
-                std::cout << spd::BatchCustomArgumentsException << std::endl;
+            if (!Helper::try_parse_int(params[3], step_limit)) {
+                std::cout << spd::BatchDoodleArgumentsException << std::endl;
                 return;
             }
         }
 
         join(4); // # 终止上一个线程
-        custom_batch_thread_done = false;
-        this->custom_batch_thread = std::make_unique<std::thread>(std::thread(
-            [params, csv_content, step_limit, seed_limit, suit_count, this]() {
-                const auto output = params[1] + "\\custom\\custom_" + Helper::get_current_timestamp_millis() + ".csv";
+        doodle_batch_thread_done = false;
+        this->doodle_batch_thread = std::make_unique<std::thread>(std::thread(
+            [params, csv_content, step_limit, seed_limit, this]() {
+                const auto output = params[1] + "\\doodle\\doodle_" + Helper::get_current_timestamp_millis() + ".csv";
                 int real_id = 0;
 
                 bool can_execute = false;
-                for (auto item: csv_content) {
+                for (const auto &item: csv_content) {
                     real_id++;
                     auto info = Helper::split(item, ",");
                     int id;
@@ -312,16 +303,16 @@ void BatchMode::setup() {
                             continue;
                     }
 
-                    auto str104 = info[1];
-                    custom_batch_solver = new Solver(id, str104, suit_count);
-                    custom_batch_solver->call_dfs(output, real_id, true, step_limit);
-                    if (custom_batch_stop_flag) {
+                    const auto str104 = info[1];
+                    doodle_batch_solver = new Solver(id, str104);
+                    doodle_batch_solver->call_dfs(output, real_id, true, step_limit);
+                    if (doodle_batch_stop_flag) {
                         break;
                     }
                 }
-                custom_batch_stop_flag = false;
-                custom_batch_thread_done = true;
-                std::cout << "COMPLETED!!!" << std::endl << "> ";
+                doodle_batch_stop_flag = false;
+                doodle_batch_thread_done = true;
+                std::cout << spd::CompleteDesc << std::endl << "> ";
             }));
     }));
     arg_commands->insert(std::make_pair("stop", [this](const std::string &args) {
@@ -336,7 +327,7 @@ void BatchMode::setup() {
             join(1);
         } else if (params[0] == "pgmaker") {
             join(3);
-        } else if (params[0] == "custom") {
+        } else if (params[0] == "doodle") {
             join(4);
         } else {
             std::cout << spd::BatchStopOptionsException << std::endl;
@@ -393,20 +384,20 @@ void BatchMode::setup() {
                 return;
             }
         }
-        if (custom_batch_solver != nullptr) {
-            if (custom_batch_solver->solved) {
-                std::cout << spd::BatchCustomSolved << custom_batch_solver->poker->mark << spd::Calc <<
-                        custom_batch_solver->calc << std::endl;
+        if (doodle_batch_solver != nullptr) {
+            if (doodle_batch_solver->solved) {
+                std::cout << spd::BatchDoodleSolved << doodle_batch_solver->poker->mark << spd::Calc <<
+                        doodle_batch_solver->calc << std::endl;
                 return;
             } else {
-                std::cout << spd::BatchCustomSolving << custom_batch_solver->poker->mark << spd::Calc <<
-                        custom_batch_solver->calc << std::endl;
+                std::cout << spd::BatchDoodleSolving << doodle_batch_solver->poker->mark << spd::Calc <<
+                        doodle_batch_solver->calc << std::endl;
                 return;
             }
         }
     }));
     commands->insert(std::make_pair("help", []() {
-        std::cout << "You are in `batch mode(spider --batch)` now." << std::endl
+        std::cout << "You are in `batch mode (spider --batch)` now." << std::endl
                 << "Commands:" << std::endl << std::endl
                 << "    Try to batch solve vita levels." << std::endl
                 << "        [[ vita `level_json_file_path` `output_path` (`step_limit`) ]]" << std::endl << std::endl
@@ -426,13 +417,13 @@ void BatchMode::setup() {
                 << std::endl <<
                 std::endl
                 << "    Try to batch solve custom levels (contains skip seed)." << std::endl
-                << "        [[ custom `level_csv_file_path` `output_path` `suit_count` (`step_limit` `seed_limit`) ]]"
+                << "        [[ doodle `level_csv_file_path` `output_path` (`step_limit` `seed_limit`) ]]"
                 << std::endl << std::endl
-                << "        --->[[\033[32m custom E:/foobar/test.csv E:/foo/bar/output 1 1000000 7373 \033[0m]]<---" <<
+                << "        --->[[\033[32m doodle E:/foobar/test.csv E:/foo/bar/output 1000000 7373 \033[0m]]<---" <<
                 std::endl <<
                 std::endl
                 << "    Stop the level currently being attempted to solve." << std::endl
-                << "        [[\033[32m stop `vita | playvalve | pgmaker | custom` \033[0m]]" << std::endl << std::endl
+                << "        [[\033[32m stop `vita | playvalve | pgmaker | doodle` \033[0m]]" << std::endl << std::endl
                 << "    Query vita/play-valve/pg-maker/custom exporter." << std::endl
                 << "        [[\033[32m query \033[0m]]" << std::endl << std::endl
                 << "    Clear screen." << std::endl
@@ -511,23 +502,23 @@ void BatchMode::join(const int type) {
         pgmaker_batch_stop_flag = false;
     }
     if (type == 0 || type == 4) {
-        custom_batch_stop_flag = true;
-        if (custom_batch_thread_done && custom_batch_thread != nullptr && custom_batch_thread->joinable()) {
-            std::cout << spd::BatchCustomWaitThread << std::endl;
-            custom_batch_thread->join();
-            std::cout << spd::BatchCustomThreadEnd << std::endl;
-        } else if (!custom_batch_thread_done && custom_batch_thread != nullptr) {
-            if (custom_batch_solver != nullptr)
-                custom_batch_solver->stop();
-            std::cout << spd::BatchCustomWaitThread << std::endl;
-            custom_batch_thread->join();
-            std::cout << spd::BatchCustomThreadEnd << std::endl;
-            custom_batch_thread.reset();
+        doodle_batch_stop_flag = true;
+        if (doodle_batch_thread_done && doodle_batch_thread != nullptr && doodle_batch_thread->joinable()) {
+            std::cout << spd::BatchDoodleWaitThread << std::endl;
+            doodle_batch_thread->join();
+            std::cout << spd::BatchDoodleThreadEnd << std::endl;
+        } else if (!doodle_batch_thread_done && doodle_batch_thread != nullptr) {
+            if (doodle_batch_solver != nullptr)
+                doodle_batch_solver->stop();
+            std::cout << spd::BatchDoodleWaitThread << std::endl;
+            doodle_batch_thread->join();
+            std::cout << spd::BatchDoodleThreadEnd << std::endl;
+            doodle_batch_thread.reset();
         }
-        if (custom_batch_solver != nullptr) {
-            delete custom_batch_solver;
-            custom_batch_solver = nullptr;
+        if (doodle_batch_solver != nullptr) {
+            delete doodle_batch_solver;
+            doodle_batch_solver = nullptr;
         }
-        custom_batch_stop_flag = false;
+        doodle_batch_stop_flag = false;
     }
 }

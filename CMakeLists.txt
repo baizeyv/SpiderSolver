@@ -69,9 +69,9 @@ add_executable(spider src/main.cpp
         src/mode/misc_mode.h
 )
 
-set(UPX_EXE "E:\\env\\upx-5.0.2-win64\\upx.exe")
-add_custom_command(TARGET spider POST_BUILD
-        COMMAND ${CMAKE_STRIP} $<TARGET_FILE:spider>
-        COMMAND ${UPX_EXE} --best --lzma --force $<TARGET_FILE:spider>
-        COMMENT "Stripping and UPX compressing spider"
-)
+#set(UPX_EXE "E:\\env\\upx-5.0.2-win64\\upx.exe")
+#add_custom_command(TARGET spider POST_BUILD
+#        COMMAND ${CMAKE_STRIP} $<TARGET_FILE:spider>
+#        COMMAND ${UPX_EXE} --best --lzma --force $<TARGET_FILE:spider>
+#        COMMENT "Stripping and UPX compressing spider"
+#)
