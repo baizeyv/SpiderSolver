@@ -7,7 +7,7 @@
 #include "../IMode.h"
 
 
-class level_mode : public IMode {
+class level_mode final : public IMode {
 public:
     level_mode();
     ~level_mode() override;

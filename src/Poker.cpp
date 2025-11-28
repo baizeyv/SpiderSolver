@@ -188,7 +188,7 @@ std::vector<Card> Poker::generate_deck(const int seed, const int suitCount, cons
         std::vector<int> tmpNew;
         for (int k = 0; k < 2; k++) {
             for (int j = 0; j < 4; j++) {
-                auto tmp = j % suitCount;
+                const auto tmp = j % suitCount;
                 for (int i = 0; i < 13; i++) {
                     tmpNew.push_back(tmp * 13 + i + 1);
                 }
