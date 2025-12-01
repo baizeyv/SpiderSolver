@@ -4,9 +4,9 @@
 
 #include "DebugMode.h"
 
-DebugMode::DebugMode() : is_input(true), vita_debug_solver(nullptr), playvalve_debug_solver(nullptr),
-                         pgmaker_debug_solver(nullptr), doodle_debug_solver(nullptr) {
-}
+DebugMode::DebugMode() :
+    is_input(true), vita_debug_solver(nullptr), playvalve_debug_solver(nullptr), pgmaker_debug_solver(nullptr),
+    doodle_debug_solver(nullptr) {}
 
 DebugMode::~DebugMode() {
     delete arg_commands;
@@ -53,8 +53,8 @@ DebugMode::~DebugMode() {
 }
 
 void DebugMode::setup() {
-    arg_commands = new std::map<std::string, std::function<void(const std::string &)> >;
-    commands = new std::map<std::string, std::function<void()> >;
+    arg_commands = new std::map<std::string, std::function<void(const std::string &)>>;
+    commands = new std::map<std::string, std::function<void()>>;
 
     arg_commands->insert(std::make_pair("vita", [this](const std::string &args) {
         // # command: vita level_string
@@ -188,47 +188,54 @@ void DebugMode::setup() {
         system("cls");
         spd::output_icon();
     }));
-    commands->insert(std::make_pair("shrink", []() {
-        Helper::trim_memory();
-    }));
+    commands->insert(std::make_pair("shrink", []() { Helper::trim_memory(); }));
     commands->insert(std::make_pair("help", []() {
         std::cout << "You are in `debug mode (spider --debug)` now." << std::endl
-                << "Commands:" << std::endl << std::endl
-                << "    Try to debug solve vita level, and output info to the debug_log path." << std::endl
-                << "        [[ vita `level_string` ]]" << std::endl << std::endl
-                <<
-                "        --->[[\033[32m vita YYVYWN,1;QXVUSO,1;RYNPWU,1;ZNTNSR,1;YRPZT,1;QTQNU,1;PZQOO,1;ZTSTN,1;PRVUR,1;OOSWX,1;UWWQRXZRZYSPQXSVXWONTOSVVSRWWTZXPTPUYNQYUUXOVVPQZX,0 \033[0m]]<---"
-                << std::endl << std::endl
-                << "    Try to debug solve play-valve level, and output info to the debug_log path." << std::endl
-                << "        [[ playvalve `level_seed` `suit_count` ]]" << std::endl << std::endl
-                <<
-                "        --->[[\033[32m playvalve 12345 1 \033[0m]]<---"
-                << std::endl << std::endl
-                << "    Try to debug solve pg-maker level, and output info to the debug_log path." << std::endl
-                << "        [[ pgmaker `level_seed` `suit_count` ]]" << std::endl << std::endl
-                <<
-                "        --->[[\033[32m pgmaker 12345 1 \033[0m]]<---"
-                << std::endl << std::endl
-                << "    Try to debug solve doodle level, and output info to the debug_log path." << std::endl
-                << "        [[ doodle `level_string` ]]" << std::endl << std::endl
-                <<
-                "        --->[[\033[32m doodle lkjihgedcballkjihcjihgfegcehifcjdklhacbbhdagicdgjbldmkmkjgljfaebdemfmkmamakbfgkedildbehfmccgebiahailffjm \033[0m]]<---"
-                << std::endl << std::endl
-                << "    Stop the level currently being attempted to solve." << std::endl
-                << "        [[\033[32m stop `vita | playvalve | pgmaker | doodle` \033[0m]]" << std::endl << std::endl
-                << "    Clear screen." << std::endl
-                << "        [[\033[32m clear \033[0m]]" << std::endl << std::endl
-                << "    Exit." << std::endl
-                << "        [[\033[32m exit \033[0m]]" << std::endl
-                << "        [[\033[32m quit \033[0m]]" << std::endl << std::endl
-                << "    Trim memory." << std::endl
-                << "        [[\033[32m shrink \033[0m]]" << std::endl << std::endl;
+                  << "Commands:" << std::endl
+                  << std::endl
+                  << "    Try to debug solve vita level, and output info to the debug_log path." << std::endl
+                  << "        [[ vita `level_string` ]]" << std::endl
+                  << std::endl
+                  << "        --->[[\033[32m vita "
+                     "YYVYWN,1;QXVUSO,1;RYNPWU,1;ZNTNSR,1;YRPZT,1;QTQNU,1;PZQOO,1;ZTSTN,1;PRVUR,1;OOSWX,1;"
+                     "UWWQRXZRZYSPQXSVXWONTOSVVSRWWTZXPTPUYNQYUUXOVVPQZX,0 \033[0m]]<---"
+                  << std::endl
+                  << std::endl
+                  << "    Try to debug solve play-valve level, and output info to the debug_log path." << std::endl
+                  << "        [[ playvalve `level_seed` `suit_count` ]]" << std::endl
+                  << std::endl
+                  << "        --->[[\033[32m playvalve 12345 1 \033[0m]]<---" << std::endl
+                  << std::endl
+                  << "    Try to debug solve pg-maker level, and output info to the debug_log path." << std::endl
+                  << "        [[ pgmaker `level_seed` `suit_count` ]]" << std::endl
+                  << std::endl
+                  << "        --->[[\033[32m pgmaker 12345 1 \033[0m]]<---" << std::endl
+                  << std::endl
+                  << "    Try to debug solve doodle level, and output info to the debug_log path." << std::endl
+                  << "        [[ doodle `level_string` ]]" << std::endl
+                  << std::endl
+                  << "        --->[[\033[32m doodle "
+                     "lkjihgedcballkjihcjihgfegcehifcjdklhacbbhdagicdgjbldmkmkjgljfaebdemfmkmamakbfgkedildbehfmccgebiah"
+                     "ailffjm \033[0m]]<---"
+                  << std::endl
+                  << std::endl
+                  << "    Stop the level currently being attempted to solve." << std::endl
+                  << "        [[\033[32m stop `vita | playvalve | pgmaker | doodle` \033[0m]]" << std::endl
+                  << std::endl
+                  << "    Clear screen." << std::endl
+                  << "        [[\033[32m clear \033[0m]]" << std::endl
+                  << std::endl
+                  << "    Exit." << std::endl
+                  << "        [[\033[32m exit \033[0m]]" << std::endl
+                  << "        [[\033[32m quit \033[0m]]" << std::endl
+                  << std::endl
+                  << "    Trim memory." << std::endl
+                  << "        [[\033[32m shrink \033[0m]]" << std::endl
+                  << std::endl;
     }));
 }
 
-bool DebugMode::input() {
-    return is_input;
-}
+bool DebugMode::input() { return is_input; }
 
 void DebugMode::join(const int type) {
     if (type == 0 || type == 2) {

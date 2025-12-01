@@ -26,8 +26,6 @@ namespace spd {
     static std::string StopTestOptionsException = "ERROR(SPD40004): [Task Test Query Options Error]";
     static std::string ViewTestArgumentsException = "ERROR(SPD40000): [View Test Solve Arguments Error]";
     static std::string ViewTestOptionsException = "ERROR(SPD40000): [View Test Solve Options Error]";
-    static std::string ViewVitaLevelLengthException =
-            "ERROR(SPD40001): [View Vita Arguments Level String Length Error]";
     static std::string ViewSpdSeedException = "ERROR(SPD40001): [View PlayValve Arguments Seed Error]";
     static std::string VitaTestWaitThread = "Wait Vita Test Thread End ...";
     static std::string PlayValveTestWaitThread = "Wait PlayValve Test Thread End ...";
@@ -113,11 +111,51 @@ namespace spd {
     static std::string DebugDoodleWaitThread = "Wait Debug Doodle Thread End ...";
     static std::string DebugDoodleThreadEnd = "Debug Doodle Thread End";
 
+    // # part of test mode
+    static std::string TestVitaRunning =
+            "ERROR(SPD400001): [Test vita mode is running! Please stop it by `stop vita` firstly.]";
+    static std::string TestViewArgumentsException = "ERROR(SPD40000): [View Test Solve Arguments Error]";
+    static std::string TestViewVitaLevelLengthException =
+            "ERROR(SPD40001): [View Vita Arguments Level String Length Error]";
+    static std::string TestVitaArgumentsException = "ERROR(SPD400000): [Test vita solver arguments error.]";
+    static std::string TestVitaLevelLengthException = "ERROR(SPD400002): [Test vita mode level string length error.]";
+    static std::string TestVitaStart = "Vita Test Start -> ";
+    static std::string TestPlayValveRunning =
+            "ERROR(SPD400001): [Test play-valve mode is running! Please stop it by `stop playvalve` firstly.]";
+    static std::string TestPlayValveArgumentsException = "ERROR(SPD400000): [Test play-valve solver arguments error.]";
+    static std::string TestPlayValveStart = "PlayValve Test Start -> ";
+    static std::string TestPGMakerRunning =
+            "ERROR(SPD400001): [Test pg-maker mode is running! Please stop it by `stop pgmaker` firstly.]";
+    static std::string TestPGMakerArgumentsException = "ERROR(SPD400000): [Test pg-maker solver arguments error.]";
+    static std::string TestPGMakerStart = "PGMaker Test Start -> ";
+    static std::string TestDoodleRunning =
+            "ERROR(SPD400001): [Test doodle mode is running! Please stop it by `stop doodle` firstly.]";
+    static std::string TestDoodleArgumentsException = "ERROR(SPD400000): [Test doodle solver arguments error.]";
+    static std::string TestDoodleLevelLengthException =
+            "ERROR(SPD400002): [Test doodle mode level string length error.]";
+    static std::string TestDoodleStart = "Doodle Test Start -> ";
+    static std::string TestStopArgumentsException = "ERROR(SPD800000): [Test stop command arguments error.]";
+    static std::string TestStopOptionsException = "ERROR(SPD800001): [Test stop command options error.]";
+    static std::string TestQueryArgumentsException = "ERROR(SPD800000): [Test query command arguments error.]";
+    static std::string TestQueryOptionsException = "ERROR(SPD800001): [Test query command options error.]";
+    static std::string TestVitaSolved = "Vita solved -> ";
+    static std::string TestVitaSolving = "Vita solving -> ";
+    static std::string TestVitaNull = "No Vita Test Task.";
+    static std::string TestPlayValveSolved = "PlayValve solved -> ";
+    static std::string TestPlayValveSolving = "PlayValve solving -> ";
+    static std::string TestPlayValveNull = "No PlayValve Test Task.";
+    static std::string TestPGMakerSolved = "PGMaker solved -> ";
+    static std::string TestPGMakerSolving = "PGMaker solving -> ";
+    static std::string TestPGMakerNull = "No PGMaker Test Task.";
+    static std::string TestDoodleSolved = "Doodle solved -> ";
+    static std::string TestDoodleSolving = "Doodle solving -> ";
+    static std::string TestDoodleNull = "No Doodle Test Task.";
+
     // # part of generation mode
     static std::string GenRunning = "Generation is running! Please stop it by `stop` firstly";
     static std::string GenArgumentsException = "ERROR(SPD40000): [Generation Arguments Error]";
     static std::string GenWaitThread = "Wait Thread End ...";
-    static std::string GenThreadEnd  = "Generation Thread End";
+    static std::string GenThreadEnd = "Generation Thread End";
 
     inline std::string EmptyCard = ":::: ";
 
