@@ -281,8 +281,7 @@ void Solver::depth_first_search_sync(State *&root, const std::function<void()> &
 
     // # 在当前合理的可能步骤数组中找到没有试过的扑克状态
     std::vector<State *> states;
-    auto no_filter_states = take_a_step(root, this);
-    for (auto &item: no_filter_states) {
+    for (auto no_filter_states = take_a_step(root, this); auto &item: no_filter_states) {
         // if (!state_exists(all_states, item) && item->secondary_valuation(this))
         if (!state_serialized_exists(all_serialized_states, item) && item->secondary_valuation(this)) {
             states.push_back(item);
@@ -304,7 +303,7 @@ void Solver::depth_first_search_sync(State *&root, const std::function<void()> &
         // # 如果调用栈达到这么多的时候,用这个算法基本上就不好求解了,直接结束
         return;
     }
-    // delete root; // ! 不能在这里删除,因为State内部使用了上一步的State,只有在剪枝的时候才时候delete
+    // ! delete root; // ! 不能在这里删除,因为State内部使用了上一步的State,只有在剪枝的时候才时候delete
     // # 完成后需要continue去delete state pointer
     bool completed_continue_flag = false;
     if (step_mode && abort_step == 1)

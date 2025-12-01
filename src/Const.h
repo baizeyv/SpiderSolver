@@ -20,28 +20,11 @@ namespace spd {
     static std::string VitaTestLevelLengthException =
             "ERROR(SPD40001): [Vita Test Solve Arguments Level String Length Error]";
     static std::string PlayValveTestOptionsException = "ERROR(SPD40001): [PlayValve Test Solve Arguments String Error]";
-    static std::string TaskTestArgumentsException = "ERROR(SPD40002): [Task Test Query Arguments Error]";
-    static std::string StopTestArgumentsException = "ERROR(SPD40003): [Task Test Query Arguments Error]";
-    static std::string TaskTestOptionsException = "ERROR(SPD40004): [Task Test Query Options Error]";
-    static std::string StopTestOptionsException = "ERROR(SPD40004): [Task Test Query Options Error]";
-    static std::string ViewTestArgumentsException = "ERROR(SPD40000): [View Test Solve Arguments Error]";
-    static std::string ViewTestOptionsException = "ERROR(SPD40000): [View Test Solve Options Error]";
-    static std::string ViewSpdSeedException = "ERROR(SPD40001): [View PlayValve Arguments Seed Error]";
     static std::string VitaTestWaitThread = "Wait Vita Test Thread End ...";
-    static std::string PlayValveTestWaitThread = "Wait PlayValve Test Thread End ...";
     static std::string VitaTestThreadEnd = "Vita Test Thread End";
-    static std::string PlayValveTestThreadEnd = "PlayValve Test Thread End";
-    static std::string NoVitaTestTask = "No Vita Test Task";
-    static std::string NoPlayValveTestTask = "No PlayValve Test Task";
-    static std::string VitaTestSolved = "Vita Test Solved -> ";
-    static std::string PlayValveTestSolved = "PlayValve Test Solved -> ";
-    static std::string VitaTestSolving = "Vita Test Solving -> ";
-    static std::string PlayValveTestSolving = "Vita Test Solving -> ";
     static std::string VitaTestStart = "Vita Test Start -> ";
     static std::string PlayValveTestStart = "PlayValve Test Start -> ";
-    static std::string VitaTestRunning = "Vita Test Is Running!Please Stop It First By `stop vita`";
     static std::string StepTestRunning = "Step Test Is Running!Please Stop It First By `stop`";
-    static std::string PlayValveTestRunning = "PlayValve Test Is Running!Please Stop It First By `stop vita`";
 
     static std::string CompleteDesc = "[Completed !!!]";
 
@@ -112,11 +95,11 @@ namespace spd {
     static std::string DebugDoodleThreadEnd = "Debug Doodle Thread End";
 
     // # part of test mode
-    static std::string TestVitaRunning =
-            "ERROR(SPD400001): [Test vita mode is running! Please stop it by `stop vita` firstly.]";
     static std::string TestViewArgumentsException = "ERROR(SPD40000): [View Test Solve Arguments Error]";
     static std::string TestViewVitaLevelLengthException =
             "ERROR(SPD40001): [View Vita Arguments Level String Length Error]";
+    static std::string TestVitaRunning =
+            "ERROR(SPD400001): [Test vita mode is running! Please stop it by `stop vita` firstly.]";
     static std::string TestVitaArgumentsException = "ERROR(SPD400000): [Test vita solver arguments error.]";
     static std::string TestVitaLevelLengthException = "ERROR(SPD400002): [Test vita mode level string length error.]";
     static std::string TestVitaStart = "Vita Test Start -> ";
@@ -158,6 +141,29 @@ namespace spd {
     static std::string TestPGMakerThreadEnd = "Test PGMaker Thread End";
     static std::string TestDoodleWaitThread = "Wait Test Doodle Thread End ...";
     static std::string TestDoodleThreadEnd = "Test Doodle Thread End";
+
+    // # part of step mode
+    static std::string StepVitaRunning =
+            "ERROR(SPD400001): [Step vita mode is running! Please stop it by `stop vita` firstly.]";
+    static std::string StepVitaArgumentsException = "ERROR(SPD400000): [Step vita solver arguments error.]";
+    static std::string StepVitaLevelLengthException = "ERROR(SPD400002): [Step vita mode level string length error.]";
+    static std::string StepVitaStart = "Vita Step Start -> ";
+    static std::string StepPlayValveRunning =
+            "ERROR(SPD400001): [Step play-valve mode is running! Please stop it by `stop playvalve` firstly.]";
+    static std::string StepPlayValveArgumentsException = "ERROR(SPD400000): [Step play-valve solver arguments error.]";
+    static std::string StepPlayValveStart = "PlayValve Step Start -> ";
+    static std::string StepPGMakerRunning =
+            "ERROR(SPD400001): [Step pg-maker mode is running! Please stop it by `stop pgmaker` firstly.]";
+    static std::string StepPGMakerArgumentsException = "ERROR(SPD400000): [Step pg-maker solver arguments error.]";
+    static std::string StepPGMakerStart = "PGMaker Step Start -> ";
+    static std::string StepDoodleRunning =
+            "ERROR(SPD400001): [Step doodle mode is running! Please stop it by `stop doodle` firstly.]";
+    static std::string StepDoodleArgumentsException = "ERROR(SPD400000): [Step doodle solver arguments error.]";
+    static std::string StepDoodleLevelLengthException =
+            "ERROR(SPD400002): [Step doodle mode level string length error.]";
+    static std::string StepDoodleStart = "Doodle Step Start -> ";
+    static std::string StepWaitThread = "Wait Step Thread End ...";
+    static std::string StepThreadEnd = "Step Thread End";
 
     // # part of generation mode
     static std::string GenRunning = "Generation is running! Please stop it by `stop` firstly";

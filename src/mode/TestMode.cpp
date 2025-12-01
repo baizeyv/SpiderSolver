@@ -154,7 +154,7 @@ void TestMode::setup() {
         std::cout << spd::TestDoodleStart << params[0] << std::endl;
         doodle_test_thread_done = false;
         this->doodle_test_thread = std::make_unique<std::thread>(std::thread([params, this]() {
-            doodle_test_solver = new Solver(params[0]);
+            doodle_test_solver = new Solver(0, params[0]);
             doodle_test_solver->call_test_dfs();
             doodle_test_thread_done = true;
         }));
