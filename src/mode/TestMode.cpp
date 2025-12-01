@@ -418,15 +418,15 @@ bool TestMode::input() { return is_input; }
 void TestMode::join(const int type) {
     if (type == 0 || type == 2) {
         if (vita_test_thread_done && vita_test_thread != nullptr && vita_test_thread->joinable()) {
-            std::cout << spd::VitaTestWaitThread << std::endl;
+            std::cout << spd::TestVitaWaitThread << std::endl;
             vita_test_thread->join();
-            std::cout << spd::VitaTestThreadEnd << std::endl;
+            std::cout << spd::TestVitaThreadEnd << std::endl;
         } else if (!vita_test_thread_done && vita_test_thread != nullptr) {
             if (vita_test_solver)
                 vita_test_solver->stop();
-            std::cout << spd::VitaTestWaitThread << std::endl;
+            std::cout << spd::TestVitaWaitThread << std::endl;
             vita_test_thread->join();
-            std::cout << spd::VitaTestThreadEnd << std::endl;
+            std::cout << spd::TestVitaThreadEnd << std::endl;
             vita_test_thread.reset();
         }
         if (vita_test_solver != nullptr) {
@@ -436,15 +436,15 @@ void TestMode::join(const int type) {
     }
     if (type == 0 || type == 1) {
         if (playvalve_test_thread_done && playvalve_test_thread != nullptr && playvalve_test_thread->joinable()) {
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::TestPlayValveWaitThread << std::endl;
             playvalve_test_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::TestPlayValveThreadEnd << std::endl;
         } else if (!playvalve_test_thread_done && playvalve_test_thread != nullptr) {
             if (playvalve_test_solver)
                 playvalve_test_solver->stop();
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::TestPlayValveWaitThread << std::endl;
             playvalve_test_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::TestPlayValveThreadEnd << std::endl;
             playvalve_test_thread.reset();
         }
         if (playvalve_test_solver != nullptr) {
@@ -454,15 +454,15 @@ void TestMode::join(const int type) {
     }
     if (type == 0 || type == 3) {
         if (pgmaker_test_thread_done && pgmaker_test_thread != nullptr && pgmaker_test_thread->joinable()) {
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::TestPGMakerWaitThread << std::endl;
             pgmaker_test_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::TestPGMakerThreadEnd << std::endl;
         } else if (!pgmaker_test_thread_done && pgmaker_test_thread != nullptr) {
             if (pgmaker_test_solver)
                 pgmaker_test_solver->stop();
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::TestPGMakerWaitThread << std::endl;
             pgmaker_test_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::TestPGMakerThreadEnd << std::endl;
             pgmaker_test_thread.reset();
         }
         if (pgmaker_test_solver != nullptr) {
@@ -472,15 +472,15 @@ void TestMode::join(const int type) {
     }
     if (type == 0 || type == 4) {
         if (doodle_test_thread_done && doodle_test_thread != nullptr && doodle_test_thread->joinable()) {
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::TestDoodleWaitThread << std::endl;
             doodle_test_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::TestDoodleThreadEnd << std::endl;
         } else if (!doodle_test_thread_done && doodle_test_thread != nullptr) {
             if (doodle_test_solver)
                 doodle_test_solver->stop();
-            std::cout << spd::PlayValveTestWaitThread << std::endl;
+            std::cout << spd::TestDoodleWaitThread << std::endl;
             doodle_test_thread->join();
-            std::cout << spd::PlayValveTestThreadEnd << std::endl;
+            std::cout << spd::TestDoodleThreadEnd << std::endl;
             doodle_test_thread.reset();
         }
         if (doodle_test_solver != nullptr) {

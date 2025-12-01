@@ -150,6 +150,14 @@ namespace spd {
     static std::string TestDoodleSolved = "Doodle solved -> ";
     static std::string TestDoodleSolving = "Doodle solving -> ";
     static std::string TestDoodleNull = "No Doodle Test Task.";
+    static std::string TestVitaWaitThread = "Wait Test Vita Thread End ...";
+    static std::string TestVitaThreadEnd = "Test Vita Thread End";
+    static std::string TestPlayValveWaitThread = "Wait Test PlayValve Thread End ...";
+    static std::string TestPlayValveThreadEnd = "Test PlayValve Thread End";
+    static std::string TestPGMakerWaitThread = "Wait Test PGMaker Thread End ...";
+    static std::string TestPGMakerThreadEnd = "Test PGMaker Thread End";
+    static std::string TestDoodleWaitThread = "Wait Test Doodle Thread End ...";
+    static std::string TestDoodleThreadEnd = "Test Doodle Thread End";
 
     // # part of generation mode
     static std::string GenRunning = "Generation is running! Please stop it by `stop` firstly";
