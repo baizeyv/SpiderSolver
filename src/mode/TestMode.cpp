@@ -410,14 +410,6 @@ void TestMode::setup() {
                   << "    Trim memory." << std::endl
                   << "        [[\033[32m shrink \033[0m]]" << std::endl
                   << std::endl;
-
-
-        // << "    query `vita | playvalve` -> Query the level currently being attempted to solve." << std::endl
-        // << "    stop `vita | playvalve` -> Stop the level currently being attempted to solve." << std::endl
-        // << "    view `vita` `vita_level_string` -> View the Vita level cards." << std::endl
-        // << "    view `playvalve` `seed` `suit_count` -> View the PlayValve level cards." << std::endl
-        // << "    view `pgmaker` `seed` `suit_count` -> View the PGMaker level cards." << std::endl
-        // << "    shrink -> Trim memory." << std::endl;
     }));
 }
 
