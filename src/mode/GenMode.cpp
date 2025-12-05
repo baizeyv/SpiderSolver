@@ -84,6 +84,7 @@ void GenMode::setup() {
     commands->insert(std::make_pair("help", []() {
         std::cout << "You are in `GenMode(spider --generate)` now." << std::endl
                   << "Commands:" << std::endl
+                  << std::endl
                   << "    Try to generate winning levels." << std::endl
                   << "        [[ generate `suit_count` `output_path` `step_limit` ]]" << std::endl
                   << std::endl

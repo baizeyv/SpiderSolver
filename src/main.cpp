@@ -1,6 +1,5 @@
-#include <csignal>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <windows.h>
 
 #include "Const.h"
@@ -9,45 +8,34 @@
 #include "mode/BatchMode.h"
 #include "mode/DebugMode.h"
 #include "mode/GenMode.h"
+#include "mode/StepMode.h"
+#include "mode/TestMode.h"
 #include "mode/level_mode.h"
 #include "mode/misc_mode.h"
 #include "mode/shuffle_mode.h"
-#include "mode/StepMode.h"
-#include "mode/TestMode.h"
 
 /**
  * * Main Function
- * @param argc 
- * @param argv 
- * @return 
+ * @param argc
+ * @param argv
+ * @return
  */
-int main(const int argc, char* argv[])
-{
+int main(const int argc, char *argv[]) {
 
-    cxxopts::Options options(
-        "spider", "\n[Spider Solitaire Solver]\n@author: baizeyv\n@contact: baizeyv@gmail.com\n@git: https://github.com/baizeyv/SpiderSolver\n");
-    options.add_options()
-        ("h,help", "Show help information.")
-        ("t,test", "Enter `test` mode.")
-        ("d,debug", "Enter `debug` mode.")
-        ("b,batch", "Enter `batch` mode.")
-        ("g,generate", "Enter `generate` mode.")
-        ("s,step", "Enter `step` mode.")
-        ("o,output", "Debug mode output path.", cxxopts::value<std::string>()->default_value(""))
-        ("f,shuffle", "Enter export shuffled csv mode.")
-        ("l,level", "Enter export level csv mode.")
-        ("m,misc", "Enter Misc mode.")
-        ("v,version", "Show spider version.");
-    try
-    {
-        if (const auto result = options.parse(argc, argv); result.count("help"))
-        {
+    cxxopts::Options options("spider", "\n[Spider Solitaire Solver]\n@author: baizeyv\n@contact: "
+                                       "baizeyv@gmail.com\n@git: https://github.com/baizeyv/SpiderSolver\n");
+    options.add_options()("h,help", "Show help information.")("t,test", "Enter `test` mode.")(
+            "d,debug", "Enter `debug` mode.")("b,batch", "Enter `batch` mode.")("g,generate", "Enter `generate` mode.")(
+            "s,step", "Enter `step` mode.")("o,output", "Debug mode output path.",
+                                            cxxopts::value<std::string>()->default_value(""))(
+            "f,shuffle", "Enter export shuffled csv mode.")("l,level", "Enter export level csv mode.")(
+            "m,misc", "Enter Misc mode.")("v,version", "Show spider version.");
+    try {
+        if (const auto result = options.parse(argc, argv); result.count("help")) {
             spd::output_icon();
             std::cout << options.help() << std::endl;
             return 0;
-        }
-        else if (result.count("test"))
-        {
+        } else if (result.count("test")) {
             system("cls");
             spd::output_icon();
             // # test mode
@@ -55,14 +43,11 @@ int main(const int argc, char* argv[])
             mode->setup();
             mode->enter();
             delete mode;
-        }
-        else if (result.count("debug"))
-        {
+        } else if (result.count("debug")) {
             system("cls");
             spd::output_icon();
             // # debug mode
-            if (result.count("output"))
-            {
+            if (result.count("output")) {
                 spd::OutputPath = result["output"].as<std::string>();
             }
             spd::DebugOutput = true;
@@ -70,9 +55,7 @@ int main(const int argc, char* argv[])
             mode->setup();
             mode->enter();
             delete mode;
-        }
-        else if (result.count("batch"))
-        {
+        } else if (result.count("batch")) {
             system("cls");
             spd::output_icon();
             // # batch mode
@@ -80,9 +63,7 @@ int main(const int argc, char* argv[])
             mode->setup();
             mode->enter();
             delete mode;
-        }
-        else if (result.count("step"))
-        {
+        } else if (result.count("step")) {
             system("cls");
             spd::output_icon();
             // # step mode
@@ -90,9 +71,7 @@ int main(const int argc, char* argv[])
             mode->setup();
             mode->enter();
             delete mode;
-        }
-        else if (result.count("generate"))
-        {
+        } else if (result.count("generate")) {
             system("cls");
             spd::output_icon();
             // # generation mode
@@ -100,8 +79,7 @@ int main(const int argc, char* argv[])
             mode->setup();
             mode->enter();
             delete mode;
-        }
-        else if (result.count("shuffle")) {
+        } else if (result.count("shuffle")) {
             system("cls");
             spd::output_icon();
             // # shuffle mode
@@ -109,8 +87,7 @@ int main(const int argc, char* argv[])
             mode->setup();
             mode->enter();
             delete mode;
-        }
-        else if (result.count("level")) {
+        } else if (result.count("level")) {
             system("cls");
             spd::output_icon();
             // # level mode
@@ -118,8 +95,7 @@ int main(const int argc, char* argv[])
             mode->setup();
             mode->enter();
             delete mode;
-        }
-        else if (result.count("misc")) {
+        } else if (result.count("misc")) {
             system("cls");
             spd::output_icon();
             // # misc mode
@@ -127,15 +103,11 @@ int main(const int argc, char* argv[])
             mode->setup();
             mode->enter();
             delete mode;
-        }
-        else if (result.count("version"))
-        {
+        } else if (result.count("version")) {
             spd::output_icon();
             std::cout << "       spider version:" << spd::VERSION << std::endl;
         }
-    }
-    catch (const cxxopts::exceptions::exception e)
-    {
+    } catch (const cxxopts::exceptions::exception e) {
         std::cerr << "Error " << e.what() << std::endl;
     }
 
