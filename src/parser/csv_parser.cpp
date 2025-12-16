@@ -138,7 +138,8 @@ csv_data csv_parser::parse(std::string &line) {
     data.suit_count = result[12];
     data.history = result[13];
     data.level = result[14];
-    data.seed = result[15];
+    data.serialized = result[15];
+    data.str = result[16];
     return data;
 }
 

@@ -10,7 +10,7 @@
 #include "Helper.h"
 #include "Solver.h"
 
-State::State(Poker * &poker) {
+State::State(Poker * poker) {
     this->poker = poker;
     previous = nullptr;
 

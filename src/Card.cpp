@@ -6,25 +6,37 @@
 
 #include <string>
 
-bool operator==(const Card &lhs, const Card &rhs) {
-    return lhs.suit == rhs.suit && lhs.value == rhs.value;
-}
+bool operator==(const Card &lhs, const Card &rhs) { return lhs.suit == rhs.suit && lhs.value == rhs.value; }
 
-std::ostream& operator<<(std::ostream &out, const Card &card) {
+std::ostream &operator<<(std::ostream &out, const Card &card) {
     out << card.get_suit() << card.get_value();
     return out;
 }
 
-Card::Card(int value, const int suit) : suit(suit - 1) {
+Card::Card(int value) {
     original_value = value;
+
+    if (original_value >= 1 && original_value <= 13) {
+        this->suit = 1;
+    } else if (original_value >= 14 && original_value <= 26) {
+        this->suit = 0;
+    } else if (original_value >= 27 && original_value <= 39) {
+        this->suit = 3;
+    } else if (original_value >= 40 && original_value <= 53) {
+        this->suit = 2;
+    } else {
+        this->suit = 0;
+    }
+
     if (value <= 52 && value >= 40)
         value -= 39;
-    else if (value  <= 39 &&value >= 27)
+    else if (value <= 39 && value >= 27)
         value -= 26;
     else if (value <= 26 && value >= 14)
         value -= 13;
     this->value = value;
 }
+Card::Card(const char c) : Card(to_value(c)) {}
 
 std::string Card::get_suit() const {
     switch (suit) {
@@ -53,12 +65,9 @@ std::string Card::get_value() const {
     return "[" + std::to_string(value) + "] ";
 }
 
-std::string Card::to_string() const {
-    return get_suit() + get_value();
-}
+std::string Card::to_string() const { return get_suit() + get_value(); }
 
-char Card::to_char() const
-{
+char Card::to_char() const {
     if (const auto offest_index = original_value - 1; offest_index < 26)
         return 'a' + offest_index;
     else

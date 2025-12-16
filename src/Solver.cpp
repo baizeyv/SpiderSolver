@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <chrono>
 #include <filesystem>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <mutex>
 #include <ranges>
 
@@ -21,11 +21,9 @@ std::vector<State *> Solver::take_a_step(State *state, Solver *solver) {
     for (size_t i = 0; i < state->visibleCards.size(); i++) {
         // # find all the movable cards
         Card *first = nullptr;
-        auto movableCards = find_movable_card_in_column(state->visibleCards[i], first);
-        if (!movableCards.empty()) {
+        if (auto movableCards = find_movable_card_in_column(state->visibleCards[i], first); !movableCards.empty()) {
             // # 尝试移动
-            auto newStates = move_movable_cards(movableCards, i, state, solver);
-            for (auto &item: newStates) {
+            for (auto newStates = move_movable_cards(movableCards, i, state, solver); auto &item: newStates) {
                 if (!state_exists(results, item))
                     results.insert(item);
                 else
@@ -45,9 +43,7 @@ std::vector<State *> Solver::take_a_step(State *state, Solver *solver) {
     return sort(results);
 }
 
-std::vector<Card *> Solver::find_movable_card_in_column(
-    std::vector<Card *> &column,
-    Card * &firstCard) {
+std::vector<Card *> Solver::find_movable_card_in_column(std::vector<Card *> &column, Card *&firstCard) {
     std::vector<Card *> result;
     if (column.empty())
         return result;
@@ -85,8 +81,8 @@ std::vector<Card *> Solver::find_movable_card_in_column(
     return result;
 }
 
-std::vector<State *> Solver::move_movable_cards(const std::vector<Card *> &movableCards,
-                                                const int &fromIndex, State * &state, Solver * &solver) {
+std::vector<State *> Solver::move_movable_cards(const std::vector<Card *> &movableCards, const int &fromIndex,
+                                                State *&state, Solver *&solver) {
     // # 最终结果Set
     std::unordered_set<State *, StatePtrHash, StatePtrEqual> result;
     for (int column = 0; column < state->visibleCards.size(); column++) {
@@ -101,14 +97,14 @@ std::vector<State *> Solver::move_movable_cards(const std::vector<Card *> &movab
                     // # 判断是否是空列全部到另一个空列
                     if (i == movableCards.size()) {
                         // # 全移动的情况
-                        if (state->visibleCards[fromIndex].size() + state->hiddenCards[fromIndex].size() == i && state->
-                            is_blank(column)) {
+                        if (state->visibleCards[fromIndex].size() + state->hiddenCards[fromIndex].size() == i &&
+                            state->is_blank(column)) {
                             continue;
                         }
                     }
                     std::vector cards(movableCards.begin(), movableCards.begin() + i);
-                    if (!state->visibleCards[column].empty() && !cards.empty() && state->visibleCards[column][0]->value
-                        == cards.back()->value + 1) {
+                    if (!state->visibleCards[column].empty() && !cards.empty() &&
+                        state->visibleCards[column][0]->value == cards.back()->value + 1) {
                         // # 可以放到目标列 (符合差值为1的条件)
                         auto newState = create_new_state(state, cards, fromIndex, column);
                         if (!state_exists(result, newState))
@@ -119,8 +115,8 @@ std::vector<State *> Solver::move_movable_cards(const std::vector<Card *> &movab
                 }
             } else {
                 // # 启动了过滤器了
-                if (movableCards.size() == state->visibleCards[fromIndex].size() && state->hiddenCards[fromIndex].size()
-                    == 0) {
+                if (movableCards.size() == state->visibleCards[fromIndex].size() &&
+                    state->hiddenCards[fromIndex].size() == 0) {
                     // # 当前列没有hidden的牌了，并且要全部移动到另一个空列的情况,不添加
                 } else {
                     auto newState = create_new_state(state, movableCards, fromIndex, column);
@@ -149,20 +145,17 @@ std::vector<State *> Solver::move_movable_cards(const std::vector<Card *> &movab
     return vec;
 }
 
-Solver::Solver(const int seed, const int suitCount, const int max_value, const bool pg_maker) : depth(0),
-    sync_end_flag(false), calc(0), solved(false) {
+Solver::Solver(const int seed, const int suitCount, const int max_value, const bool pg_maker) :
+    depth(0), sync_end_flag(false), calc(0), solved(false) {
     poker = new Poker(seed, suitCount, max_value, pg_maker);
     root_state = new State(poker);
 }
 
-Solver::Solver(const int fake_seed, const std::string &str104, const int max_value) : depth(0),
-    sync_end_flag(false),
-    calc(0),
-    solved(false) {
+Solver::Solver(const int fake_seed, const std::string &str104, const int max_value) :
+    depth(0), sync_end_flag(false), calc(0), solved(false) {
     poker = new Poker(fake_seed, str104, max_value);
     root_state = new State(poker);
 }
-
 
 Solver::Solver(const std::string &vitaLevel) : depth(0), sync_end_flag(false), calc(0), solved(false) {
     poker = new Poker(vitaLevel);
@@ -183,8 +176,7 @@ Solver::~Solver() {
 }
 
 void Solver::call_step_dfs() {
-    depth_first_search_sync(root_state, []() {
-    }, "", 0, false, -1, true);
+    depth_first_search_sync(root_state, []() {}, "", 0, false, -1, true);
     Helper::trim_memory();
     // if (!solved)
     // {
@@ -199,8 +191,7 @@ void Solver::call_step_dfs() {
 }
 
 void Solver::call_test_dfs() {
-    depth_first_search_sync(root_state, []() {
-    }, "", 0, false, -1);
+    depth_first_search_sync(root_state, []() {}, "", 0, false, -1);
     Helper::trim_memory();
     // if (!solved)
     // {
@@ -215,8 +206,7 @@ void Solver::call_test_dfs() {
 }
 
 void Solver::call_dfs(const std::string &file, const int id, const bool exportNull, const int stepLimit) {
-    depth_first_search_sync(root_state, []() {
-    }, file, id, exportNull, stepLimit);
+    depth_first_search_sync(root_state, []() {}, file, id, exportNull, stepLimit);
     Helper::trim_memory();
     // if (!solved)
     // {
@@ -231,8 +221,7 @@ void Solver::call_dfs(const std::string &file, const int id, const bool exportNu
 }
 
 void Solver::depth_first_search_sync(State *&root, const std::function<void()> &onCompleted, const std::string &file,
-                                     const int id,
-                                     const bool exportNull, const int stepLimit, const bool step_mode) {
+                                     const int id, const bool exportNull, const int stepLimit, const bool step_mode) {
     if (step_mode) {
         while (next_step == 0) {
             if (abort_step == 1) {
@@ -348,12 +337,10 @@ void Solver::depth_first_search_sync(State *&root, const std::function<void()> &
     }
 }
 
-void Solver::stop() {
-    sync_end_flag = true;
-}
+void Solver::stop() { sync_end_flag = true; }
 
-State *Solver::create_new_state(const State *state, const std::vector<Card *> &cards,
-                                const int fromIndex, const int toIndex) {
+State *Solver::create_new_state(const State *state, const std::vector<Card *> &cards, const int fromIndex,
+                                const int toIndex) {
     const auto resultState = new State(state);
     if (fromIndex < 0 || toIndex < 0)
         return resultState;
@@ -416,8 +403,8 @@ std::vector<State *> Solver::sort(std::unordered_set<State *, StatePtrHash, Stat
             if (from < 0 || to < 0 || from < to)
                 return std::numeric_limits<int>::min();
             const auto &prev = p->previous;
-            if (!prev->visibleCards[to].empty() && prev->visibleCards[from][0]->suit == prev->visibleCards[to][0]->
-                suit) {
+            if (!prev->visibleCards[to].empty() &&
+                prev->visibleCards[from][0]->suit == prev->visibleCards[to][0]->suit) {
                 return std::numeric_limits<int>::max();
             }
             return std::numeric_limits<int>::min();

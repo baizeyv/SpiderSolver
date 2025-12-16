@@ -16,6 +16,8 @@ add_executable(spider src/main.cpp
         src/State.h
         src/Solver.cpp
         src/Solver.h
+        src/Joker.cpp
+        src/Joker.h
         src/Helper.cpp
         src/Helper.h
         src/cxxopts.h

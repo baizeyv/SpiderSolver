@@ -29,7 +29,7 @@ public:
     /**
      * * playvalve 和 pgmaker 的 deck 输出需要翻转
      */
-    bool reverse_output;
+    bool no_reverse_output;
 
     Poker(int seed, int suit_count, int max_value = 13, bool pg_maker = false);
 
@@ -54,8 +54,6 @@ private:
     static std::vector<Card> generate_pg_maker_specific_deck(std::vector<int> cards, int suit_count);
 
     static char card_value_to_char(int x);
-
-    static Card build_card(int suit, int value);
 
 
 public:

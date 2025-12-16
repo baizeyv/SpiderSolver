@@ -15,8 +15,6 @@
 
 class Solver {
 private:
-
-
     /**
      * * 所有尝试过的状态的指针HashSet
      */
@@ -34,7 +32,7 @@ private:
 
     std::atomic<bool> sync_end_flag;
 
-    static std::vector<State *> take_a_step(State* state, Solver* solver);
+    static std::vector<State *> take_a_step(State *state, Solver *solver);
 
     /**
      * * 找到一列中可以移动的牌指针数组
@@ -42,24 +40,25 @@ private:
      * @param firstCard
      * @return
      */
-    static std::vector<Card*> find_movable_card_in_column(std::vector<Card*>& column, Card*& firstCard);
+    static std::vector<Card *> find_movable_card_in_column(std::vector<Card *> &column, Card *&firstCard);
 
-    static std::vector<State*> move_movable_cards(const std::vector<Card*>& movableCards, const int& fromIndex, State*& state, Solver*& solver);
+    static std::vector<State *> move_movable_cards(const std::vector<Card *> &movableCards, const int &fromIndex,
+                                                   State *&state, Solver *&solver);
 
 public:
-    State* root_state;
+    State *root_state;
 
-    Poker* poker;
+    Poker *poker;
     /**
      * * 特殊算法过滤器,当使用过滤器无解时再关闭过滤器重新执行一次
-     * true->代表开启过滤器
+     * * true->代表开启过滤器
      */
     bool special_filter = true;
 
     uint8_t prepare_query : 1 = 0;
 
     uint8_t next_step : 1 = 0;
-    
+
     uint8_t abort_step : 1 = 0;
 
     /**
@@ -71,19 +70,20 @@ public:
 
     explicit Solver(int seed, int suitCount, int max_value = 13, bool pg_maker = false);
 
-    explicit Solver(int fake_seed, const std::string& str104, int max_value = 13);
+    explicit Solver(int fake_seed, const std::string &str104, int max_value = 13);
 
     explicit Solver(const std::string &vitaLevel);
 
     ~Solver();
 
     void call_step_dfs();
-    
+
     void call_test_dfs();
 
     void call_dfs(const std::string &file = "", int id = 0, bool exportNull = true, int stepLimit = -1);
 
-    void depth_first_search_sync(State* &root, const std::function<void()> &onCompleted, const std::string &file = "", int id = 0, bool exportNull = true, int stepLimit = -1, bool step_mode = false);
+    void depth_first_search_sync(State *&root, const std::function<void()> &onCompleted, const std::string &file = "",
+                                 int id = 0, bool exportNull = true, int stepLimit = -1, bool step_mode = false);
 
     void stop();
 
@@ -95,15 +95,14 @@ public:
      * @param toIndex
      * @return
      */
-    static State* create_new_state(const State* state, const std::vector<Card*>& cards, const int fromIndex, const int toIndex);
+    static State *create_new_state(const State *state, const std::vector<Card *> &cards, int fromIndex, int toIndex);
 
-    static bool state_exists(std::unordered_set<State *, StatePtrHash, StatePtrEqual>& results, State* &newState);
+    static bool state_exists(std::unordered_set<State *, StatePtrHash, StatePtrEqual> &results, State *&newState);
 
-    static bool state_serialized_exists(const std::unordered_set<std::string>& results, State* &newState);
-    
+    static bool state_serialized_exists(const std::unordered_set<std::string> &results, State *&newState);
+
     static std::vector<State *> sort(std::unordered_set<State *, StatePtrHash, StatePtrEqual> states);
 };
 
 
-
-#endif //SOLVER_H
+#endif // SOLVER_H

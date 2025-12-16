@@ -18,7 +18,7 @@ class Solver;
 class State final : public IMemUsage {
 
 public:
-    const Poker* poker;
+    Poker* poker;
     /**
      * * 牌堆指针数组
      */
@@ -55,7 +55,7 @@ public:
 
     explicit State(const State *previous_state);
 
-    explicit State(Poker * &poker);
+    explicit State(Poker * poker);
 
     explicit State(const std::vector<std::vector<Card*>> &vec, const State *previous_state);
 

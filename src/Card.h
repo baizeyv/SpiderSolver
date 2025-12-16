@@ -22,7 +22,9 @@ public:
 
     uint8_t original_value : 6;
 
-    explicit Card(int value, const int suit);
+    explicit Card(int value);
+
+    explicit Card(char c);
 
     std::string get_suit() const;
 
