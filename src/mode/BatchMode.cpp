@@ -76,8 +76,7 @@ void BatchMode::setup() {
             std::cout << spd::BatchVitaArgumentsException << std::endl;
             return;
         }
-        auto json_path = params[0];
-        auto output_path = params[1];
+        auto &json_path = params[0];
         auto json_content = Helper::read_file(json_path);
         const nlohmann::json j = nlohmann::json::parse(json_content);
         int step_limit = -1;
@@ -144,8 +143,7 @@ void BatchMode::setup() {
             std::cout << spd::BatchPlayValveArgumentsException << std::endl;
             return;
         }
-        auto txt_path = params[0];
-        auto output_path = params[1];
+        auto &txt_path = params[0];
         auto txt_content = Helper::read_file(txt_path);
         auto seeds = Helper::split(txt_content, ",");
         int step_limit = -1;
@@ -192,8 +190,7 @@ void BatchMode::setup() {
             std::cout << spd::BatchPGMakerArgumentsException << std::endl;
             return;
         }
-        const auto txt_path = params[0];
-        auto output_path = params[1];
+        const auto &txt_path = params[0];
         const auto txt_content = Helper::read_file(txt_path);
         auto seeds = Helper::split(txt_content, ",");
         int step_limit = -1;
