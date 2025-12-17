@@ -144,7 +144,7 @@ void misc_mode::setup() {
             const auto ld =
                     LevelData(id, item.seed, suit_count, calc, difficulty, step1, step2, step3, step4, step5, step6,
                               step7, step8, item.history, item.level, item.serialized, item.str,
-                              joker.get_first_movable_count(), Joker::get_first_empty_column_count(item.history));
+                              joker.get_first_movable_count(), joker.get_first_empty_column_count_by_state(item.history));
 
             const auto e = Exporter(output_file);
             e.export_csv(ld);

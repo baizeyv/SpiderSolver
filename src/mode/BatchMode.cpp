@@ -268,13 +268,13 @@ void BatchMode::setup() {
         int step_limit = -1;
         int seed_limit = -1;
         if (params.size() == 4) {
-            if (!Helper::try_parse_int(params[3], step_limit) || !
-                Helper::try_parse_int(params[4], seed_limit)) {
+            if (!Helper::try_parse_int(params[2], step_limit) || !
+                Helper::try_parse_int(params[3], seed_limit)) {
                 std::cout << spd::BatchDoodleArgumentsException << std::endl;
                 return;
             }
         } else if (params.size() == 3) {
-            if (!Helper::try_parse_int(params[3], step_limit)) {
+            if (!Helper::try_parse_int(params[2], step_limit)) {
                 std::cout << spd::BatchDoodleArgumentsException << std::endl;
                 return;
             }

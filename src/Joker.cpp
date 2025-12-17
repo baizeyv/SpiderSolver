@@ -4,7 +4,11 @@
 
 #include "Joker.h"
 
+#include <iostream>
+
+#include "Const.h"
 #include "Helper.h"
+#include "State.h"
 Joker::Joker(const std::string &level_serialized) {
     const auto array = Helper::split(level_serialized, ";");
     // # deck 50 张
@@ -23,13 +27,13 @@ Joker::Joker(const std::string &level_serialized) {
         // # 可见牌的数量
         int visible_count;
         Helper::try_parse_int(tmp[0], visible_count);
-        for (int t = visible_count - 1; t >= 0; --t) {
+        for (int t = 0; t < visible_count; ++t) {
             const auto c = tmp[1][t];
             const auto cd = Card(c);
             this->visible_cards[i].push_back(cd);
         }
         // # 不可见的牌
-        for (int t = tmp[1].size() - 1; t >= visible_count; t--) {
+        for (int t = visible_count; t < tmp[1].size(); ++t) {
             const auto c = tmp[1][t];
             const auto cd = Card(c);
             this->hidden_cards[i].push_back(cd);
@@ -44,11 +48,11 @@ int Joker::get_first_movable_count() {
         list.push_back(visible_cards[i][0].value);
     }
     for (int i = 0; i < visible_cards.size(); ++i) { // # from
-        for (int j = 0;j < visible_cards.size(); ++j) { // # to
+        for (int j = 0; j < visible_cards.size(); ++j) { // # to
             if (j == i)
                 continue;
             if (list[i] + 1 == list[j])
-                count ++;
+                count++;
         }
     }
     // for (size_t i = 0; i < this->visible_cards.size(); ++i) {
@@ -67,15 +71,23 @@ int Joker::get_first_movable_count() {
     return count;
 }
 
-int Joker::get_first_empty_column_count(const std::string &history) {
+int Joker::get_first_empty_column_count_by_state(const std::string &history) {
     if (history.size() <= 10) {
         // # [UNSOLVED]
         return -1;
     }
     int result = 0;
     const auto array = Helper::split(history, ">");
-    std::vector count_vec{6, 6, 6, 6, 5, 5, 5, 5, 5, 5};
+
+    std::vector<Card> ddd = deck_cards;
+    std::vector<std::vector<Card>> hhh = hidden_cards;
+    std::vector<std::vector<Card>> vvv = visible_cards;
+
+    State st(vvv, hhh, ddd);
+
     for (const auto &item: array) {
+        if (item.empty())
+            continue;
         result++;
         const auto list = Helper::split(item, ":");
         int from_column_index;
@@ -86,22 +98,21 @@ int Joker::get_first_empty_column_count(const std::string &history) {
         Helper::try_parse_int(Helper::split(list[3], "]")[0], motion_count);
 
         if (from_column_index < 0 || to_column_index < 0 || motion_count < 0) {
-            // # 发牌了
-            for (size_t i = 0; i < count_vec.size(); i++) {
-                count_vec[i]++;
-            }
-            continue;
+            // # 需要发牌了
+            st.play_deck();
+        } else {
+            st.move_card(from_column_index, motion_count, to_column_index);
         }
-
-        count_vec[from_column_index] -= motion_count;
-        count_vec[to_column_index] += motion_count;
-        if (count_vec[from_column_index] <= 0)
-            return result;
+        for (int i = 0; i < 10; i++) {
+            if (st.is_blank(i)) {
+                return result;
+            }
+        }
     }
     return -1;
 }
 
-std::vector<Card> Joker::find_movable_card_in_column(std::vector<Card> &column, Card* &first_card) {
+std::vector<Card> Joker::find_movable_card_in_column(std::vector<Card> &column, Card *&first_card) {
     std::vector<Card> result;
     if (column.empty())
         return result;
@@ -118,7 +129,7 @@ std::vector<Card> Joker::find_movable_card_in_column(std::vector<Card> &column, 
         for (size_t i = 1; i < column.size(); i++) {
             tail.push_back(column[i]);
         }
-        Card* tmp = &column[0];
+        Card *tmp = &column[0];
         for (const auto list = find_movable_card_in_column(tail, tmp); auto &card: list) {
             result.push_back(card);
         }
@@ -136,6 +147,83 @@ std::vector<Card> Joker::find_movable_card_in_column(std::vector<Card> &column, 
             result.push_back(card);
         }
         return result;
+    }
+    return result;
+}
+
+std::string Joker::to_str(const std::vector<std::vector<Card>> &v_cards, std::vector<std::vector<Card>> &h_cards,
+                          std::vector<Card> &deck) {
+    std::string res;
+    int max_hidden = 0;
+    for (auto &item: h_cards) {
+        if (!item.empty() && item.size() > max_hidden) {
+            max_hidden = item.size();
+        }
+    }
+    int max_visible = 0;
+    for (auto &item: v_cards) {
+        if (!item.empty() && item.size() > max_visible) {
+            max_visible = item.size();
+        }
+    }
+    res += hidden_string(0, max_hidden, h_cards);
+    res += "\n";
+    res += "\n";
+    res += visible_string(0, max_visible, v_cards);
+    res += "\n";
+    res += "\n";
+    res += deck_string(deck);
+
+    return res;
+}
+
+std::string Joker::hidden_string(const int row, const int max, const std::vector<std::vector<Card>> &hhh) {
+    if (max == 0)
+        return "";
+    if (row == max - 1)
+        return floor_hidden_string(row, hhh);
+    return floor_hidden_string(row, hhh) + "\n" + hidden_string(row + 1, max, hhh);
+}
+
+std::string Joker::floor_hidden_string(const int row, const std::vector<std::vector<Card>> &hhh) {
+    std::string result;
+    for (auto &column: hhh) {
+        if (column.size() > row) {
+            result += column[column.size() - row - 1].to_string();
+        } else {
+            result += spd::EmptyCard;
+        }
+    }
+    return result;
+}
+
+std::string Joker::visible_string(const int row, const int max, const std::vector<std::vector<Card>> &vvv) {
+    if (max == 0)
+        return "";
+    if (row == max - 1)
+        return floor_visible_string(row, vvv);
+    return floor_visible_string(row, vvv) + "\n" + visible_string(row + 1, max, vvv);
+}
+
+std::string Joker::floor_visible_string(const int row, const std::vector<std::vector<Card>> &vvv) {
+    std::string result;
+    for (auto &column: vvv) {
+        if (column.size() > row) {
+            result += column[column.size() - row - 1].to_string();
+        } else {
+            result += spd::EmptyCard;
+        }
+    }
+    return result;
+}
+
+std::string Joker::deck_string(const std::vector<Card> &ddd) {
+    std::string result;
+    for (size_t i = 0; i < ddd.size(); i++) {
+        if (i % 10 == 0 && i != 0) {
+            result += "\n";
+        }
+        result += ddd[i].to_string();
     }
     return result;
 }

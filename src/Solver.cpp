@@ -129,7 +129,7 @@ std::vector<State *> Solver::move_movable_cards(const std::vector<Card *> &movab
         } else {
             // # 目标列不为空
             for (size_t i = movableCards.size(); i >= 1; i--) {
-                std::vector<Card *> cards(movableCards.begin(), movableCards.begin() + i);
+                std::vector cards(movableCards.begin(), movableCards.begin() + i);
                 if (state->visibleCards[column][0]->value == cards.back()->value + 1) {
                     // # 可以放到目标列 (符合差值为1的条件)
                     auto newState = create_new_state(state, cards, fromIndex, column);

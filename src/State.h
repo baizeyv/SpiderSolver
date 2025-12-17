@@ -59,6 +59,8 @@ public:
 
     explicit State(const std::vector<std::vector<Card*>> &vec, const State *previous_state);
 
+    State(std::vector<std::vector<Card>>&vvv, std::vector<std::vector<Card>>&hhh, std::vector<Card>&ddd);
+
     ~State() override;
 
     /**

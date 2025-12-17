@@ -46,19 +46,30 @@ public:
     /**
      * * 获取第一步可以移动的步骤的数量
      */
-    int get_first_movable_count() ;
+    int get_first_movable_count();
 
     /**
      * * 获取第一次空出随便一列需要移动的步骤数
      * @param history 移动的历史记录
      * @return
      */
-    static int get_first_empty_column_count(const std::string& history);
+    int get_first_empty_column_count_by_state(const std::string &history);
 
 private:
+    static std::string hidden_string(int row, int max, const std::vector<std::vector<Card>>&hhh);
 
-    static std::vector<Card> find_movable_card_in_column(std::vector<Card> &column, Card* & first_card);
+    static std::string floor_hidden_string(int row, const std::vector<std::vector<Card>>&hhh);
 
+    static std::string visible_string(int row, int max, const std::vector<std::vector<Card>>&vvv);
+
+    static std::string floor_visible_string(int row, const std::vector<std::vector<Card>>&vvv);
+
+    static std::string deck_string(const std::vector<Card> &ddd);
+
+    static std::vector<Card> find_movable_card_in_column(std::vector<Card> &column, Card *&first_card);
+
+    static std::string to_str(const std::vector<std::vector<Card>> &v_cards, std::vector<std::vector<Card>> &h_cards,
+                     std::vector<Card> &deck);
 };
 
 

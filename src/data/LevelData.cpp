@@ -64,7 +64,7 @@ LevelData::LevelData(const int id, const State &state, const bool is_null) :
     str = state.poker->to_level_string();
     auto joker = Joker(serialized);
     first_movable_count = joker.get_first_movable_count();
-    first_empty_column_count = Joker::get_first_empty_column_count(history);
+    first_empty_column_count = joker.get_first_empty_column_count_by_state(history);
 }
 
 LevelData::~LevelData() = default;

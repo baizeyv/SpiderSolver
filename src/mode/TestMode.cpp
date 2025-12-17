@@ -313,6 +313,7 @@ void TestMode::setup() {
                 std::cout << *poker << std::endl;
                 delete poker;
             }
+            // todo: view doodle
         } else {
             std::cout << spd::TestViewArgumentsException << std::endl;
             return;

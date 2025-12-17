@@ -10,7 +10,7 @@
 #include "Helper.h"
 #include "Solver.h"
 
-State::State(Poker * poker) {
+State::State(Poker *poker) {
     this->poker = poker;
     previous = nullptr;
 
@@ -44,13 +44,13 @@ State::State(Poker * poker) {
     }
 }
 
-State::State(const std::vector<std::vector<Card *> > &vec, const State *previous_state) {
+State::State(const std::vector<std::vector<Card *>> &vec, const State *previous_state) {
     this->poker = previous_state->poker;
-    std::vector<std::vector<Card *> > newVisibleCards;
-    std::vector<std::vector<Card *> > newHiddenCards;
+    std::vector<std::vector<Card *>> newVisibleCards;
+    std::vector<std::vector<Card *>> newHiddenCards;
     std::vector<Card *> newDeckCards;
 
-    std::vector<std::vector<Card *> > tmpDeck;
+    std::vector<std::vector<Card *>> tmpDeck;
     // ###############################################
     // # main part
     for (size_t i = 0; i < 10; i++) {
@@ -123,6 +123,29 @@ State::State(const std::vector<std::vector<Card *> > &vec, const State *previous
     collection_steps = previous_state->collection_steps;
     poker = previous_state->poker;
 }
+State::State(std::vector<std::vector<Card>> &vvv, std::vector<std::vector<Card>> &hhh, std::vector<Card> &ddd) :
+    poker(nullptr), previous(nullptr) {
+    visibleCards.clear();
+    hiddenCards.clear();
+    deckCard.clear();
+    for (auto &item: ddd) {
+        deckCard.push_back(&item);
+    }
+    for (size_t i = 0; i < vvv.size(); i++) {
+        std::vector<Card *> a;
+        for (size_t j = 0; j < vvv[i].size(); ++j) {
+            a.push_back(&vvv[i][j]);
+        }
+        visibleCards.push_back(a);
+    }
+    for (size_t i = 0; i < hhh.size(); i++) {
+        std::vector<Card *> a;
+        for (size_t j = 0; j < hhh[i].size(); ++j) {
+            a.push_back(&hhh[i][j]);
+        }
+        hiddenCards.push_back(a);
+    }
+}
 
 State::~State() {
     deckCard.clear();
@@ -133,8 +156,8 @@ State::~State() {
 }
 
 State::State(const State *previous_state) {
-    std::vector<std::vector<Card *> > newVisibleCards;
-    std::vector<std::vector<Card *> > newHiddenCards;
+    std::vector<std::vector<Card *>> newVisibleCards;
+    std::vector<std::vector<Card *>> newHiddenCards;
     const std::vector newDeckCards(previous_state->deckCard.begin(), previous_state->deckCard.end());
     const std::vector newHistory(previous_state->history.begin(), previous_state->history.end());
     for (int i = 0; i < 10; i++) {
@@ -156,9 +179,7 @@ State::State(const State *previous_state) {
 }
 
 
-int State::finished_count() const {
-    return 8 - (card_count / 13);
-}
+int State::finished_count() const { return 8 - (card_count / 13); }
 
 bool State::is_completed() const {
     if (!deckCard.empty())
@@ -175,9 +196,7 @@ bool State::is_completed() const {
     return true;
 }
 
-bool State::is_blank(const int index) const {
-    return visibleCards[index].size() + hiddenCards[index].size() == 0;
-}
+bool State::is_blank(const int index) const { return visibleCards[index].size() + hiddenCards[index].size() == 0; }
 
 void State::move_card(const int from, const int count, const int to) {
     const size_t tmpCount = std::min<size_t>(count, visibleCards[from].size());
@@ -260,10 +279,10 @@ int State::get_valuation() {
                 } else {
                     addValue(val, down->value, value);
                     val = 0;
-                    //一个乱序组
-                    //eg. 7 1 -> -7
-                    //eg. 1 7 -> -14
-                    //eg. 5 5 -> -10
+                    // 一个乱序组
+                    // eg. 7 1 -> -7
+                    // eg. 1 7 -> -14
+                    // eg. 5 5 -> -10
                     int dv = -std::ranges::max(top->value, down->value);
                     if (top->value < down->value)
                         dv *= 2;
@@ -331,9 +350,7 @@ bool State::secondary_valuation(const Solver *solver) {
     return currentValue > previousValue;
 }
 
-int State::get_suit_count() const {
-    return poker->suitCount;
-}
+int State::get_suit_count() const { return poker->suitCount; }
 
 std::string State::to_string() const {
     std::string res;
@@ -363,15 +380,16 @@ std::string State::to_string() const {
 std::string State::to_full_string() const {
     std::string result =
             "[-----------------------------------------------------------------------------------------------------]\n";
-    result += "[CALC: " + std::to_string(calc) + "] [VALUATION: " + std::to_string(valuation) + "] [STEP: " +
-            std::to_string(history.size()) + "] [COLLECTION: " + std::to_string(finished_count()) + "] ";
+    result += "[CALC: " + std::to_string(calc) + "] [VALUATION: " + std::to_string(valuation) +
+              "] [STEP: " + std::to_string(history.size()) + "] [COLLECTION: " + std::to_string(finished_count()) +
+              "] ";
     if (previous) {
         // # 存在上一步
         const auto from = history[0].get_from();
         const auto count = history[0].get_count();
         const auto to = history[0].get_to();
         result += "[FROM:" + std::to_string(from) + ",COUNT:" + std::to_string(count) + ",TO:" + std::to_string(to) +
-                "]    Previous >> Current\n";
+                  "]    Previous >> Current\n";
         int current_max_hidden = 0;
         for (auto &item: hiddenCards) {
             if (!item.empty() && item.size() > current_max_hidden) {
@@ -462,6 +480,8 @@ bool State::detect_collection(const int index) {
             if (card->value == set && suit == card->suit) {
                 // # 同色才能收牌
                 set++;
+                if (set > 13)
+                    break;
             } else {
                 set = -1;
                 break;
@@ -520,8 +540,8 @@ int State::check_flop(const State *state, int column, int &depth, const int limi
             continue;
         if (state->visibleCards[i][0]->value == value + 1) {
             // # 可以向其他列移动
-            State *newState = Solver::create_new_state(state, std::vector<Card *>{state->visibleCards[column][0]},
-                                                       column, i);
+            State *newState =
+                    Solver::create_new_state(state, std::vector<Card *>{state->visibleCards[column][0]}, column, i);
             setTo.insert(newState);
             result += 2;
         }
@@ -583,8 +603,8 @@ int State::extra_valuation_more_suit() const {
                 if (x == 0)
                     list.push_back(previous->visibleCards[i][0]);
                 else {
-                    if (previous->visibleCards[i][x]->suit == list.back()->suit && previous->visibleCards[i][x]->value -
-                        1 == list.back()->value)
+                    if (previous->visibleCards[i][x]->suit == list.back()->suit &&
+                        previous->visibleCards[i][x]->value - 1 == list.back()->value)
                         list.push_back(previous->visibleCards[i][x]);
                     else
                         break;
@@ -600,8 +620,8 @@ int State::extra_valuation_more_suit() const {
                         if (c == 0)
                             st.push_back(visibleCards[from][0]);
                         else {
-                            if (visibleCards[from][c]->suit == st.back()->suit && visibleCards[from][c]->value - 1 == st
-                                .back()->value)
+                            if (visibleCards[from][c]->suit == st.back()->suit &&
+                                visibleCards[from][c]->value - 1 == st.back()->value)
                                 st.push_back(visibleCards[from][c]);
                             else
                                 break;
@@ -679,7 +699,7 @@ std::string State::deck_string() const {
 
 State State::shuffle() const {
     // # 打乱前的每一列从上到下的牌型
-    std::vector<std::vector<Card *> > original;
+    std::vector<std::vector<Card *>> original;
     // ######################################################
     for (int i = 0; i < 10; ++i) {
         std::vector<Card *> tmp;
@@ -701,8 +721,8 @@ State State::shuffle() const {
     auto a_mapping = shuffle_int_vector(0, 1, 2, 3);
     auto b_mapping = shuffle_int_vector(0, 1, 2, 3, 4, 5);
 
-    std::vector<std::vector<Card *> > a_input;
-    std::vector<std::vector<Card *> > b_input;
+    std::vector<std::vector<Card *>> a_input;
+    std::vector<std::vector<Card *>> b_input;
     a_input.reserve(4);
     b_input.reserve(6);
     for (size_t i = 0; i < 10; i++) {
@@ -716,7 +736,7 @@ State State::shuffle() const {
     const auto a_result = reorder_vector(a_input, a_mapping);
     const auto b_result = reorder_vector(b_input, b_mapping);
 
-    std::vector<std::vector<Card *> > shuffled_vector;
+    std::vector<std::vector<Card *>> shuffled_vector;
     for (size_t i = 0; i < a_result.size(); i++) {
         shuffled_vector.push_back(a_result[i]);
     }
@@ -808,15 +828,15 @@ std::string State::to_level() const {
 std::string State::to_level_str() const {
     std::string result;
 
-    for (size_t i = 0; i < 10; i ++) {
-        for (size_t j = 0; j < visibleCards[i].size(); j ++) {
+    for (size_t i = 0; i < 10; i++) {
+        for (size_t j = 0; j < visibleCards[i].size(); j++) {
             result += visibleCards[i][j]->to_char();
         }
-        for (size_t j = 0; j < hiddenCards[i].size(); j ++) {
+        for (size_t j = 0; j < hiddenCards[i].size(); j++) {
             result += hiddenCards[i][j]->to_char();
         }
     }
-    for (const auto& card : deckCard) {
+    for (const auto &card: deckCard) {
         result += card->to_char();
     }
     return result;
